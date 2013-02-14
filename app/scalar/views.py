@@ -7,6 +7,7 @@ from app.database import db_session
 from app.models import User,DataSet
 from app.scalar.models import UserTrace,UserTileSelection
 from sqlalchemy.orm.exc import NoResultFound
+from app.forms.decorators import consent_required
 import uuid
 
 mod = Blueprint('scalar',__name__,url_prefix='/scalar')
@@ -40,14 +41,17 @@ def send_request(request):
     return json.loads(response)
 
 @mod.route('/warmup/', methods=["POST", "GET"])
+@consent_required
 def warmup():
     return render_template('scalar/warmup.html')
 
 @mod.route('/canvas/', methods=["POST", "GET"])
+@consent_required
 def get_data2_canvas():
     return render_template('scalar/canvas.html')
 
 @mod.route('/fetch-first-tile',methods=["POST", "GET"])
+@consent_required
 def fetch_first_tile():
     current_app.logger.info("got fetch first tile request")
     query = request.args.get('query',"",type=str)
@@ -104,6 +108,7 @@ def fetch_first_tile():
     return json.dumps(queryresultarr)
 
 @mod.route('/fetch-tile',methods=["POST", "GET"])
+@consent_required
 def fetch_tile():
     current_app.logger.info("got fetch tile request")
     tile_xid = request.args.get('tile_xid',"",type=int)
@@ -165,6 +170,7 @@ def fetch_tile():
     return json.dumps(queryresultarr)
 
 @mod.route('/tile-selected/',methods=["POST","GET"])
+@consent_required
 def tile_selected():
     try:
         db_session.add(session['user_tile_selection']) 
@@ -177,6 +183,7 @@ def tile_selected():
     return json.dumps(str(0))
 
 @mod.route('/tile-unselected/',methods=["POST","GET"])
+@consent_required
 def tile_unselected():
     if 'user_tile_selection' in session:
         uts = session['user_tile_selection']
@@ -194,6 +201,9 @@ def tile_unselected():
 
 @mod.before_request
 def before_request(exception=None):
+    g.consent = None
+    if 'consent' in session:
+        g.consent = session['consent']
     g.user = None
     if 'user_id' not in session:
         session['user_id'] = str(uuid.uuid4())
