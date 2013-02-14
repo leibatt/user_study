@@ -1,6 +1,7 @@
 *env
 config.py
 *.pyc
+*.swp
 app/data/sqlite/temp.db
 app/data/sqlite/temp.db.old
 app/data/postgres/test.sql
