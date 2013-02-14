@@ -1,0 +1,34 @@
+id,value,question_id
+1,"Female",2
+2,"Male",2
+3,"Novice",6
+4,"Experienced beginner",6
+5,"Intermediate user",6
+6,"Experienced user",6
+7,"Expert",6
+8,"Desktop",7
+9,"Laptop",7
+10,"Tablet/iPad",7
+11,"Smart phone",7
+12,"Other",7
+13,"Less than 1 hour",11
+14,"Between 1 and 3 hours",11
+15,"Between 3 and 5 hours",11
+16,"Between 5 and 8 hours",11
+17,"More than 8 hours",11
+18,"Monthly",12
+19,"Weekly",12
+20,"Daily",12
+21,"Hourly",12
+22,"Personal",13
+23,"Public",13
+24,"Desktop",14
+25,"Laptop",14
+26,"Tablet/iPad",14
+27,"Smart phone",14
+28,"Other",14
+29,"Strongly disagree",15
+30,"Disagree",15
+31,"Neutral",15
+32,"Agree",15
+33,"Strongly agree",15

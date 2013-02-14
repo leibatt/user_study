@@ -1,0 +1,37 @@
+id,question_text,input_type,response_type,parent_question,survey_id
+1,"Age:","text","number",,1
+2,"Gender:","select",,,1
+3,"Where are you from?","text","string",,1
+4,"Where are you located now?","text","string",,1
+5,"What is your occupation","text","string",1
+6,"What is your level of computer experience?","select",,,1
+7,"What type of computer are you using?","select",,,1
+8,"What brand of computer are you using?","text","string",,1
+9,"What size of screen are you using?","text","string",,1
+10,"What operating system are you using right now?","text","string",,1
+11,"How many hours per day do you spend on a computer?","select",,,1
+12,"How often do you use the Internet?","select",,,1
+13,"Are you working on a public or personal computer?","select",,,1
+14,"What kinds of computing devices do you own or frequently use? (Select all that apply)","select",,,1
+15,"For each statement below, please select the number that corresponds to your level of agreement with that statement:","select",,,2
+16,"The interaction style (buttons, menus, etc.) was appropriate for the task","select",,15,2
+17,"If given a choice, I would use this program to complete similar tasks in my daily life.","select",,15,2
+18,"The integration of the visualization with the user interface was seamless and lead to smooth interactions.","select",,15,2
+19,"The program was too slow to be practical.","select",,15,2
+20,"The visualization was aesthetically pleasing.","select",,15,2
+21,"The program responded quickly enough to allow me to complete the task at my own pace.","select",,15,2
+22,"The task took too long to complete.","select",,15,2
+23,"If this interface were part of a software program for performing similar tasks to the one performed today, I would recommend it to my friends/colleagues.","select",,15,2
+24,"I frequently had to wait for the program to load before continuing with the task.","select",,15,2
+25,"I enjoyed performing the task.","select",,15,2
+26,"The user interface was easy to use.","select",,15,2
+27,"I wanted the program to respond faster.","select",,15,2
+28,"Using the program was annoying and I did not enjoy it.","select",,15,2
+29,"I felt that the visualization was always available and loaded when I wanted to continue with the task.","select",,15,2
+30,"The program helped me to quickly complete the task.","select",,15,2
+31,"I felt that the program’s response time interfered with my ability to complete the task in a timely manner.","select",,15,2
+32,"The visualization was an interesting representation of data.","select",,15,2
+33,"The interface design was cohesive and visually pleasing.","select",,15,2
+34,"The user interface was clumsy and slow.","select",,15,2
+35,"The computer response time was too slow for me to be able to complete the task in a reasonable amount of time.","select",,15,2
+36,"Please provide any additional comments you have about the visualization tool below:","textbox","string",,2

@@ -1,0 +1,6 @@
+*env
+config.py
+*.pyc
+app/data/sqlite/temp.db
+app/data/sqlite/temp.db.old
+app/data/postgres/test.sql

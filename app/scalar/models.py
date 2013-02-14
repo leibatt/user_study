@@ -1,0 +1,57 @@
+from sqlalchemy import Column, Integer, String, Boolean, Text, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy.orm import relationship, backref
+from app.database import Base
+from app.models import User, DataSet
+import datetime
+
+# user movement history
+class UserTrace(Base):
+	__tablename__ = "user_traces"
+	id = Column(Integer,primary_key=True)
+	tile_id = Column(Text,nullable=False)
+        zoom_level = Column(Integer,nullable=False)
+	timestamp = Column(DateTime(timezone=True),nullable=False)
+	query = Column(Text,nullable=False) # must know what query was run
+	user_id = Column(Integer,ForeignKey("users.id"),nullable=False)
+	dataset_id = Column(Integer,ForeignKey("data_sets.id")) # dataset used? may be null, but hopefully isn't
+
+	user = relationship("User",backref=backref("traces"))
+	dataset = relationship("DataSet",backref=backref("traces"))
+
+	def __init__(self,tile_id,zoom_level,query,user_id,dataset_id):
+		self.user_id = user_id
+		self.tile_id = tile_id
+		self.zoom_level = zoom_level
+		self.timestamp = datetime.datetime.now()
+		self.query = query
+		self.dataset_id = dataset_id
+
+	def __repr__():
+		return "UserTrace(%r, %r, %r, %r, %r, %r)" % (self.user_id,self.tile_id,self.query,self.dataset_id,self.timestamp)
+
+class UserTileSelection(Base):
+	__tablename__ = "user_tile_selections"
+	id = Column(Integer,primary_key=True)
+	tile_id = Column(Text,nullable=False)
+        zoom_level = Column(Integer,nullable=False)
+	timestamp = Column(DateTime(timezone=True),nullable=False)
+	query = Column(Text,nullable=False) # must know what query was run
+	user_id = Column(Integer,ForeignKey("users.id"),nullable=False)
+	dataset_id = Column(Integer,ForeignKey("data_sets.id")) # dataset used? may be null, but hopefully isn't
+
+	user = relationship("User",backref=backref("tile_selections"))
+	dataset = relationship("DataSet",backref=backref("tile_selections"))
+
+	__table_args__ = (UniqueConstraint('tile_id','zoom_level','query','user_id', name='uix_3'),)
+
+	def __init__(self,tile_id,zoom_level,query,user_id,dataset_id):
+		self.user_id = user_id
+		self.tile_id = tile_id
+		self.zoom_level = zoom_level
+		self.timestamp = datetime.datetime.now()
+		self.query = query
+		self.dataset_id = dataset_id
+
+	def __repr__():
+		return "UserTileSelection(%r, %r, %r, %r, %r, %r)" % (self.user_id,self.tile_id,self.query,self.dataset_id,self.timestamp)
+

@@ -1,0 +1,34 @@
+value,question_id
+"Female",2
+"Male",2
+"Novice",6
+"Experienced beginner",6
+"Intermediate user",6
+"Experienced user",6
+"Expert",6
+"Desktop",7
+"Laptop",7
+"Tablet/iPad",7
+"Smart phone",7
+"Other",7
+"Less than 1 hour",11
+"Between 1 and 3 hours",11
+"Between 3 and 5 hours",11
+"Between 5 and 8 hours",11
+"More than 8 hours",11
+"Monthly",12
+"Weekly",12
+"Daily",12
+"Hourly",12
+"Personal",13
+"Public",13
+"Desktop",14
+"Laptop",14
+"Tablet/iPad",14
+"Smart phone",14
+"Other",14
+"Strongly disagree",15
+"Disagree",15
+"Neutral",15
+"Agree",15
+"Strongly agree",15

@@ -1,0 +1,4 @@
+name,query
+"ndsi","select * from ndsi_array"
+"ndvi_us","select * from ndvi_us"
+"us1000","select * from us1000"

@@ -1,0 +1,11 @@
+<html>
+	<head>
+	</head>
+	<body>
+		{% from "forms/_survey_template.html" import render_form %}
+		<form method="POST" action="/forms/pretest/submit/">
+		{{ render_form(form) }}
+			<input type="submit" value="Submit">
+		</form>
+	</body>
+</html>

@@ -1,0 +1,6 @@
+id,name,query
+1,"ndsi","select * from ndsi_array"
+2,"ndvi_us","select * from ndvi_us"
+3,"us1000","select * from us1000"
+4,"cali100","select * from cali100"
+5,"us100","select * from us100"
