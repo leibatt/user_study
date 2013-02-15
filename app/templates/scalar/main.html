@@ -26,6 +26,11 @@
 <body style="margin: 20px;">
 	<div id="task-description">
 	{% block description %}
+		<h1 id="task-description-header">{% block header %}{% endblock %}</h1>
+		<div id="task-description-instructions">
+			{% block instructions%}
+			{% endblock %}
+		</div>
 	{% endblock %}
 	</div>
 	<h2>Options</h2>
@@ -46,7 +51,7 @@
 			<a>Reset Query</a>
 		</span>
 		<span id="done-button">
-			<a>{% block donebutton %}Done{% endblock %}</a>
+			<a>Done with {% block donebutton %}{% endblock %}</a>
 		</span>
 	</div>
 	<h2 id="resulting-plot-header" class="heading">Resulting Plot<small></small></h2>

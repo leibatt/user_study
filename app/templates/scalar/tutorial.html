@@ -1,0 +1,55 @@
+{% extends "scalar/instructions.html" %}
+{% block title %}Tutorial{% endblock %}
+{% block header %}Tutorial{% endblock %}
+{% block content %}
+	<p>This brief tutorial will show you how to use the ScalaR visualization system. When you are ready to try using ScalaR, click the "Done with Tutorial" button below to go to the Warmup page.</p>
+	<h2>Overview</h2>
+	<h2>Query Options</h2>
+	<ul id="query-options-content">
+		<li>
+			<h3>Changing the Resolution<h3>
+		</li>
+		<li>
+			<h3>Starting Over<h3>
+		</li>
+	</ul>
+	<h2>Visualization Options</h2>
+	<ul id="vis-options-content">
+		<li>
+		<h3>Changing the Axes</h3>
+		</li>
+		<li>
+		<h3>Changing the Color Scheme</h3>
+		</li>
+		<li>
+		<h3>Resizing the Visualization</h3>
+		</li>
+	</ul>
+	<h2>Navigating the Data Set</h2>
+	<ul id="navigation-content">
+		<li>
+		<h3>Directional Buttons</h3>
+		</li>
+		<li>
+		<h3>Click Zoom</h3>
+		</li>
+	</ul>
+	<h2>For the User Study</h2>
+	<ul id="user-study-content">
+		<li>
+		<h3>Completing Tasks</h3>
+		</li>
+		<li>
+		<h3>Making Selections</h3>
+		</li>
+		<li>
+		<h3>Reviewing your selections</h3>
+		</li>
+		<li>
+		<h3>Resetting your selections</h3>
+		</li>
+	</ul>
+{% endblock %}
+
+{% block next %}{{url_for('scalar.warmup')}}{% endblock %}
+{% block donebutton %}Tutorial{% endblock %}

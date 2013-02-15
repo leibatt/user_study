@@ -40,10 +40,25 @@ def send_request(request):
     close_connection_to_backend()
     return json.loads(response)
 
+@mod.route('/tutorial/', methods=["POST", "GET"])
+@consent_required
+def tutorial():
+    return render_template('scalar/tutorial.html')
+
 @mod.route('/warmup/', methods=["POST", "GET"])
 @consent_required
 def warmup():
     return render_template('scalar/warmup.html')
+
+@mod.route('/task1/', methods=["POST", "GET"])
+@consent_required
+def task1():
+    return render_template('scalar/task1.html')
+
+@mod.route('/task2/', methods=["POST", "GET"])
+@consent_required
+def task2():
+    return render_template('scalar/task2.html')
 
 @mod.route('/canvas/', methods=["POST", "GET"])
 @consent_required

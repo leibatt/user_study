@@ -31,7 +31,7 @@ def get_pretest():
 def submit_pretest():
     form = forms.generate_survey_instance_form("pre",request.form)
     forms.submit_user_responses(session['user_id'],form)
-    return redirect(url_for('scalar.warmup'))
+    return redirect(url_for('scalar.tutorial'))
 
 @mod.route('/posttest/show/', methods=["POST", "GET"])
 @consent_required
@@ -49,6 +49,8 @@ def submit_posttest():
 @mod.route('/done/',methods=["POST","GET"])
 @consent_required
 def done():
+    session.pop('user_id') #don't let user modify selections at this point
+    session.pop('consent')
     return render_template('forms/done.html')
 
 @mod.before_request

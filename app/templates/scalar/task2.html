@@ -1,0 +1,17 @@
+{% extends "scalar/main.html" %}
+{% block title %}Task 2{% endblock %}
+{% block specialvars %}
+	{{ super() }}
+	<script type=text/javascript>
+		$DATA_SET = "cali100";
+		$NEXT_TASK_PAGE = "{{url_for('forms.get_posttest')}}";
+	</script>
+{% endblock %}
+{% block head %}
+	{{ super() }}
+{% endblock %}
+{% block header %}Task 2{% endblock %}
+{% block instructions %}
+	<p>Goal: find areas in the data set with high .</p>
+{% endblock %}
+{% block donebutton %}Task 2{% endblock %}

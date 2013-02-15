@@ -24,7 +24,7 @@ $(document).ready(function() {
 	$('#button-down').on('click',move_down);
 	$('#button-left').on('click',move_left);
 	$('#button-right').on('click',move_right);
-	$('#done-button a').on('click',goto_posttest);
+	$('#done-button a').on('click',goto_next);
 	$('#reset-query-button a').on('click',user_query_handler);
 	$('#answer-select-checkbox').on('click',function() {
 		console.log("checking answer select checkbox");
@@ -41,8 +41,8 @@ $(document).ready(function() {
 	$('#done-button a').button();
 	$('#reset-query-button a').button();
 
-	function goto_posttest() {
-		window.location = $SCRIPT_ROOT+'/forms/posttest/show/';
+	function goto_next() {
+		window.location = $SCRIPT_ROOT+$NEXT_TASK_PAGE;
 		return false;
 	}
 
