@@ -31,7 +31,7 @@ def get_pretest():
 def submit_pretest():
     form = forms.generate_survey_instance_form("pre",request.form)
     forms.submit_user_responses(session['user_id'],form)
-    return redirect(url_for('scalar.get_data2_canvas'))
+    return redirect(url_for('scalar.warmup'))
 
 @mod.route('/posttest/show/', methods=["POST", "GET"])
 @consent_required

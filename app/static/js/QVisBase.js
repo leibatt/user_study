@@ -131,7 +131,7 @@ QVis.Graph.prototype.createScale = function(_data,_types,label,axislength,axispa
 }
 // clear the relevant
 QVis.Graph.prototype.clear = function() {
-	$('#resulting-plot-header').removeClass('show');
+	//$('#resulting-plot-header').removeClass('show');
 	this.map = $("#"+this.rootid + " #map");
 	this.jsvg = $("#"+this.rootid + " svg");
 	this.jlegend = $("#"+this.rootid+" .legend");
@@ -494,6 +494,7 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 			return false;
 		});
 	})();
+
 
 	return {'x_label':x_label,'y_label':y_label,'z_label':z_label};
 }

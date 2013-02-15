@@ -398,25 +398,9 @@ $(document).ready(function() {
 	}
 
 	function draw_graph(jsondata) {
-		menutype = $('#vis-type-menu').val();
 		var opts = {overlap:-0, r:1.5};
-		var use_dims = false;
-		switch(menutype) {
-			case 'mapplot':
-				renderagg = new QVis.MapPlot('aggplot', opts);
-				break;
-			case 'scatterplot':
-				renderagg = new QVis.ScatterPlot('aggplot', opts);
-				break;
-			case 'heatmap':
-				renderagg = new QVis.HeatMap('aggplot',opts);
-				use_dims = true;
-				break;
-			default:
-				console.log('menu type not supported, using heatmap...');
-				renderagg = new QVis.HeatMap('aggplot', opts);
-				use_dims = true;
-		}
+		var use_dims = true;
+		renderagg = new QVis.HeatMap('aggplot', opts);
 		
 		var data = jsondata['data'];
 
