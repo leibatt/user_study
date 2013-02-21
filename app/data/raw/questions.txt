@@ -12,7 +12,7 @@ id,question_text,input_type,response_type,parent_question,survey_id
 11,"How many hours per day do you spend on a computer?","select",,,1
 12,"How often do you use the Internet?","select",,,1
 13,"Are you working on a public or personal computer?","select",,,1
-14,"What kinds of computing devices do you own or frequently use? (Select all that apply)","select",,,1
+14,"What kinds of computing devices do you own or frequently use? (Select all that apply)","multiple",,,1
 15,"For each statement below, please select the number that corresponds to your level of agreement with that statement:","select",,,2
 16,"The interaction style (buttons, menus, etc.) was appropriate for the task","select",,15,2
 17,"If given a choice, I would use this program to complete similar tasks in my daily life.","select",,15,2
