@@ -65,8 +65,10 @@ class UserResponse(Base):
 	__tablename__ = "user_responses"
 	value = Column(Text) #user's response text, may be empty or null
 	comment = Column(Text) # additional comments from user (i.e. elaborate on "Other")
-	user_id = Column(Integer,ForeignKey("users.id"),primary_key=True)
-	question_id = Column(Integer,ForeignKey("survey_questions.id"),primary_key=True)
+
+	id = Column(Integer,primary_key=True)
+	user_id = Column(Integer,ForeignKey("users.id"))
+	question_id = Column(Integer,ForeignKey("survey_questions.id"))
 	response_id = Column(Integer,ForeignKey("survey_responses.id")) #may not have predefined survey response
 	timestamp = Column(DateTime)
 

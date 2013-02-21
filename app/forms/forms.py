@@ -1,5 +1,5 @@
 from wtforms import Form, BooleanField, TextField, validators
-from app.bootstrap.fields import BootstrapRadioField as BRadioField
+from app.bootstrap.fields import BootstrapRadioField as BRadioField, BootstrapCheckBoxField as BCheckBoxField,MultiCheckboxField
 from app.database import db_session
 import app.forms.models as models
 
@@ -40,7 +40,7 @@ def submit_user_responses(user_id,form):
 	for question_id in form.question_ids:
 		q_id = int(question_id[len(QUESTION_PREFIX):])
 		data = form[question_id].data
-		print "here's the data:",data,len(data)
+		print "here's the data:",data,",length:",len(data)
 		if len(data) > 0:
 			question = db_session.query(models.SurveyQuestion).filter_by(id=q_id).one() #get the question answered
 			response_id = None
@@ -49,12 +49,21 @@ def submit_user_responses(user_id,form):
 					continue
 				else:
 					response_id = int(data)
-			# delete user's previous response
-			user_response = db_session.query(models.UserResponse).filter_by(user_id=u_id,question_id=q_id).delete()
+				# delete user's previous response
+				db_session.query(models.UserResponse).filter_by(user_id=u_id,question_id=q_id).delete()
+				#assume no comments for now
+				user_response = models.UserResponse(data,None,u_id,q_id,response_id)
+				db_session.add(user_response)
+				print user_response
+			elif question.input_type == "multiple":
+				# delete user's previous response
+				db_session.query(models.UserResponse).filter_by(user_id=u_id,question_id=q_id).delete()
+				for d in data: #already know we have valid answers
+					response_id = int(d)
 			#assume no comments for now
-			user_response = models.UserResponse(data,None,u_id,q_id,response_id)
-			db_session.add(user_response)
-			print user_response
+					user_response = models.UserResponse(d,None,u_id,q_id,response_id)
+					db_session.add(user_response)
+	
 	db_session.commit()
 
 def get_survey_questions(survey_name):
@@ -65,7 +74,7 @@ def get_survey_questions(survey_name):
 	return questions
 
 def generate_field_for_question(question):
-	if question.input_type == "select": # get selections
+	if question.input_type in ["select","multiple"]: # get selections
 		if question.parent_question is not None:
 			print "parent question:",question.parent_question
 			responses = db_session.query(models.SurveyQuestion).filter_by(id=question.parent_question).one().responses
@@ -74,6 +83,9 @@ def generate_field_for_question(question):
 		selections = [0] * len(responses)
 		for i,response in enumerate(responses):
 			selections[i] = (response.id,response.value)
-		return BRadioField(question.question_text,choices=selections)
+		if question.input_type == "select":
+			return BRadioField(question.question_text,choices=selections)
+		else:
+			return BCheckBoxField(question.question_text,choices=selections)
 	else:
 		return TextField(question.question_text)
