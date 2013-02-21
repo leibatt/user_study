@@ -1,12 +1,16 @@
-<html>
-<head>
-	<title>Consent Form - ScalaR User Study</title>
-</head>
+{% extends "instructions.html" %}
+{% block head %}
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='bootstrap/css/bootstrap.css')}}">
+	{{ super() }}
 
-
-<body>
-	<h1>CONSENT TO PARTICIPATE IN NON-BIOMEDICAL RESEARCH</h1>
+	<script type="text/javascript" src="{{url_for('static',filename='bootstrap/js/bootstrap.js')}}" ></script>
+{% endblock %}
+{% block title %}Consent Form{% endblock %}
+{% block header %}CONSENT TO PARTICIPATE IN NON-BIOMEDICAL RESEARCH{% endblock %}
+{% block subheader %}
 	<h2>Expert-User Analysis of ScalaR</h2>
+{% endblock %}
+{% block content %}
 	<div id="intro">
 		<p>
 You are asked to participate in a research study conducted by Michael Stonebraker (Ph.D.), and Leilani Battle (B.S.), from the department of Electrical Engineering and Computer Science at the Massachusetts Institute of Technology (M.I.T.). You were selected as a possible participant in this study because you are a domain scientist interested in visual exploration of big data, particularly with NASA MODIS satellite imagery data. You should read the information below, and ask questions about anything you do not understand, before deciding whether or not to participate.
@@ -113,10 +117,14 @@ In the event you suffer such an injury, M.I.T. may provide itself, or arrange fo
 You are not waiving any legal claims, rights or remedies because of your participation in this research study.  If you feel you have been treated unfairly, or you have questions regarding your rights as a research subject, you may contact the Chairman of the Committee on the Use of Humans as Experimental Subjects, M.I.T., Room E25-143B, 77 Massachusetts Ave, Cambridge, MA 02139, phone 1-617-253 6787.
 		</p>
 	</div>
-	<form id="answer-select" method="POST" action="/forms/consent/submit/">
-		<label for="consent-check" id="consent-check-label">I have read and understand the information above, and have decided to participate in this study.</label>
-		<input id="consent-check" name="consent-check" type="checkbox"/>
-		<input type="submit" value="Accept"/>
+	{{ super() }}
+{% endblock %}
+{% block form_content %}
+		<label id="consent-check-label">
+			<input id="consent-check" name="consent-check" type="checkbox"/>I have read and understand the information above, and have decided to participate in this study.
+		</label>
+		{{ super() }}
 	</form>
-</body>
-</html>
+{% endblock %}
+{% block next %}{{ url_for('forms.submit_consent') }}{% endblock %}
+{% block submit_text %}Accept{% endblock %}

@@ -1,11 +1,13 @@
-<html>
-<head>
-	<title>Welcome - ScalaR User Study</title>
-</head>
+{% extends "instructions.html" %}
+{% block head %}
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='bootstrap/css/bootstrap.css')}}">
+	{{ super() }}
 
-
-<body>
-	<h1>ScalaR User Study</h1>
+	<script type="text/javascript" src="{{url_for('static',filename='bootstrap/js/bootstrap.js')}}" ></script>
+{% endblock %}
+{% block title %}Welcome{% endblock %}
+{% block header %}ScalaR User Study{% endblock %}
+{% block content %}
 	<div>
 		<p>
 Welcome! We've created a visualization system called ScalaR to facilitate the exploration of scientific data. This website is part of a research study on the effectiveness of ScalaR as a visual data exploration tool.
@@ -37,9 +39,9 @@ If you are interested in participating in the study, click on the start button b
 		</ul>
 		<p>
 participation is entirely voluntary and you can stop participating at any time. Close this browser window/tab to stop the study. None of your personal information will be requested or recorded in this user study.
+		</p>
 	</div>
-	<form id="start-study-button" method="POST" action="/forms/consent/show/">
-		<input type="submit" value="Start"/>
-	</form>
-</body>
-</html>
+	{{ super() }}
+{% endblock %}
+{% block next %}{{ url_for('forms.get_consent') }}{% endblock %}
+{% block submit_text %}Start{% endblock %}

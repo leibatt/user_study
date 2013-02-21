@@ -1,4 +1,10 @@
-{% extends "scalar/instructions.html" %}
+{% extends "instructions.html" %}
+{% block head %}
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='bootstrap/css/bootstrap.css')}}">
+	{{ super() }}
+
+	<script type="text/javascript" src="{{url_for('static',filename='bootstrap/js/bootstrap.js')}}" ></script>
+{% endblock %}
 {% block title %}Tutorial{% endblock %}
 {% block header %}Tutorial{% endblock %}
 {% block content %}
@@ -49,6 +55,7 @@
 		<h3>Resetting your selections</h3>
 		</li>
 	</ul>
+	{{ super() }}
 {% endblock %}
 
 {% block next %}{{url_for('scalar.warmup')}}{% endblock %}

@@ -24,7 +24,7 @@ $(document).ready(function() {
 	$('#button-down').on('click',move_down);
 	$('#button-left').on('click',move_left);
 	$('#button-right').on('click',move_right);
-	$('#done-button a').on('click',goto_next);
+	//$('#done-button a').on('click',goto_next);
 	$('#reset-query-button a').on('click',user_query_handler);
 	$('#answer-select-checkbox').on('click',function() {
 		console.log("checking answer select checkbox");
@@ -36,10 +36,19 @@ $(document).ready(function() {
 			$.get($SCRIPT_ROOT+'/scalar/tile-unselected/',{},function(data){console.log("got here");});
 		}
 	});
+	$( "#dialog-message1" ).dialog({
+		autoOpen: false,
+		modal: true,
+		buttons: {
+		Ok: function() {
+			$( this ).dialog( "close" );
+			}
+		}
+	});
 
-	$('.nav-button').button();
-	$('#done-button a').button();
-	$('#reset-query-button a').button();
+	//$('.nav-button').button();
+	//$('#done-button a').button();
+	//$('#reset-query-button a').button();
 
 	function goto_next() {
 		window.location = $SCRIPT_ROOT+$NEXT_TASK_PAGE;
@@ -316,6 +325,7 @@ $(document).ready(function() {
 	}
 
 	function redraw_graph(jsondata){
+		// TODO: hardcode xdim and ydim
 		// preserve existing labels
 		var x_label = renderagg.labelsfrombase.x_label;
 		var y_label = renderagg.labelsfrombase.y_label;
@@ -398,6 +408,7 @@ $(document).ready(function() {
 	}
 
 	function draw_graph(jsondata) {
+		//TODO: hardcode xdim and ydim
 		var opts = {overlap:-0, r:1.5};
 		var use_dims = true;
 		renderagg = new QVis.HeatMap('aggplot', opts);
@@ -495,5 +506,11 @@ $(document).ready(function() {
 		console.log(["width",width,"height",height,"xdim",xdim,"ydim",ydim,"xindex",xindex,"yindex",yindex,"future_xtiles_exact",future_tiles_exact[indexmap[renderagg.labelsfrombase.x_label]],"future_ytiles_exact",future_tiles_exact[indexmap[renderagg.labelsfrombase.y_label]]]);
 		return zoom_in2(xindex,yindex);
 	}
+
+	function show_dialogue1() {
+		$( "#dialog-message1" ).dialog('open');
+	}
+
 	user_query_handler();
+	show_dialogue1();
 });

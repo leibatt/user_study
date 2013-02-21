@@ -1,0 +1,23 @@
+{% extends "instructions.html" %}
+{% block head %}
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='bootstrap/css/bootstrap.css')}}">
+	{{ super() }}
+
+	<script type="text/javascript" src="{{url_for('static',filename='bootstrap/js/bootstrap.js')}}" ></script>
+{% endblock %}
+{% block content %}
+	{% block description %}
+		<div id="form-description">
+		{% block instructions%}
+			<p>Please complete the following questions to the best of your ability.</p>
+		{% endblock %}
+		</div>
+	{% endblock %}
+	{{ super() }}
+{% endblock %}
+
+{% block form_content %}
+	{% from "forms/_survey_template.html" import render_form %}
+	{{ render_form(form) }}
+	{{ super() }}
+{% endblock %}

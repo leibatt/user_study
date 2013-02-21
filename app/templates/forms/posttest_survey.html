@@ -1,11 +1,5 @@
-<html>
-	<head>
-	</head>
-	<body>
-		{% from "forms/_survey_template.html" import render_form %}
-		<form method="POST" action="/forms/posttest/submit/">
-		{{ render_form(form) }}
-			<input type="submit" value="Submit">
-		</form>
-	</body>
-</html>
+{% extends "forms/forms_base.html" %}
+{% block title %}Post-Test Survey{% endblock %}
+{% block header %}Post-Test Survey{% endblock %}
+{% block next %}{{ url_for('forms.submit_posttest') }}{% endblock %}
+{% block submit_text %}Submit Pre-Test{% endblock %}

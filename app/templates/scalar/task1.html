@@ -1,4 +1,4 @@
-{% extends "scalar/main.html" %}
+{% extends "scalar/scalar_base.html" %}
 {% block title %}Task 1{% endblock %}
 {% block specialvars %}
 	{{ super() }}
@@ -7,11 +7,10 @@
 		$NEXT_TASK_PAGE = "{{url_for('scalar.task2')}}";
 	</script>
 {% endblock %}
-{% block head %}
-	{{ super() }}
-{% endblock %}
 {% block header %}Task 1{% endblock %}
+{% block taskname %} Task 1{% endblock %}
 {% block instructions %}
 	<p>Goal: find areas in the data set with at least 50% snow cover.</p>
 {% endblock %}
 {% block donebutton %}Task 1{% endblock %}
+{% block next %}{{ url_for('scalar.task2')}}{% endblock %}

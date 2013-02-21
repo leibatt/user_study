@@ -1,4 +1,5 @@
-from wtforms import Form, BooleanField, TextField, RadioField, validators
+from wtforms import Form, BooleanField, TextField, validators
+from app.bootstrap.fields import BootstrapRadioField as BRadioField
 from app.database import db_session
 import app.forms.models as models
 
@@ -21,13 +22,14 @@ def generate_survey_instance_form(survey_name,request_form=None):
 		question_id = QUESTION_PREFIX+str(question.id)
 		question_ids.append(question_id)
 		setattr(SurveyInstanceForm,question_id, generate_field_for_question(question))
-	
+
 	setattr(SurveyInstanceForm,"question_ids",question_ids)
 
 	if request_form is None:
 		form = SurveyInstanceForm()
 	else:
 		form = SurveyInstanceForm(request_form)
+		print form[question_id]()	
 
 	return form
 
@@ -72,6 +74,6 @@ def generate_field_for_question(question):
 		selections = [0] * len(responses)
 		for i,response in enumerate(responses):
 			selections[i] = (response.id,response.value)
-		return RadioField(question.question_text,choices=selections)
+		return BRadioField(question.question_text,choices=selections)
 	else:
 		return TextField(question.question_text)

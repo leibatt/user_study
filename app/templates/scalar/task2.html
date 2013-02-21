@@ -1,4 +1,4 @@
-{% extends "scalar/main.html" %}
+{% extends "scalar/scalar_base.html" %}
 {% block title %}Task 2{% endblock %}
 {% block specialvars %}
 	{{ super() }}
@@ -11,7 +11,9 @@
 	{{ super() }}
 {% endblock %}
 {% block header %}Task 2{% endblock %}
+{% block taskname %} Task 2{% endblock %}
 {% block instructions %}
 	<p>Goal: find areas in the data set with high .</p>
 {% endblock %}
 {% block donebutton %}Task 2{% endblock %}
+{% block next %}{{ url_for('forms.get_posttest')}}{% endblock %}

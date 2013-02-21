@@ -1,5 +1,0 @@
-{% macro render_form(form) %}
-	{% for question_id in form.question_ids %}
-		<div>{{ form[question_id].label }}: {{ form[question_id]() }}</div>
-	{% endfor %}
-{% endmacro %}

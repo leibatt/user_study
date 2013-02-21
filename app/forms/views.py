@@ -44,14 +44,8 @@ def get_posttest():
 def submit_posttest():
     form = forms.generate_survey_instance_form("post",request.form)
     forms.submit_user_responses(session['user_id'],form)
-    return redirect(url_for('forms.done'))
+    return redirect(url_for('home.done'))
 
-@mod.route('/done/',methods=["POST","GET"])
-@consent_required
-def done():
-    session.pop('user_id') #don't let user modify selections at this point
-    session.pop('consent')
-    return render_template('forms/done.html')
 
 @mod.before_request
 def before_request(exception=None):

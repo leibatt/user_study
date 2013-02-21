@@ -1,0 +1,26 @@
+<html>
+<head>
+	{% block head %}
+
+	<title>{% block title %}{% endblock %} - ScalaR User Study</title>
+
+	{% endblock %}
+</head>
+
+
+<body>
+	<h1>{% block header %}{% endblock %}</h1>
+	{% block subheader %}
+	{% endblock %}
+	<div id="content">
+	{% block content %}
+	{% block form %}
+		<form id="done-button" method="POST" action="{% block next %}{% endblock %}">
+		{% block form_content %}
+			<input type="submit"  class ="btn" value="{% block submit_text %}Done with {% block donebutton %}{% endblock %}{% endblock %}"/>
+		{% endblock %}
+		</form>
+	{% endblock %}
+	{% endblock %}
+	</div>
+</body>

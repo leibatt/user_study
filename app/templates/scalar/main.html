@@ -2,13 +2,15 @@
 <head>
 	{% block head %}
 	<!--<link rel="stylesheet" type="{{url_for('static',filename='css/bootstrap.css')}}">-->
-	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/ui-lightness/jquery-ui-1.8.19.custom.css')}}">
+	<!--<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/ui-lightness/jquery-ui-1.8.19.custom.css')}}">-->
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/jquery-ui-1.10.1.custom.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/base.css')}}">
 	<title>{% block title %}{% endblock %} - ScalaR User Study</title>
 
 	<script type="text/javascript" src="{{url_for('static',filename='js/jquery.js')}}" ></script>
 	<script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.js')}}" ></script>
-	<script type="text/javascript" src="{{url_for('static',filename='js/jquery-ui-1.8.19.custom.min.js')}}" ></script>
+	<!--<script type="text/javascript" src="{{url_for('static',filename='js/jquery-ui-1.8.19.custom.min.js')}}" ></script>-->
+	<script type="text/javascript" src="{{url_for('static',filename='js/jquery-ui-1.10.1.custom.js')}}" ></script>
 	<script type="text/javascript" src="{{url_for('static',filename='js/d3.v2.js')}}" ></script>
 	<script type="text/javascript" src="{{url_for('static',filename='js/move-zoom.js')}}" ></script>
 	<script type="text/javascript" src="{{url_for('static',filename='js/colorbrewer.js')}}" ></script>
@@ -142,6 +144,10 @@
 			<input type="submit" id="vis-update-submit" class="update-submit" value="Submit"/>
 		</div>
 	</form>
+	<div id="extra-content">
+	{% block extra_content %}
+	{% endblock %}
+	</div>
 </body>
 
 

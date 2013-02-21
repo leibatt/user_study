@@ -2,9 +2,7 @@
 config.py
 *.pyc
 *.swp
-*.js~
-*.html~
-*.py~
+*.*~
 app/data/sqlite/temp.db
 app/data/sqlite/temp.db.old
 app/data/postgres/test.sql

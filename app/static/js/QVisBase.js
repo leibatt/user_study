@@ -251,7 +251,7 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 	// render x-axis select options
 	if(this.selectx) {
 		//this.xlabeldiv.prepend($("<label for=\"xaxis-select\">invert</label>"));
-		this.xlabeldiv.find("label#xlabel-select").after($("<select name=\"xaxis-select\" id=\"xaxis-select\"></select>"));
+		this.xlabeldiv.find("#xlabel-radio").before($("<select name=\"xaxis-select\" id=\"xaxis-select\"></select>"));
 		var xaxisselect = this.xlabeldiv.find("select");
 		var xaxisattrselect = xaxisselect.append($('<optgroup id="xaxis-attrs" label="attrs"></optgroup>')).find("#xaxis-attrs");
 		var xaxisdimselect = xaxisselect.append($('<optgroup id="xaxis-dims" label="dims"></optgroup>')).find("#xaxis-dims");
@@ -311,7 +311,7 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 	// render y-axis select options
 	if(this.selecty) {
 		//var yaxisselect = this.ylabeldiv.prepend($("<select></select>")).find("select");
-		this.ylabeldiv.find("label#ylabel-select").after($("<select name=\"yaxis-select\" id=\"yaxis-select\"></select>"));
+		this.ylabeldiv.find("#ylabel-radio").before($("<select name=\"yaxis-select\" id=\"yaxis-select\"></select>"));
 		var yaxisselect = this.ylabeldiv.find("select");
 		var yaxisattrselect = yaxisselect.append($('<optgroup id="yaxis-attrs" label="attrs"></optgroup>')).find("#yaxis-attrs");
 		var yaxisdimselect = yaxisselect.append($('<optgroup id="yaxis-dims" label="dims"></optgroup>')).find("#yaxis-dims");
@@ -363,7 +363,7 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 
 	if(this.selectz) {
 		//var zaxisselect = this.zlabeldiv.prepend($("<select></select>")).find("select");
-		this.zlabeldiv.find("label#zlabel-select").after($("<select name=\"zaxis-select\" id=\"zaxis-select\"></select>"));
+		this.zlabeldiv.find("#zlabel-radio").before($("<select name=\"zaxis-select\" id=\"zaxis-select\"></select>"));
 		var zaxisselect = this.zlabeldiv.find("select");
 		var zaxisattrselect = zaxisselect.append($('<optgroup id="zaxis-attrs" label="attrs"></optgroup>')).find("#zaxis-attrs");
 		var zaxisdimselect = zaxisselect.append($('<optgroup id="zaxis-dims" label="dims"></optgroup>')).find("#zaxis-dims");
