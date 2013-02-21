@@ -1,5 +1,5 @@
 from wtforms import Form, BooleanField, TextField, validators
-from app.bootstrap.fields import BootstrapRadioField as BRadioField, BootstrapCheckBoxField as BCheckBoxField,MultiCheckboxField
+from app.bootstrap.fields import BootstrapRadioField as BRadioField, BootstrapCheckBoxField as BCheckBoxField
 from app.database import db_session
 import app.forms.models as models
 
