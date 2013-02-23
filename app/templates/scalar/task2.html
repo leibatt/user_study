@@ -3,8 +3,9 @@
 {% block specialvars %}
 	{{ super() }}
 	<script type=text/javascript>
-		$DATA_SET = "cali100";
+		$DATA_SET = "us1000";
 		$NEXT_TASK_PAGE = "{{url_for('forms.get_posttest')}}";
+		$TASK="task2";
 	</script>
 {% endblock %}
 {% block head %}

@@ -70,6 +70,7 @@ def get_data2_canvas():
 def fetch_first_tile():
     current_app.logger.info("got fetch first tile request")
     query = request.args.get('query',"",type=str)
+    taskname = request.args.get('task',"",type=str)
     ds = None
     if len(query) == 0: #look for data set
         data_set = request.args.get('data_set',"",type=str)
@@ -78,6 +79,8 @@ def fetch_first_tile():
                 ds = db_session.query(DataSet).filter_by(name=data_set).one()
                 query = ds.query
 		session['data_set'] = ds
+                if len(taskname) > 0 and taskname not in session: # record what data set was used for this task
+                    session[taskname]=ds.id
             except:
                 current_app.logger.warning("could not locate data set %r" % \
                                            data_set)
@@ -247,12 +250,13 @@ def task2_selections():
 
 def get_tile_selections(taskname):
     selections = []
-    if g.ds is not None:
-        results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,
-                                                      dataset_id=g.ds.id).all()
-    else:
-        results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,
-                                                      query=session['query']).all()
+    results = []
+    if taskname in session: # if there is a dataset_id already associated with this task
+        results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,dataset_id=session[taskname]).all()
+    #elif g.ds is not None: # else grab the most recent data set
+    #    results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,dataset_id=g.ds.id).all()
+    #else: # else grab the latest query
+    #    results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,query=session['query']).all()
     for result in results:
         selections.append(dict(image=result.image,
                                tile_id=result.tile_id,

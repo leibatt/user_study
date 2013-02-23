@@ -1,29 +1,33 @@
 {% extends "instructions.html" %}
 {% block form %}
 	<div>
+	{% if selections %}
 		<div class="row-fluid">
 			<ul class = "thumbnails">
-			{% for item in selections %}
-				<li class="span4">
-					<div class="thumbnail">
-						<img alt="300x200" style="width: 300px; height: 200px" src="{{item.image}}">
-						<div class="caption">
-							<ul class="unstyled">
-								<li>tile id: {{item.tile_id}}</li>
-								<li>zoom level: {{item.zoom_level}}</li>
-								<li>date chosen: {{item.datetime}}</li>
-							</ul>
-							<div>
-								<label class="checkbox">
-									<input type="checkbox" class="selectionThumbnail" id="selectionThumbnail{{item.id}}">Delete
-								</label>
+				{% for item in selections %}
+					<li class="span4">
+						<div class="thumbnail">
+							<img alt="300x200" style="width: 300px; height: 200px" src="{{item.image}}">
+							<div class="caption">
+								<!--<ul class="unstyled">
+									<li>tile id: {{item.tile_id}}</li>
+									<li>zoom level: {{item.zoom_level}}</li>
+									<li>date chosen: {{item.datetime}}</li>
+								</ul>-->
+								<div>
+									<label class="checkbox">
+										<input type="checkbox" class="selectionThumbnail" id="selectionThumbnail{{item.id}}">Delete
+									</label>
+								</div>
 							</div>
 						</div>
-					</div>
-				</li>
-			{% endfor %}
+					</li>
+				{% endfor %}
 			</ul>
 		</div>
+		{{ super() }}
+	{% else %}
+		<p>No selections!</p>
+	{% endif %}
 	</div>
-	{{ super() }}
 {% endblock %}

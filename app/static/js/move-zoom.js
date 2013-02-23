@@ -294,7 +294,7 @@ $(document).ready(function() {
 		$('#answer-select').removeClass('show');
 		//$('#loading_image').addClass('show');
 		$("body").css("cursor", "progress");
-		$.getJSON($SCRIPT_ROOT+'/scalar/fetch-first-tile',{data_set: $DATA_SET,data_threshold:resolution_lvl},function(jsondata){
+		$.getJSON($SCRIPT_ROOT+'/scalar/fetch-first-tile',{data_set: $DATA_SET, task:$TASK,data_threshold:resolution_lvl},function(jsondata){
 			console.log(jsondata);
 			//$('#loading_image').removeClass('show');
 			$("body").css("cursor", "auto");
