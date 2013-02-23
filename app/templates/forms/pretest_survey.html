@@ -1,5 +1,6 @@
 {% extends "forms/forms_base.html" %}
 {% block title %}Pre-Test Survey{% endblock %}
 {% block header %}Pre-Test Survey{% endblock %}
+{% block pretest_nav_active %}active{% endblock %}
 {% block next %}{{ url_for('forms.submit_pretest') }}{% endblock %}
 {% block submit_text %}Submit Pre-Test{% endblock %}

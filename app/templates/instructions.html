@@ -1,26 +1,75 @@
 <html>
 <head>
-	{% block head %}
-
+{% block head %}
+{% block my_stylesheets %}
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/nav.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/main.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='bootstrap/css/bootstrap.css')}}">
+{% endblock %}
 	<title>{% block title %}{% endblock %} - ScalaR User Study</title>
-
-	{% endblock %}
+{% block my_scripts %}
+	<script type="text/javascript" src="{{url_for('static',filename='js/jquery-1.9.1.js')}}" ></script>
+	<script type="text/javascript" src="{{url_for('static',filename='bootstrap/js/bootstrap.js')}}" ></script>
+{% endblock %}
+{% endblock %}
 </head>
 
 
 <body>
-	<h1>{% block header %}{% endblock %}</h1>
-	{% block subheader %}
-	{% endblock %}
-	<div id="content">
-	{% block content %}
-	{% block form %}
-		<form id="done-button" method="POST" action="{% block next %}{% endblock %}">
-		{% block form_content %}
-			<input type="submit"  class ="btn" value="{% block submit_text %}Done with {% block donebutton %}{% endblock %}{% endblock %}"/>
-		{% endblock %}
-		</form>
-	{% endblock %}
-	{% endblock %}
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span12">
+				<div class="page-header">
+					<h1>{% block header %}{% endblock %}</h1>
+					{% block subheader %}
+					{% endblock %}
+				</div>
+			</div>
+		</div>
+		<div class="row-fluid">
+			<div class="span1">
+				<div id="nav-menu" class="tabbable tabs-left">
+					<ul class="nav nav-tabs nav-stacked">
+						<li class="{% block welcome_nav_active %}{% endblock %}">
+							<a href="{{url_for('home.welcome')}}">Home</a>
+						</li>
+						<li class="{% block consent_nav_active %}{% endblock %}">
+							<a href="{{url_for('forms.get_consent')}}">Consent Form</a>
+						</li>
+						<li class="{% if g.consent is none %}disabled{% endif %} {% block pretest_nav_active %}{% endblock %}">
+							<a href="{{url_for('forms.get_pretest')}}">Pre-Test</a>
+						</li>
+						<li class="{% if g.consent is none %}disabled{% endif %} {% block tutorial_nav_active %}{% endblock %}">
+							<a href="{{url_for('scalar.tutorial')}}">Tutorial</a>
+						</li>
+						<li class="{% if g.consent is none %}disabled{% endif %} {% block warmup_nav_active %}{% endblock %}">
+							<a href="{{url_for('scalar.warmup')}}">Warmup</a>
+						</li>
+						<li class="{% if g.consent is none %}disabled{% endif %} {% block task1_nav_active %}{% endblock %}">
+							<a href="{{url_for('scalar.task1')}}">Task 1</a>
+						</li>
+						<li class="{% if g.consent is none %}disabled{% endif %} {% block task2_nav_active %}{% endblock %}">
+							<a href="{{url_for('scalar.task2')}}">Task2</a>
+						</li>
+						<li class="{% if g.consent is none %}disabled{% endif %} {% block posttest_nav_active %}{% endblock %}">
+							<a href="{{url_for('forms.get_posttest')}}">Post-Test</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="span10">
+				<div id="content">
+				{% block content %}
+				{% block form %}
+					<form id="done-button" method="POST" action="{% block next %}{% endblock %}">
+					{% block form_content %}
+						<input type="submit"  class ="btn" value="{% block submit_text %}Done with {% block donebutton %}{% endblock %}{% endblock %}"/>
+					{% endblock %}
+					</form>
+				{% endblock %}
+				{% endblock %}
+				</div>
+			</div>
+		</div>
 	</div>
 </body>

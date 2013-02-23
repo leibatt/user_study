@@ -70,12 +70,14 @@ def get_data2_canvas():
 def fetch_first_tile():
     current_app.logger.info("got fetch first tile request")
     query = request.args.get('query',"",type=str)
+    ds = None
     if len(query) == 0: #look for data set
         data_set = request.args.get('data_set',"",type=str)
         if len(data_set) > 0:
             try:
                 ds = db_session.query(DataSet).filter_by(name=data_set).one()
                 query = ds.query
+		session['data_set'] = ds
             except:
                 current_app.logger.warning("could not locate data set %r" % \
                                            data_set)
@@ -103,7 +105,12 @@ def fetch_first_tile():
             tile_id = [0] * int(queryresultarr['saved_qpresults']['numdims'])
         user_trace = UserTrace(tile_id=str(tile_id),zoom_level=0,query=session['query'],user_id=g.user.id,dataset_id=None)
         # save current tile info for tracking tile selection
-        uts = UserTileSelection(tile_id=str(tile_id),zoom_level=0,query=session['query'],user_id=g.user.id,dataset_id=None)
+        uts = UserTileSelection(tile_id=str(tile_id),zoom_level=0,query=session['query'],user_id=g.user.id,dataset_id=None,image=None)
+	if ds is not None: #there is an associated data set
+            user_trace.dataset_id = ds.id
+            uts.dataset_id = ds.id
+        else:
+            current_app.logger.warning("data set not passed")
         db_session.add(user_trace)
         db_session.commit()
         #log the tile request
@@ -163,7 +170,14 @@ def fetch_tile():
                                 zoom_level=level,
                                 query=session['query'],
                                 user_id=g.user.id,
-                                dataset_id=None)
+                                dataset_id=None,
+                                image=None)
+
+        if g.ds is not None:
+            user_trace.dataset_id = g.ds.id
+            uts.dataset_id = g.ds.id
+        else:
+            current_app.logger.warning("g.ds is None!")
 
         db_session.add(user_trace)
         db_session.commit()
@@ -187,14 +201,16 @@ def fetch_tile():
 @mod.route('/tile-selected/',methods=["POST","GET"])
 @consent_required
 def tile_selected():
+    img = request.args.get('img',"",type=str)
     try:
+        if len(img) > 0:
+            session['user_tile_selection'].image = img
         db_session.add(session['user_tile_selection']) 
         db_session.commit()
-    except:
-        pass #didn't work but oh well
-        current_app.logger.warning("unable to remove %r from database" \
-                                       % (uts))
-
+    except Exception as e:
+        current_app.logger.warning("unable to insert into database" % (e))
+    current_app.logger.info("got here")
+    print "\n\n\n\ngot here"
     return json.dumps(str(0))
 
 @mod.route('/tile-unselected/',methods=["POST","GET"])
@@ -214,11 +230,48 @@ def tile_unselected():
                                        % (uts))
     return json.dumps(str(0))
 
+@mod.route('/warmup/selections/',methods=["POST","GET"])
+@consent_required
+def warmup_selections():
+    return get_tile_selections("warmup")
+
+@mod.route('/task1/selections/',methods=["POST","GET"])
+@consent_required
+def task1_selections():
+    return get_tile_selections("task1")
+
+@mod.route('/task2/selections/',methods=["POST","GET"])
+@consent_required
+def task2_selections():
+    return get_tile_selections("task2")
+
+def get_tile_selections(taskname):
+    selections = []
+    if g.ds is not None:
+        results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,
+                                                      dataset_id=g.ds.id).all()
+    else:
+        results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,
+                                                      query=session['query']).all()
+    for result in results:
+        selections.append(dict(image=result.image,
+                               tile_id=result.tile_id,
+                               zoom_level=result.zoom_level,
+                               timestamp=result.timestamp,
+                               id=result.id)) 
+
+    return render_template('scalar/selections_'+taskname+'.html',selections=selections)
+    
 @mod.before_request
 def before_request(exception=None):
     g.consent = None
     if 'consent' in session:
         g.consent = session['consent']
+    g.ds = None
+    if 'data_set' in session:
+         g.ds = session['data_set']
+         db_session.add(g.ds)
+         db_session.commit()
     g.user = None
     if 'user_id' not in session:
         session['user_id'] = str(uuid.uuid4())

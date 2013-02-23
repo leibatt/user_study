@@ -9,8 +9,16 @@
 {% endblock %}
 {% block header %}Warmup{% endblock %}
 {% block taskname %} Warmup{% endblock %}
+{% block warmup_nav_active %}active{% endblock %}
 {% block instructions %}
+	<h2>Overview</h2>
 	<p>This warmup will give you an opportunity to explore the ScalaR visualization system.</p>
+	<h2>What You Need to Know</h2>
+	<p><strong>About the Data Set</strong>: The warmup data set is a 2D array containing Normalized Difference Vegetation Index (NDVI) calculations from the MODIS data set. The two dimensions are latitude (x) and longitude (y). A high NDVI value (1.0) means that particular latitude/longitude area contains a high amount of vegetation (trees, shrubs, grass etc.). A low value (-1.0) means that particular part of the earth does not contain vegetation.
+	</p>
+	<p>
+		<strong>Goal(s)</strong>: learn how ScalaR works; find subsets of the data that contain roughly 50% high NDVI values.
+	</p>
 {% endblock %}
 {% block donebutton %}Warmup{% endblock %}
 {% block next %}{{ url_for('scalar.task1')}}{% endblock %}

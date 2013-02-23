@@ -33,13 +33,13 @@ class BootstrapCheckBoxField(SelectMultipleField):
 def render_list(field,**kwargs):
 		kwargs.setdefault('type',field.field_type)
 		field_id = kwargs.pop('id',field.id)
-		html = [u'<ul %s>'% html_params(id=field_id)]
+		html = [u'<ul %s>'% html_params(id=field_id,class_="unstyled")]
 		for value, label, checked in field.iter_choices():
 			choice_id = u'%s-%s' % (field_id, value)
 			options = dict(kwargs, name=field.name, value=value, id=choice_id)
 			if checked:
 				 options['checked'] = 'checked'
-			html.append(u'<li><label %s>' % html_params(class_="radio"))
+			html.append(u'<li><label %s>' % html_params(class_=field.field_type))
 			html.append(u'<input %s />'% html_params(**options))
 			html.append(u'%s</label></li>' % label)
 		html.append(u'</ul>')

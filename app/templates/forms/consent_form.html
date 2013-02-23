@@ -1,15 +1,10 @@
 {% extends "instructions.html" %}
-{% block head %}
-	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='bootstrap/css/bootstrap.css')}}">
-	{{ super() }}
-
-	<script type="text/javascript" src="{{url_for('static',filename='bootstrap/js/bootstrap.js')}}" ></script>
-{% endblock %}
 {% block title %}Consent Form{% endblock %}
 {% block header %}CONSENT TO PARTICIPATE IN NON-BIOMEDICAL RESEARCH{% endblock %}
 {% block subheader %}
 	<h2>Expert-User Analysis of ScalaR</h2>
 {% endblock %}
+{% block consent_nav_active %}active{% endblock %}
 {% block content %}
 	<div id="intro">
 		<p>

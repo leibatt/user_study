@@ -36,6 +36,7 @@ class UserTileSelection(Base):
         zoom_level = Column(Integer,nullable=False)
 	timestamp = Column(DateTime(timezone=True),nullable=False)
 	query = Column(Text,nullable=False) # must know what query was run
+	image = Column(Text) # image of the tile in base64 encoded string
 	user_id = Column(Integer,ForeignKey("users.id"),nullable=False)
 	dataset_id = Column(Integer,ForeignKey("data_sets.id")) # dataset used? may be null, but hopefully isn't
 
@@ -44,13 +45,14 @@ class UserTileSelection(Base):
 
 	__table_args__ = (UniqueConstraint('tile_id','zoom_level','query','user_id', name='uix_3'),)
 
-	def __init__(self,tile_id,zoom_level,query,user_id,dataset_id):
+	def __init__(self,tile_id,zoom_level,query,user_id,dataset_id,image):
 		self.user_id = user_id
 		self.tile_id = tile_id
 		self.zoom_level = zoom_level
 		self.timestamp = datetime.datetime.now()
 		self.query = query
 		self.dataset_id = dataset_id
+		self.image = image
 
 	def __repr__():
 		return "UserTileSelection(%r, %r, %r, %r, %r, %r)" % (self.user_id,self.tile_id,self.query,self.dataset_id,self.timestamp)

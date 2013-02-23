@@ -1,12 +1,9 @@
-#xlabel-radio,#ylabel-radio,#zlabel-radio {
-	display: inline;
-}
-
 /*
 #sql-query-form label {
 	display: block;
 }
 */
+
 /* do I want this to be block? */
 #option-buttons {
 	display: block;
@@ -22,39 +19,46 @@ g.xaxis path,g.yaxis path {
 	display: none;
 }
 
-div.xlabel, div.ylabel, div.zlabel,div.colorscheme,form div.width,form div.height {
-	margin: 10px;
+/*center update menu items and add 5px padding */
+div.xlabel, div.ylabel, div.zlabel,div.colorscheme,#label-width,#label-height {
+	margin: 5px;
 	text-align: center;
 }
 
-
+/* center update menu submit button */
 div#update-submit-div {
 	text-align: center;
 }
 
+/* hide all the visualization components by default */
 #outer-aggplot, #aggplot, #map, #canvas, #aggplot-form, #resulting-plot-header, #nav, #answer-select, #histogram-container,
 canvas#hist1, canvas#hist2, #loading_image {
 	display: none;
 }
 
+/* show the plot, and make position relative to confine the click rectangle to this div. 
+	Display inline-block to get the histograms in the right place */
 #aggplot.show {
 	display: inline-block;
 	position:relative;
 }
 
-
+/*
+ show these visualizatio components, and make them display block
+*/
 #aggplot-form.show,#resulting-plot-header.show, #nav.show, #map.show, #canvas.show, #answer-select.show,
 canvas#hist1.show, #loading_image.show {
 	display: block;
 }
 
+/* Make the svg click rectangle position absolute so it is positioned over the canvas */
 #svg_aggplot {
 	position: absolute;
 	top: 0;
 	left: 0;
 }
 
-
+/* controls the highlighting of the yes/no for answers to the user study */
 #answer-select-checked-yes.highlight,#answer-select-checked-no.highlight {
 	color: blue;
 	font-weight:bold;

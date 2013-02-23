@@ -1,0 +1,10 @@
+/* center all page headers */
+div.page-header h1, div.page-header h2 {
+	text-align: center;
+}
+
+/*
+#xlabel-radio ,#ylabel-radio,#zlabel-radio {
+	display: inline;
+}
+*/

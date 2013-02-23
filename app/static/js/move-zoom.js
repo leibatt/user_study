@@ -19,6 +19,7 @@ var menutype;
 var once =0;
 
 $(document).ready(function() {
+	$('ul.nav-list > li.disabled > a').click(function () { return false; }); // don't let IE users click on disabled nav links
 	$('#sql-query-submit').on('click',user_query_handler);
 	$('#button-up').on('click',move_up);
 	$('#button-down').on('click',move_down);
@@ -31,7 +32,8 @@ $(document).ready(function() {
 		$('#answer-select-checked-yes').toggleClass('highlight');
 		$('#answer-select-checked-no').toggleClass('highlight');
 		if ($('#answer-select-checkbox').is(':checked')) {
-			$.get($SCRIPT_ROOT+'/scalar/tile-selected/',{},function(data){console.log("got here");});
+			var canvasImg = $('#canvas')[0].toDataURL('image/jpeg'); // get image data
+			$.get($SCRIPT_ROOT+'/scalar/tile-selected/',{img:canvasImg},function(data){console.log("got here");});
 		} else {
 			$.get($SCRIPT_ROOT+'/scalar/tile-unselected/',{},function(data){console.log("got here");});
 		}

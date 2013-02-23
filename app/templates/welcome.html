@@ -1,12 +1,7 @@
 {% extends "instructions.html" %}
-{% block head %}
-	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='bootstrap/css/bootstrap.css')}}">
-	{{ super() }}
-
-	<script type="text/javascript" src="{{url_for('static',filename='bootstrap/js/bootstrap.js')}}" ></script>
-{% endblock %}
 {% block title %}Welcome{% endblock %}
 {% block header %}ScalaR User Study{% endblock %}
+{% block welcome_nav_active %}active{% endblock %}
 {% block content %}
 	<div>
 		<p>
@@ -17,24 +12,30 @@ If you are interested in participating in the study, click on the start button b
 		</p>
 		<ul>
 			<li>
-				<p>Complete 2 questionnaires (10 minutes):</p>
+				<p>Complete 2 questionnaires (10 minutes)</p>
+<!--
 				<ul>
 					<li>A demographics questionnaire at the beginning of the experiment</li>
 					<li>A satisfaction survey at the end of the experiment</li>
 				</ul>
+-->
 			</i>
 			<li>
-				<p>Learn how to use ScalaR (10 minutes):</p>
+				<p>Learn how to use ScalaR (10 minutes)</p>
+<!--
 				<ul>
 					<li>Read a short introduction to ScalaR's functionality</li>
 					<li>Explore ScalaR's  functionality on a simple data set</li>
 				</ul>
+-->
 			</li>
 			<li>
-				<p>Complete two research-related tasks using ScalaR (40 minutes):</p>
+				<p>Complete two research-related tasks using ScalaR (40 minutes)</p>
+<!--
 				<ul>
 					<li>Identify subsets of the provided data sets that meet given visual requirements using ScalaR</li>
 				</ul>
+-->
 			</li>
 		</ul>
 		<p>

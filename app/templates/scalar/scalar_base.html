@@ -1,152 +1,181 @@
 {% extends "instructions.html" %}
-{% block head %}
-	<!--<link rel="stylesheet" type="{{url_for('static',filename='css/bootstrap.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/ui-lightness/jquery-ui-1.8.19.custom.css')}}">-->
-	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/jquery-ui-1.10.1.custom.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='bootstrap/css/bootstrap.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/base.css')}}">
-
+{% block my_stylesheets %}
 	{{ super() }}
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/jquery-ui-1.10.1.custom.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/base.css')}}">
+{% endblock %}
 
-	<script type="text/javascript" src="{{url_for('static',filename='js/jquery.js')}}" ></script>
-	<script type="text/javascript" src="{{url_for('static',filename='bootstrap/js/bootstrap.js')}}" ></script>
-	<!--<script type="text/javascript" src="{{url_for('static',filename='js/jquery-ui-1.8.19.custom.min.js')}}" ></script>-->
+{% block my_scripts %}
+	{{ super() }}
 	<script type="text/javascript" src="{{url_for('static',filename='js/jquery-ui-1.10.1.custom.js')}}" ></script>
 	<script type="text/javascript" src="{{url_for('static',filename='js/d3.v2.js')}}" ></script>
 	<script type="text/javascript" src="{{url_for('static',filename='js/move-zoom.js')}}" ></script>
 	<script type="text/javascript" src="{{url_for('static',filename='js/colorbrewer.js')}}" ></script>
 	<script type="text/javascript" src="{{url_for('static',filename='js/QVisBase.js')}}" ></script>
 	<script type="text/javascript" src="{{url_for('static',filename='js/QVisHeatMap.js')}}" ></script>
-	{% block specialvars %}
+{% block specialvars %}
 	<script type=text/javascript>
 		$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 	</script>
-	{% endblock %}
+{% endblock %}
 {% endblock %}
 
 {% block content %}
-	{% block description %}
-		<div id="task-description">
-			{% block instructions%}
-			{% endblock %}
-		</div>
-	{% endblock %}
-	<h2>Options</h2>
-	<form id="sql-query-form" method="post">
-		<label for="resolution-lvl">Up to how many data points can I show you?
-			<select name="resolution-lvl" id="resolution-lvl-menu">
-				<option value="0">default</option>
-				<option value="2500">2500 data points</option>
-				<option value="10000">10000 data points</option>
-				<option value="40000">40000 data points</option>
-				<option value="250000">250000 data points</option>
-				<option value="1000000">1000000 data points</option>
-			</select>
-		</label>
-		<input type="submit" id="sql-query-submit" class ="btn" value="Update Resolution"></input>
-	</form>
-	<div id="option-buttons">
-		<span id="reset-query-button">
-			<a class="btn">Reset Answers for{% block taskname %}{% endblock %}</a>
-		</span>
-		{{ super() }}
-	</div>
-	<h2 id="resulting-plot-header" class="heading">Resulting Plot<small></small></h2>
-	<img src="{{url_for('static',filename='images/ajax-loader.gif')}}" id="loading_image">
-	<div id="nav">
-		<a id="button-up" class="nav-button btn">up</a>
-		<a id="button-down" class="nav-button btn">down</a>
-		<a id="button-left" class="nav-button btn">left</a>
-		<a id="button-right" class="nav-button btn">right</a>
-	</div>
-	<div id="aggplot" class=".hide-element">
-		<div class="legend"></div>
-		<canvas id="canvas" class=".hide-element"></canvas>
-		<svg></svg>
-		<div id="map" class=".hide-element">
-			<div></div>
-		</div>
-	</div>
-	<form id="answer-select">
-		<label id="answer-select-checkbox-label">
-			This subset of the data meets the requirements:
-			<input id="answer-select-checkbox" name="answer-select" type="checkbox"/>
-			[<span id="answer-select-checked-yes">yes</span>,
-			<span id="answer-select-checked-no" >no</span>]
-		</label>
-	</form>
-	<form id="aggplot-form">
-		<div name="xlabel" class="xlabel">
-			<label id="xlabel-select">x Axis:
-				<div id="xlabel-radio">
-					<label class="checkbox inline"><input type="radio" id="xlabel-radio1" name="xlabel-radio" value="invert"/>invert</label>
-					<label class="checkbox inline"><input type="radio" id="xlabel-radio2" name="xlabel-radio" checked="checked"  value=""/>none</label>
+	<div class="accordion" id="accordion2">
+		<div class="accordion-group">
+			<div class="accordion-heading">
+				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseOverview">
+				Overview
+				</a>
+			</div>
+			<div id="collapseOverview" class="accordion-body collapse in">
+				<div class="accordion-inner">
+				{% block description %}
+					<div id="task-description">
+						{% block instructions%}
+						{% endblock %}
+					</div>
+				{% endblock %}
 				</div>
-			</label>
+			</div>
 		</div>
-		<div name="ylabel" class="ylabel">
-			<label id="ylabel-select">y Axis:
-				<div id="ylabel-radio">
-					<label class="checkbox inline"><input type="radio" id="ylabel-radio1" name="ylabel-radio" value="invert"/>invert</label>
-					<label class="checkbox inline"><input type="radio" id="ylabel-radio2" name="ylabel-radio" checked="checked" value=""/>none</label>
+		<div class="accordion-group">
+			<div class="accordion-heading">
+				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseOptions">
+				Options
+				</a>
+			</div>
+			<div id="collapseOptions" class="accordion-body collapse in">
+				<div class="accordion-inner">
+					<h2>Options</h2>
+					<form id="sql-query-form" method="post">
+						<label for="resolution-lvl">Up to how many data points can I show you?
+							<select name="resolution-lvl" id="resolution-lvl-menu">
+								<option value="0">default</option>
+								<option value="2500">2500 data points</option>
+								<option value="10000">10000 data points</option>
+								<option value="40000">40000 data points</option>
+								<option value="250000">250000 data points</option>
+								<option value="1000000">1000000 data points</option>
+							</select>
+						</label>
+						<input type="submit" id="sql-query-submit" class ="btn" value="Update Resolution"></input>
+					</form>
+					<div id="option-buttons">
+						<span id="reset-query-button">
+							<a class="btn">Reset Answers for{% block taskname %}{% endblock %}</a>
+						</span>
+						{{ super() }}
+					</div>
 				</div>
-			</label>
+			</div>
 		</div>
-		<div name="zlabel" class="zlabel">
-			<label id="zlabel-select">z Axis (color):
-				<div id="zlabel-radio">
-					<label class="checkbox inline"><input type="radio" id="zlabel-radio1" name="zlabel-radio" value="invert"/>invert</label>
-					<label class="checkbox inline"><input type="radio" id="zlabel-radio2" name="zlabel-radio" checked="checked" value=""/>none</label>
+		<div class="accordion-group">
+			<div class="accordion-heading">
+				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseResults">
+				Resulting Plot
+				</a>
+			</div>
+			<div id="collapseResults" class="accordion-body collapse in">
+				<div class="accordion-inner">
+					<h2 id="resulting-plot-header" class="heading">Resulting Plot</h2>
+					<img src="{{url_for('static',filename='images/ajax-loader.gif')}}" id="loading_image">
+					<div id="nav">
+						<a id="button-up" class="nav-button btn"><i class="icon-arrow-up"></i></a>
+						<a id="button-down" class="nav-button btn"><i class="icon-arrow-down"></i></a>
+						<a id="button-left" class="nav-button btn"><i class="icon-arrow-left"></i></a>
+						<a id="button-right" class="nav-button btn"><i class="icon-arrow-right"></i></a>
+					</div>
+					<div id="aggplot" class=".hide-element">
+						<div class="legend"></div>
+						<canvas id="canvas" class=".hide-element"></canvas>
+						<svg></svg>
+						<div id="map" class=".hide-element">
+							<div></div>
+						</div>
+					</div>
+					<form id="answer-select">
+						<label id="answer-select-checkbox-label">
+							This subset of the data meets the requirements:
+							<input id="answer-select-checkbox" name="answer-select" type="checkbox"/>
+							[<span id="answer-select-checked-yes">yes</span>,
+							<span id="answer-select-checked-no" >no</span>]
+						</label>
+					</form>
 				</div>
-			</label>
+			</div>
 		</div>
-		<div class="colorscheme">
-			<label id="label-color-scheme">color scheme:
-				<select id="color-scheme">
-					<option value="YlGn">Yellow->Green</option>
-					<option value="YlGnBu">Yellow->Green->Blue</option>
-					<option value="GnBu" selected="selected">Green->Blue</option>
-					<option value="BuGn">Blue->Green</option>
-					<option value="PuBuGn">Purple->Blue->Green</option>
-					<option value="PuBu">Purple->Blue</option>
-					<option value="BuPu">Blue->Purple</option>
-					<option value="RdPu">Red->Purple</option>
-					<option value="PuRd">Purple->Red</option>
-					<option value="OrRd">Orange->Red</option>
-					<option value="YlOrRd">Yellow->Orange->Red</option>
-					<option value="YlOrBr">Yellow->Orange->Brown</option>
-					<option value="Purples">Purples</option>
-					<option value="Blues">Blues</option>
-					<option value="Greens">Greens</option>
-					<option value="Oranges">Oranges</option>
-					<option value="Reds">Reds</option>
-					<option value="Greys">Greys</option>
-					<option value="PuOr">Purple->Orange</option>
-					<option value="BrBG">Brown->BlueGreen</option>
-					<option value="PRGn">Purple->Red->Green</option>
-					<option value="PiYG">Pink->Yellow-Green</option>
-					<option value="RdBu">Red->Blue</option>
-					<option value="RdGy">Red->Green-Yellow</option>
-					<option value="RdYlBu">Red->Yellow->Blue</option>
-					<option value="Spectral">Spectral</option>
-					<option value="RdYlGn">Red->Yellow->Green</option>
-				</select>
-			</label>
+		<div class="accordion-group">
+			<div class="accordion-heading">
+				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseUpdateMenu">
+				Visualization Options
+				</a>
+			</div>
+			<div id="collapseUpdateMenu" class="accordion-body collapse in">
+				<div class="accordion-inner">
+					<form id="aggplot-form">
+						<div name="xlabel" class="xlabel form-inline">
+							<label id="xlabel-select">x Axis:</label>
+							<label class="checkbox"><input type="radio" id="xlabel-radio1" name="xlabel-radio" value="invert"/>invert</label>
+							<label class="checkbox"><input type="radio" id="xlabel-radio2" name="xlabel-radio" checked="checked"  value=""/>none</label>
+						</div>
+						<div name="ylabel" class="ylabel form-inline">
+							<label id="ylabel-select">y Axis:</label>
+							<label class="checkbox"><input type="radio" id="ylabel-radio1" name="ylabel-radio" value="invert"/>invert</label>
+							<label class="checkbox"><input type="radio" id="ylabel-radio2" name="ylabel-radio" checked="checked" value=""/>none</label>
+						</div>
+						<div name="zlabel" class="zlabel form-inline">
+							<label id="zlabel-select">z Axis (color):</label>
+							<label class="checkbox"><input type="radio" id="zlabel-radio1" name="zlabel-radio" value="invert"/>invert</label>
+							<label class="checkbox"><input type="radio" id="zlabel-radio2" name="zlabel-radio" checked="checked" value=""/>none</label>
+						</div>
+						<div class="colorscheme">
+							<label id="label-color-scheme">color scheme:
+								<select id="color-scheme" class="span2">
+									<option value="YlGn">Yellow->Green</option>
+									<option value="YlGnBu">Yellow->Green->Blue</option>
+									<option value="GnBu" selected="selected">Green->Blue</option>
+									<option value="BuGn">Blue->Green</option>
+									<option value="PuBuGn">Purple->Blue->Green</option>
+									<option value="PuBu">Purple->Blue</option>
+									<option value="BuPu">Blue->Purple</option>
+									<option value="RdPu">Red->Purple</option>
+									<option value="PuRd">Purple->Red</option>
+									<option value="OrRd">Orange->Red</option>
+									<option value="YlOrRd">Yellow->Orange->Red</option>
+									<option value="YlOrBr">Yellow->Orange->Brown</option>
+									<option value="Purples">Purples</option>
+									<option value="Blues">Blues</option>
+									<option value="Greens">Greens</option>
+									<option value="Oranges">Oranges</option>
+									<option value="Reds">Reds</option>
+									<option value="Greys">Greys</option>
+									<option value="PuOr">Purple->Orange</option>
+									<option value="BrBG">Brown->BlueGreen</option>
+									<option value="PRGn">Purple->Red->Green</option>
+									<option value="PiYG">Pink->Yellow-Green</option>
+									<option value="RdBu">Red->Blue</option>
+									<option value="RdGy">Red->Green-Yellow</option>
+									<option value="RdYlBu">Red->Yellow->Blue</option>
+									<option value="Spectral">Spectral</option>
+									<option value="RdYlGn">Red->Yellow->Green</option>
+								</select>
+							</label>
+						</div>
+						<label id="label-width">width:
+							<input type="text" id="update-width" class="span1"/>
+						</label>
+						<label id="label-height">height:
+							<input type="text" id="update-height" class="span1"/>
+						</label>
+						<div id="update-submit-div">
+							<input type="submit" id="vis-update-submit" class="update-submit btn" value="Submit"/>
+						</div>
+					</form>
+				</div>
+			</div>
 		</div>
-		<div class="width">
-			<label id="label-width">width:
-				<input type="text" id="update-width"/>
-			</label>
-		</div>
-		<div class="height">
-			<label id="label-height">height:
-				<input type="text" id="update-height"/>
-			</label>
-		</div>
-		<div id="update-submit-div">
-			<input type="submit" id="vis-update-submit" class="update-submit btn" value="Submit"/>
-		</div>
-	</form>
+	</div>
 	<div id="extra-content">
 	{% block extra_content %}
 	{% endblock %}
