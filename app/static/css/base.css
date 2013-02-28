@@ -32,7 +32,7 @@ div#update-submit-div {
 
 /* hide all the visualization components by default */
 #outer-aggplot, #aggplot, #map, #canvas, #aggplot-form, #resulting-plot-header, #nav, #answer-select, #histogram-container,
-canvas#hist1, canvas#hist2, #loading_image {
+canvas#hist1, canvas#hist2, #loading_image, #legend {
 	display: none;
 }
 
@@ -46,7 +46,7 @@ canvas#hist1, canvas#hist2, #loading_image {
 /*
  show these visualizatio components, and make them display block
 */
-#aggplot-form.show,#resulting-plot-header.show, #nav.show, #map.show, #canvas.show, #answer-select.show,
+#aggplot-form.show,#resulting-plot-header.show, #map.show, #canvas.show, #answer-select.show,
 canvas#hist1.show, #loading_image.show {
 	display: block;
 }
@@ -56,6 +56,28 @@ canvas#hist1.show, #loading_image.show {
 	position: absolute;
 	top: 0;
 	left: 0;
+}
+
+/* add padding between the directional buttons and the visualization */
+#nav.show {
+	display: block;
+	padding: 0px 0px 20px;
+}
+
+/* adjust legend so it's next to visualization on the left side, 
+and add padding between the legend and visualization */
+#legend.show {
+	display: block;
+	float: left;
+	padding: 0px 30px 0px 0px;
+}
+
+/* fix up line thinkness, etc for legend */
+.legend-axis path,
+.legend-axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 
 /* controls the highlighting of the yes/no for answers to the user study */

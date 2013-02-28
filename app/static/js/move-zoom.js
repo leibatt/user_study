@@ -20,6 +20,7 @@ var once =0;
 
 $(document).ready(function() {
 	$('ul.nav-list > li.disabled > a').click(function () { return false; }); // don't let IE users click on disabled nav links
+	$('[rel=tooltip]').tooltip(); // enable tooltips
 	$('#sql-query-submit').on('click',user_query_handler);
 	$('#button-up').on('click',move_up);
 	$('#button-down').on('click',move_down);
@@ -292,6 +293,7 @@ $(document).ready(function() {
 		$('#aggplot-form').removeClass('show');
 		$('#nav').removeClass('show');
 		$('#answer-select').removeClass('show');
+		$('#legend').removeClass('show');
 		//$('#loading_image').addClass('show');
 		$("body").css("cursor", "progress");
 		$.getJSON($SCRIPT_ROOT+'/scalar/fetch-first-tile',{data_set: $DATA_SET, task:$TASK,data_threshold:resolution_lvl},function(jsondata){
@@ -306,6 +308,7 @@ $(document).ready(function() {
 				$('#aggplot').addClass('show');
 				$('#answer-select').addClass('show');
 				$('#aggplot-form').addClass('show');
+				$('#legend').addClass('show');
 
 				// set index back to 0
 				current_id = new Array(numdims);
@@ -509,10 +512,5 @@ $(document).ready(function() {
 		return zoom_in2(xindex,yindex);
 	}
 
-	function show_dialogue1() {
-		$( "#dialog-message1" ).dialog('open');
-	}
-
 	user_query_handler();
-	show_dialogue1();
 });

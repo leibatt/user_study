@@ -138,11 +138,13 @@ QVis.Graph.prototype.clear = function() {
 	this.xlabeldiv = $("#"+this.rootid+"-form .xlabel");	
 	this.ylabeldiv = $("#"+this.rootid+"-form .ylabel");	
 	this.zlabeldiv = $("#"+this.rootid+"-form .zlabel");	
+	this.legend = $("#legend-content");
 	this.xlabeldiv.find("select").remove();//.empty();
 	this.ylabeldiv.find("select").remove();//.empty();
 	this.zlabeldiv.find("select").remove();//.empty();
 	this.jsvg.empty(); this.jlegend.empty();
 	this.map.empty();
+	this.legend.empty();
 	this.map.append('<div></div>');
 	this.brush = null;
 	this.max = null;
@@ -814,6 +816,39 @@ QVis.Graph.prototype.drawRectsCanvas = function(ctx,_data,_types,xscale,yscale,x
 	}
 	var end = Math.round((new Date().getTime())/1000);
 	console.log(["draw rect duration",end-start]);
+}
+
+/*
+Draws the legend for the graph. Needs the container to draw the legend in,
+desired dimensions of the legend, and the color scale.
+*/
+QVis.Graph.prototype.drawLegend = function(l_w,l_h,color) {
+	var xpadding = 50;
+	var ypadding = 15;
+	var numcolors = 9; // number of colors in color scale
+	var temp = this;
+	var color_domain = color.domain();
+	var scale = d3.scale.linear().domain([color_domain[0],color_domain[1]]).range([ypadding,l_h+ypadding]);
+	var ticks = [color_domain[0]];
+	var step = 1.0 *(color_domain[1] - color_domain[0]) / numcolors; // divide domain by number of colors in the scale
+	for(var i = 1; i < numcolors; i++) { // loop over number of colors in scale - 1 to get ticks, I only use 9 by default
+		ticks.push(color_domain[0]+i*step);
+	}
+	ticks.push(color_domain[1]);
+	console.log(["ticks",ticks]);
+	var axis = d3.svg.axis().scale(scale).orient("left").tickValues(ticks).tickFormat(d3.format(".2f"));
+	var svg = d3.selectAll(this.legend.get()).append("svg")
+		.attr("width",l_w+xpadding)
+		.attr("height",l_h+2*ypadding);
+	svg.selectAll("rect")
+		.data(ticks.slice(0,ticks.length-1))
+		.enter().append("rect")
+		.attr("x", xpadding)
+		.attr("y", function(d) { return scale(d); })
+		.attr("width",l_w)
+		.attr("height",Math.round(l_h/numcolors))
+		.attr("fill",function(d) { return color(d) });
+	svg.append("g").attr("class","legend-axis").attr("transform","translate("+xpadding+",0)").call(axis);
 }
 
 QVis.Graph.prototype.drawLines = function(container,_data,_types,xscale,yscale) {

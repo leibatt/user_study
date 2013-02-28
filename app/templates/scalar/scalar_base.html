@@ -58,6 +58,7 @@
 								<option value="250000">250000 data points</option>
 								<option value="1000000">1000000 data points</option>
 							</select>
+							<a rel="tooltip" data-placement="right" data-toggle="tooltip" title="select a menu item to make the visualization more/less detailed"><i class="icon-question-sign"></i></a>
 						</label>
 						<input type="submit" id="sql-query-submit" class ="btn" value="Update Resolution"></input>
 					</form>
@@ -85,9 +86,14 @@
 						<a id="button-down" class="nav-button btn"><i class="icon-arrow-down"></i></a>
 						<a id="button-left" class="nav-button btn"><i class="icon-arrow-left"></i></a>
 						<a id="button-right" class="nav-button btn"><i class="icon-arrow-right"></i></a>
+						<a rel="tooltip" data-placement="right" data-toggle="tooltip" title="click these buttons to move up/down/left/right through the data set"><i class="icon-question-sign"></i></a>
+					</div>
+					<div id="legend">
+						<!--<h3>Legend</h3>-->
+						<div id="legend-content">
+						</div>
 					</div>
 					<div id="aggplot" class=".hide-element">
-						<div class="legend"></div>
 						<canvas id="canvas" class=".hide-element"></canvas>
 						<svg></svg>
 						<div id="map" class=".hide-element">
@@ -100,6 +106,7 @@
 							<input id="answer-select-checkbox" name="answer-select" type="checkbox"/>
 							[<span id="answer-select-checked-yes">yes</span>,
 							<span id="answer-select-checked-no" >no</span>]
+							<a rel="tooltip" data-placement="right" data-toggle="tooltip" title="click this checkbox if the above visualization meets the goal requirements for the current task"><i class="icon-question-sign"></i></a>
 						</label>
 					</form>
 				</div>
@@ -118,16 +125,19 @@
 							<label id="xlabel-select">x Axis:</label>
 							<label class="checkbox"><input type="radio" id="xlabel-radio1" name="xlabel-radio" value="invert"/>invert</label>
 							<label class="checkbox"><input type="radio" id="xlabel-radio2" name="xlabel-radio" checked="checked"  value=""/>none</label>
+							<a rel="tooltip" data-placement="right" data-toggle="tooltip" title="select a menu item to change which dimension/attribute of the data set should be the x-axis of the visualization. Invert will map the largest value to the left edge of the visualization"><i class="icon-question-sign"></i></a>
 						</div>
 						<div name="ylabel" class="ylabel form-inline">
 							<label id="ylabel-select">y Axis:</label>
 							<label class="checkbox"><input type="radio" id="ylabel-radio1" name="ylabel-radio" value="invert"/>invert</label>
 							<label class="checkbox"><input type="radio" id="ylabel-radio2" name="ylabel-radio" checked="checked" value=""/>none</label>
+							<a rel="tooltip" data-placement="right" data-toggle="tooltip" title="select a menu item to change which dimension/attribute of the data set should be the y-axis of the visualization. Invert will map the largest value to the bottom edge of the visualization"><i class="icon-question-sign"></i></a>
 						</div>
 						<div name="zlabel" class="zlabel form-inline">
 							<label id="zlabel-select">z Axis (color):</label>
 							<label class="checkbox"><input type="radio" id="zlabel-radio1" name="zlabel-radio" value="invert"/>invert</label>
 							<label class="checkbox"><input type="radio" id="zlabel-radio2" name="zlabel-radio" checked="checked" value=""/>none</label>
+							<a rel="tooltip" data-placement="right" data-toggle="tooltip" title="select a menu item to change which dimension/attribute of the data set should dictate the coloring of the visualization. Invert will invert the color mapping"><i class="icon-question-sign"></i></a>
 						</div>
 						<div class="colorscheme">
 							<label id="label-color-scheme">color scheme:
@@ -160,13 +170,16 @@
 									<option value="Spectral">Spectral</option>
 									<option value="RdYlGn">Red->Yellow->Green</option>
 								</select>
+								<a rel="tooltip" data-placement="right" data-toggle="tooltip" title="select a menu item to change the color scheme"><i class="icon-question-sign"></i></a>
 							</label>
 						</div>
 						<label id="label-width">width:
 							<input type="text" id="update-width" class="span1"/>
+							<a rel="tooltip" data-placement="right" data-toggle="tooltip" title="input a number to change the width of the visualization"><i class="icon-question-sign"></i></a>
 						</label>
 						<label id="label-height">height:
 							<input type="text" id="update-height" class="span1"/>
+							<a rel="tooltip" data-placement="right" data-toggle="tooltip" title="input a number to change the height of the visualization"><i class="icon-question-sign"></i></a>
 						</label>
 						<div id="update-submit-div">
 							<input type="submit" id="vis-update-submit" class="update-submit btn" value="Submit"/>

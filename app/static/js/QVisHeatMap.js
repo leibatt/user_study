@@ -51,6 +51,7 @@ QVis.HeatMap.prototype.render_canvas = function(_data, _labels,_types, opts) {
 			self.zscale.domain([this.min[self.labelsfrombase.z_label],this.max[self.labelsfrombase.z_label]]);
 		}
 	}
+	console.log(["color domain:",self.zscale.domain()]);
 	//var xscale = d3.scale.linear().domain([Number(_labels.dimbases[xdimname]),Number(_labels.dimwidths[xdimname])+Number(_labels.dimbases[xdimname])]).range([this.px,this.w-this.px]);
 	//var yscale = d3.scale.linear().domain([Number(_labels.dimwidths[ydimname])+Number(_labels.dimbases[ydimname]),Number(_labels.dimbases[ydimname])]).range([this.py,this.h-this.py]);
 	var xscale = this.createScale(_data,_types,self.labelsfrombase.x_label,this.w,this.px,this.inv[0]/*true*/,false)
@@ -99,10 +100,12 @@ QVis.HeatMap.prototype.render_canvas = function(_data, _labels,_types, opts) {
 		.attr("id","mouseclick_rect")
 		.attr("x", this.px)
 		.attr("y", this.py)
-		.attr("width", this.w-2*this.px+Math.max(1,(self.w-2*self.px)/(_labels.dimwidths[xdimname]-1)))				
-		.attr("height", this.h-2*this.py+Math.max(1,(self.h-2*self.py)/(_labels.dimwidths[ydimname]-1)))
+		.attr("width", this.w-2*this.px/*+Math.max(1,(self.w-2*self.px)/(_labels.dimwidths[xdimname]-1))*/)				
+		.attr("height", this.h-2*this.py/*+Math.max(1,(self.h-2*self.py)/(_labels.dimwidths[ydimname]-1))*/)
 		.style("color","black")
 		.style("opacity",0.0);
+
+	this.drawLegend(30,300,self.zscale);
 }
 
 //add a new render function
@@ -176,8 +179,8 @@ QVis.HeatMap.prototype.render = function(_data, _labels,_types, opts) {
 		.attr("id","mouseclick_rect")
 		.attr("x", this.px)
 		.attr("y", this.py)
-		.attr("width", this.w-2*this.px+Math.max(1,(self.w-2*self.px)/(_labels.dimwidths[xdimname]-1)))				
-		.attr("height", this.h-2*this.py+Math.max(1,(self.h-2*self.py)/(_labels.dimwidths[ydimname]-1)))
+		.attr("width", this.w-2*this.px/*+Math.max(1,(self.w-2*self.px)/(_labels.dimwidths[xdimname]-1))*/)				
+		.attr("height", this.h-2*this.py/*+Math.max(1,(self.h-2*self.py)/(_labels.dimwidths[ydimname]-1))*/)
 		.style("color","black")
 		.style("opacity",0.0);
 }
@@ -211,6 +214,7 @@ QVis.HeatMap.prototype.mini_render_canvas = function(_data, _labels,_types, opts
 			self.zscale.domain([this.min[self.labelsfrombase.z_label],this.max[self.labelsfrombase.z_label]]);
 		}
 	}
+	console.log(["color domain:",self.zscale.domain()]);
 	//var xscale = d3.scale.linear().domain([Number(_labels.dimbases[xdimname]),Number(_labels.dimwidths[xdimname])+Number(_labels.dimbases[xdimname])]).range([this.px,this.w-this.px]);
 	//var yscale = d3.scale.linear().domain([Number(_labels.dimwidths[ydimname])+Number(_labels.dimbases[ydimname]),Number(_labels.dimbases[ydimname])]).range([this.py,this.h-this.py]);
 	var xscale = this.createScale(_data,_types,self.labelsfrombase.x_label,this.w,this.px,this.inv[0]/*true*/,false)
@@ -260,8 +264,8 @@ QVis.HeatMap.prototype.mini_render_canvas = function(_data, _labels,_types, opts
 		.attr("id","mouseclick_rect")
 		.attr("x", this.px)
 		.attr("y", this.py)
-		.attr("width", this.w-2*this.px+Math.max(1,(self.w-2*self.px)/(_labels.dimwidths[xdimname]-1)))				
-		.attr("height", this.h-2*this.py+Math.max(1,(self.h-2*self.py)/(_labels.dimwidths[ydimname]-1)))
+		.attr("width", this.w-2*this.px/*+Math.max(1,(self.w-2*self.px)/(_labels.dimwidths[xdimname]-1))*/)				
+		.attr("height", this.h-2*this.py/*+Math.max(1,(self.h-2*self.py)/(_labels.dimwidths[ydimname]-1))*/)
 		.style("color","black")
 		.style("opacity",0.0);
 }
@@ -329,8 +333,8 @@ QVis.HeatMap.prototype.mini_render = function(_data, _labels,_types, opts) {
 		.attr("id","mouseclick_rect")
 		.attr("x", this.px)
 		.attr("y", this.py)
-		.attr("width", this.w-2*this.px+Math.max(1,(self.w-2*self.px)/(_labels.dimwidths[xdimname]-1)))				
-		.attr("height", this.h-2*this.py+Math.max(1,(self.h-2*self.py)/(_labels.dimwidths[ydimname]-1)))
+		.attr("width", this.w-2*this.px/*+Math.max(1,(self.w-2*self.px)/(_labels.dimwidths[xdimname]-1))*/)				
+		.attr("height", this.h-2*this.py/*+Math.max(1,(self.h-2*self.py)/(_labels.dimwidths[ydimname]-1))*/)
 		.style("color","black")
 		.style("opacity",0.0);
 }
