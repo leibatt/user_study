@@ -2,5 +2,6 @@
 {% block title %}Warmup Selections{% endblock %}
 {% block header %}Warmup Selections{% endblock %}
 {% block warmupselect_nav_active %}active{% endblock %}
+{% block delete_url %}{{url_for('scalar.delete_warmup_selections')}}{% endblock %}
 {% block next %}{{url_for('scalar.task1')}}{% endblock %}
 {% block submit_text %}Done Reviewing Warmup Selections{% endblock %}

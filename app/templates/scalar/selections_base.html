@@ -1,33 +1,35 @@
 {% extends "instructions.html" %}
-{% block form %}
-	<div>
+{% block content %}
 	{% if selections %}
-		<div class="row-fluid">
-			<ul class = "thumbnails">
-				{% for item in selections %}
-					<li class="span4">
-						<div class="thumbnail">
-							<img alt="300x200" style="width: 300px; height: 200px" src="{{item.image}}">
-							<div class="caption">
-								<!--<ul class="unstyled">
-									<li>tile id: {{item.tile_id}}</li>
-									<li>zoom level: {{item.zoom_level}}</li>
-									<li>date chosen: {{item.datetime}}</li>
-								</ul>-->
-								<div>
-									<label class="checkbox">
-										<input type="checkbox" class="selectionThumbnail" id="selectionThumbnail{{item.id}}">Delete
-									</label>
+		<form id="delete-selections-button" method="POST" action="{% block delete_url %}{% endblock %}">
+			<a class ="btn">Select All</a>
+			<input type="submit" class ="btn" value="Delete Checked Selections"/>
+			<div class="row-fluid">
+				<ul class = "thumbnails">
+					{% for item in selections %}
+						<li class="span4">
+							<div class="thumbnail">
+								<img alt="300x200" style="width: 300px; height: 200px" src="{{item.image}}">
+								<div class="caption">
+									<!--<ul class="unstyled">
+										<li>tile id: {{item.tile_id}}</li>
+										<li>zoom level: {{item.zoom_level}}</li>
+										<li>date chosen: {{item.datetime}}</li>
+									</ul>-->
+									<div>
+										<label class="checkbox">
+											<input type="checkbox" class="selectionThumbnail" id="selectionThumbnail{{item.id}}" name="selectionThumbnail{{item.id}}" value="{{item.id}}">Delete
+										</label>
+									</div>
 								</div>
 							</div>
-						</div>
-					</li>
-				{% endfor %}
-			</ul>
-		</div>
+						</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</form>
 	{% else %}
 		<p>No selections!</p>
 	{% endif %}
-		{{ super() }}
-	</div>
+	{{ super() }}
 {% endblock %}

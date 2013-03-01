@@ -1,4 +1,4 @@
-from flask import current_app,Flask,Blueprint, session, request, render_template, g, redirect, send_file
+from flask import current_app,Flask,Blueprint, session, request, render_template, g, redirect, send_file,url_for
 import simplejson as json
 import traceback
 import websocket
@@ -247,6 +247,33 @@ def task1_selections():
 @consent_required
 def task2_selections():
     return get_tile_selections("task2")
+
+@mod.route('/warmup/selections/delete/',methods=["POST","GET"])
+@consent_required
+def delete_warmup_selections():
+    delete_selections()
+    return redirect(url_for('scalar.warmup_selections'))
+
+@mod.route('/task1/selections/delete/',methods=["POST","GET"])
+@consent_required
+def delete_task1_selections():
+    delete_selections()
+    return redirect(url_for('scalar.task1_selections'))
+
+@mod.route('/task2/selections/delete/',methods=["POST","GET"])
+@consent_required
+def delete_task2_selections():
+    delete_selections()
+    return redirect(url_for('scalar.task2_selections'))
+
+def delete_selections():
+    form = dict(request.form)
+    for fieldname, value in form.items():
+        try:
+            db_session.query(UserTileSelection).filter_by(id=int(value[0])).delete()
+        except:
+            pass # didn't work, oh well
+    db_session.commit()
 
 def get_tile_selections(taskname):
     selections = []

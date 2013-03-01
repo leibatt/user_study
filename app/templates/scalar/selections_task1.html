@@ -2,5 +2,6 @@
 {% block title %}Task 1 Selections{% endblock %}
 {% block header %}Task 1 Selections{% endblock %}
 {% block task1select_nav_active %}active{% endblock %}
+{% block delete_url %}{{url_for('scalar.delete_task1_selections')}}{% endblock %}
 {% block next %}{{url_for('scalar.task2')}}{% endblock %}
 {% block submit_text %}Done Reviewing Task1 Selections{% endblock %}
