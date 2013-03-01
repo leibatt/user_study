@@ -4,6 +4,15 @@
 }
 */
 
+/* adjust the tutorial images so they stand out on the page */
+.tutorial-overlay {
+	background-color:#000000;
+} 
+img.tutorial-image {
+	opacity:0.9;
+	filter:alpha(opacity=90); /* For IE8 and earlier */
+}
+
 /* do I want this to be block? */
 #option-buttons {
 	display: block;
@@ -46,7 +55,7 @@ canvas#hist1, canvas#hist2, #loading_image, #legend {
 /*
  show these visualizatio components, and make them display block
 */
-#aggplot-form.show,#resulting-plot-header.show, #map.show, #canvas.show, #answer-select.show,
+#aggplot-form.show,#resulting-plot-header.show, #map.show, #canvas.show,
 canvas#hist1.show, #loading_image.show {
 	display: block;
 }
@@ -56,6 +65,12 @@ canvas#hist1.show, #loading_image.show {
 	position: absolute;
 	top: 0;
 	left: 0;
+}
+
+/* add padding between answer selection checkbox area and visualization */
+#answer-select.show {
+	display: block;
+	padding: 20px 0px 0px;
 }
 
 /* add padding between the directional buttons and the visualization */

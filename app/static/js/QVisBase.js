@@ -806,6 +806,8 @@ QVis.Graph.prototype.drawRectsCanvas = function(ctx,_data,_types,xscale,yscale,x
 	//var ctx = canvas.getContext('2d');
 	var temp = this;
 	var start = Math.round((new Date().getTime())/1000);
+	ctx.fillStyle = "#FFFFFF";
+	ctx.fillRect(0,0,this.w,this.h); // set the back to be white first
 	for(var drawindex = 0; drawindex < _data.length; drawindex++) {
 		ctx.fillStyle = color(_data[drawindex]);
 		ctx.fillRect(xscale(temp.get_data_obj(_data[drawindex][x_label],_types[x_label])),
