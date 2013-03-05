@@ -1,5 +1,5 @@
 from flask import Flask
-import app.database as db
+import database as db
 import logging
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
@@ -14,7 +14,7 @@ db.init_db()
 
 #setup logger
 if not app.debug:
-	file_handler = RotatingFileHandler(LOGFILE, maxBytes=10000, backupCount=1)
+	file_handler = RotatingFileHandler(app.config['LOGFILE'], maxBytes=10000, backupCount=1)
         file_handler.setFormatter(Formatter(
             '%(asctime)s %(levelname)s: %(message)s '
             '[in %(pathname)s:%(lineno)d]'
