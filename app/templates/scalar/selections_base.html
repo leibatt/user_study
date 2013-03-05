@@ -1,8 +1,12 @@
 {% extends "instructions.html" %}
+{% block my_scripts %}
+	{{super()}}
+	<script type="text/javascript" src="{{url_for('static',filename='js/selection.js')}}" ></script>
+{% endblock %}
 {% block content %}
 	{% if selections %}
 		<form id="delete-selections-button" method="POST" action="{% block delete_url %}{% endblock %}">
-			<a class ="btn">Select All</a>
+			<a class ="btn" id="select-all-button">Select/Deselect All</a>
 			<input type="submit" class ="btn" value="Delete Checked Selections"/>
 			<div class="row-fluid">
 				<ul class = "thumbnails">

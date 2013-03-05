@@ -1,4 +1,15 @@
 {% extends "instructions.html" %}
+{% block my_stylesheets %}
+	{{super()}}
+	<style>
+		form#done-button {
+			/*text-align: center;*/
+			display:block;
+			margin-right: auto;
+			margin-left: auto;
+		}
+	</style>
+{% endblock %}
 {% block title %}Consent Form{% endblock %}
 {% block header %}CONSENT TO PARTICIPATE IN NON-BIOMEDICAL RESEARCH{% endblock %}
 {% block subheader %}
