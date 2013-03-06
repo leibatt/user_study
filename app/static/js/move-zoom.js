@@ -34,7 +34,7 @@ $(document).ready(function() {
 		$('#answer-select-checked-no').toggleClass('highlight');
 		if ($('#answer-select-checkbox').is(':checked')) {
 			var canvasImg = $('#canvas')[0].toDataURL('image/jpeg'); // get image data
-			$.post($SCRIPT_ROOT+'/scalar/tile-selected/',{img:canvasImg});
+			$.post($SCRIPT_ROOT+'/scalar/tile-selected/',{img:canvasImg},function(data){},dataType="json");
 		} else {
 			$.get($SCRIPT_ROOT+'/scalar/tile-unselected/',{});
 		}
