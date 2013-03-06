@@ -211,7 +211,7 @@ def tile_selected():
         form = dict(request.form)
         for name,value in form.items():
             if name == 'img':
-                img = value
+                img = value[0]
     try:
         if len(img) > 0:
             session['user_tile_selection'].image = img
