@@ -1,0 +1,31 @@
+        WSGIDaemonProcess user_study processes=2 threads=5
+        WSGIScriptAlias /testurl /path/to/www/user_study/apache/user_study.wsgi
+
+        <Directory /path/to/www/user_study/apache>
+                WSGIProcessGroup user_study
+                WSGIApplicationGroup %{GLOBAL}
+                Order deny,allow
+                Allow from all
+        </Directory>
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel warn
+
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+        Alias /static/ /path/to/www/user_study/app/static/
+
+        <Directory /path/to/www/user_study/app/static>
+                Order allow,deny
+                Allow from all
+        </Directory>
+
+	Alias /templates/ /path/to/www/user_study/app/templates/
+
+        <Directory /path/to/www/user_study/app/templates>
+                Order allow,deny
+                Allow from all
+        </Directory>
