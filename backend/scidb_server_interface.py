@@ -50,7 +50,7 @@ def has_bad_words(query):
 	if ";" in query:
 		return {'error':{'type':"unsafe query",'args':("no semicolons allowed",)}}
 	if BAD_WORDS is None:
-		return False
+		return {'error':{'type':"unsafe query",'args':("bad words file is missing",)}}
 	for bw in BAD_WORDS:
 		#if re.search("(^|[^a-z0-9_])"+str(bw)+"([^a-z0-9_]|$)",query,re.IGNORECASE):
 		if bw in query:
