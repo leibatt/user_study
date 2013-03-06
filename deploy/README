@@ -1,4 +1,5 @@
 The files in this directory are templates for setting up a mod_wsgi application with apache2.
-Just replace all the paths with their appropriate path values.
+Just replace all the paths with their appropriate path values, and change
+the wsgi alias to the appropriate alias value for the website.
 Note also that if you want apache to serve the static files, you need
 to replace all the url_for calls in the templates.
