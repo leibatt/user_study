@@ -16,16 +16,9 @@
 
         CustomLog ${APACHE_LOG_DIR}/access.log combined
 
-        Alias /static/ /path/to/www/user_study/app/static/
+        Alias /testurl/static/ /path/to/www/user_study/app/static/
 
         <Directory /path/to/www/user_study/app/static>
-                Order allow,deny
-                Allow from all
-        </Directory>
-
-	Alias /templates/ /path/to/www/user_study/app/templates/
-
-        <Directory /path/to/www/user_study/app/templates>
                 Order allow,deny
                 Allow from all
         </Directory>
