@@ -204,7 +204,14 @@ def fetch_tile():
 @mod.route('/tile-selected/',methods=["POST","GET"])
 @consent_required
 def tile_selected():
-    img = request.args.get('img',"",type=str)
+    if request.method == 'GET':
+        img = request.args.get('img',"",type=str)
+    else:
+        img = ""
+        form = dict(request.form)
+        for name,value in form.items():
+            if name == 'img':
+                img = value
     try:
         if len(img) > 0:
             session['user_tile_selection'].image = img
@@ -213,7 +220,6 @@ def tile_selected():
     except Exception as e:
         current_app.logger.warning("unable to insert into database" % (e))
     current_app.logger.info("got here")
-    print "\n\n\n\ngot here"
     return json.dumps(str(0))
 
 @mod.route('/tile-unselected/',methods=["POST","GET"])
