@@ -34,29 +34,11 @@ $(document).ready(function() {
 		$('#answer-select-checked-no').toggleClass('highlight');
 		if ($('#answer-select-checkbox').is(':checked')) {
 			var canvasImg = $('#canvas')[0].toDataURL('image/jpeg'); // get image data
-			$.get($SCRIPT_ROOT+'/scalar/tile-selected/',{img:canvasImg},function(data){console.log("got here");});
+			$.post($SCRIPT_ROOT+'/scalar/tile-selected/',{img:canvasImg});
 		} else {
-			$.get($SCRIPT_ROOT+'/scalar/tile-unselected/',{},function(data){console.log("got here");});
+			$.get($SCRIPT_ROOT+'/scalar/tile-unselected/',{});
 		}
 	});
-	$( "#dialog-message1" ).dialog({
-		autoOpen: false,
-		modal: true,
-		buttons: {
-		Ok: function() {
-			$( this ).dialog( "close" );
-			}
-		}
-	});
-
-	//$('.nav-button').button();
-	//$('#done-button a').button();
-	//$('#reset-query-button a').button();
-
-	function goto_next() {
-		window.location = $SCRIPT_ROOT+$NEXT_TASK_PAGE;
-		return false;
-	}
 
         function handle_selection(selected) {
 		if(selected) { // check if user selected data tile as answer
