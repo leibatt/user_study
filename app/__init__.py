@@ -1,5 +1,4 @@
 from flask import Flask
-import database as db
 import logging
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
@@ -7,10 +6,6 @@ from logging import Formatter
 app = Flask(__name__)
 #add app configurations
 app.config.from_object('config')
-
-#initialize database
-db.configure_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-db.init_db()
 
 #setup logger
 if not app.debug:
@@ -23,6 +18,13 @@ if not app.debug:
         app.logger.addHandler(file_handler)
 
 # needs to be done at the end of the file
+__all__ = ['forms','scalar','bootstrap','models','views','database']
+
+#initialize database
+import app.database as db
+db.configure_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+db.init_db()
+
 from app.views import mod as homeModule
 from app.forms.views import mod as formsModule
 from app.scalar.views import mod as scalarModule
