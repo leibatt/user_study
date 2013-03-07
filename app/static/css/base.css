@@ -60,6 +60,18 @@ canvas#hist1.show, #loading_image.show {
 	display: block;
 }
 
+/* overlay a gray div over the visualization while it's still drawing */
+#canvas-overlay {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #000000;
+	opacity: 0.8;
+	z-index: 1000;
+}
+
 /* Make the svg click rectangle position absolute so it is positioned over the canvas */
 #svg_aggplot {
 	position: absolute;

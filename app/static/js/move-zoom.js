@@ -34,7 +34,7 @@ $(document).ready(function() {
 		$('#answer-select-checked-no').toggleClass('highlight');
 		if ($('#answer-select-checkbox').is(':checked')) {
 			var canvasImg = $('#canvas')[0].toDataURL('image/jpeg'); // get image data
-			$.post($SCRIPT_ROOT+'/scalar/tile-selected/',{img:canvasImg},function(data){},dataType="json");
+			$.post($SCRIPT_ROOT+'/scalar/tile-selected/',{img:canvasImg});
 		} else {
 			$.get($SCRIPT_ROOT+'/scalar/tile-unselected/',{});
 		}
@@ -72,13 +72,7 @@ $(document).ready(function() {
 			new_id[ypos] = 0;
 		}
 		
-		$.getJSON($SCRIPT_ROOT+'/scalar/fetch-tile',{tile_xid: -1,tile_yid:-1,level:zoom,
-					x_label:x_label,y_label:y_label,
-					temp_id:new_id,data_set: $DATA_SET},function(jsondata){
-			console.log(jsondata);
-			redraw_graph(jsondata);
-			handle_selection(jsondata['selected']);
-		});
+		get_redraw_data(zoom,x_label,y_label,new_id);
 		console.log(["move up: ",current_id,current_zoom,"-->",new_id,zoom]);
 		current_id = new_id;
 		return false;
@@ -104,13 +98,7 @@ $(document).ready(function() {
 			new_id[ypos] = total_tiles[ypos]-1;
 		}
 
-		$.getJSON($SCRIPT_ROOT+'/scalar/fetch-tile',{tile_xid: -1,tile_yid:-1,level:zoom,
-					x_label:x_label,y_label:y_label,
-					temp_id:new_id,data_set: $DATA_SET},function(jsondata){
-			console.log(jsondata);
-			redraw_graph(jsondata);
-			handle_selection(jsondata['selected']);
-		});
+		get_redraw_data(zoom,x_label,y_label,new_id);
 		console.log(["move down: ",current_id,current_zoom,"-->",new_id,zoom]);
 		current_id = new_id;
 		return false;
@@ -136,13 +124,7 @@ $(document).ready(function() {
 			new_id[xpos]= 0;
 		}
 
-		$.getJSON($SCRIPT_ROOT+'/scalar/fetch-tile',{tile_xid: -1,tile_yid:-1,level:zoom,
-					x_label:x_label,y_label:y_label,
-					temp_id:new_id,data_set: $DATA_SET},function(jsondata){
-			console.log(jsondata);
-			redraw_graph(jsondata);
-			handle_selection(jsondata['selected']);
-		});
+		get_redraw_data(zoom,x_label,y_label,new_id);
 		console.log(["move left: ",current_id,current_zoom,"-->",new_id,zoom]);
 		current_id = new_id;
 		return false;
@@ -169,13 +151,7 @@ $(document).ready(function() {
 			new_id[xpos] = total_tiles[xpos]-1;
 		}
 
-		$.getJSON($SCRIPT_ROOT+'/scalar/fetch-tile',{tile_xid: -1,tile_yid:-1,level:zoom,
-					x_label:x_label,y_label:y_label,
-					temp_id:new_id,data_set: $DATA_SET},function(jsondata){
-			console.log(jsondata);
-			redraw_graph(jsondata);
-			handle_selection(jsondata['selected']);
-		});
+		get_redraw_data(zoom,x_label,y_label,new_id);
 		console.log(["move right: ",current_id,current_zoom,"-->",new_id,zoom]);
 		current_id = new_id;
 		return false;
@@ -199,13 +175,7 @@ $(document).ready(function() {
 
 		if(zoom != current_zoom) { // if we're actually going somewhere else
 
-			$.getJSON($SCRIPT_ROOT+'/scalar/fetch-tile',{tile_xid: -1,tile_yid:-1,level:zoom,
-					x_label:x_label,y_label:y_label,
-					temp_id:new_id,data_set: $DATA_SET},function(jsondata){
-				console.log(jsondata);
-				redraw_graph(jsondata);
-			 	handle_selection(jsondata['selected']);
-			});
+			get_redraw_data(zoom,x_label,y_label,new_id);
 			console.log(["zoom out: ",current_id,current_zoom,"-->",new_id,zoom]);
 			current_id = new_id;
 			current_zoom = zoom;
@@ -245,18 +215,30 @@ $(document).ready(function() {
 		console.log(["zoom",zoom,"max_zoom",max_zoom]);
 		if(zoom != current_zoom) { // if we're actually going somewhere else
 
-			$.getJSON($SCRIPT_ROOT+'/scalar/fetch-tile',{tile_xid: -1,tile_yid:-1,level:zoom,
-					x_label:x_label,y_label:y_label,
-					temp_id:new_id,data_set: $DATA_SET},function(jsondata){
-				console.log(jsondata);
-				redraw_graph(jsondata);
-				handle_selection(jsondata['selected']);
-			});
+			get_redraw_data(zoom,x_label,y_label,new_id);
 			console.log(["zoom in: ",current_id,current_zoom,"-->",new_id,zoom]);
 			current_id = new_id;
 			current_zoom = zoom;
 		}
 		return false;
+	}
+
+	function get_redraw_data(zoom,x_label,y_label,new_id) {
+		$("body").css("cursor", "progress");
+		$('<div id="canvas-overlay"></div>')
+			.attr('width', this.w)
+			.attr('height', this.h)
+			.appendTo('#aggplot');
+		$.getJSON($SCRIPT_ROOT+'/scalar/fetch-tile',{tile_xid: -1,tile_yid:-1,level:zoom,
+			x_label:x_label,y_label:y_label,
+			temp_id:new_id,data_set: $DATA_SET},
+			function(jsondata){
+				console.log(jsondata);
+				redraw_graph(jsondata);
+				handle_selection(jsondata['selected']);
+				$('#canvas-overlay').remove();
+				$("body").css("cursor", "auto");
+		});
 	}
 
 	function user_query_handler() {
@@ -278,10 +260,10 @@ $(document).ready(function() {
 		$('#legend').removeClass('show');
 		//$('#loading_image').addClass('show');
 		$("body").css("cursor", "progress");
+		$('#vis-loading-modal').modal('show');
 		$.getJSON($SCRIPT_ROOT+'/scalar/fetch-first-tile',{data_set: $DATA_SET, task:$TASK,data_threshold:resolution_lvl},function(jsondata){
 			console.log(jsondata);
 			//$('#loading_image').removeClass('show');
-			$("body").css("cursor", "auto");
 			if(!("error" in jsondata)) {
 				draw_graph(jsondata);
 				handle_selection(jsondata['selected']);
@@ -307,6 +289,9 @@ $(document).ready(function() {
 				$("#resulting-plot-header").before($(error_string));
 				return false;
 			}
+			
+			$('#vis-loading-modal').modal('hide');
+			$("body").css("cursor", "auto");
 		});
 		return false;
 	}
