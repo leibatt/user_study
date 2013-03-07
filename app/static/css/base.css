@@ -18,6 +18,7 @@ img.tutorial-image {
 	display: block;
 }
 
+/* remove any padding/borders from the g tags */
 g {
 	border: none;
 	padding:0pxs;

@@ -1,0 +1,4 @@
+/* add padding between delete selections buttons and thumbnails */
+#delete-selections-buttons {
+	margin-bottom: 10px;
+}
