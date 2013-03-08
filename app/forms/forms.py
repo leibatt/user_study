@@ -1,4 +1,4 @@
-from wtforms import Form, BooleanField, TextField, validators
+from wtforms import Form, BooleanField, TextField, TextAreaField, validators
 from app.bootstrap.fields import BootstrapRadioField as BRadioField, BootstrapCheckBoxField as BCheckBoxField
 from app.database import db_session
 import app.forms.models as models
@@ -84,5 +84,7 @@ def generate_field_for_question(question):
 			return BRadioField(question.question_text,choices=selections)
 		else:
 			return BCheckBoxField(question.question_text,choices=selections)
+	elif question.input_type in ["textbox"]:
+		return TextAreaField(question.question_text)
 	else:
 		return TextField(question.question_text)
