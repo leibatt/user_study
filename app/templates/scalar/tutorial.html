@@ -14,226 +14,272 @@
 
 	{{ super() }}
 
-	<h2>Overview</h2>
-	<div class="row-fluid">
-	<ul>
-		<li>
-			<h3>Leaving the User Study Website</h3>
-			<ul>
-				<li>Closing the user study browser window/tab or navigating away from the user study website will end your participation in the user study.
-				</li>
-				<li>Information is not saved when you end your participation in the study. Therefore, if you revisit the user study website, a new participation session will be created and you will not have access to your previous information.
-				</li>
-			</ul>
-		</li>
-		<li>
-			<h3>User Study Tasks</h3>
-			<ul>
-				<li>There are 2 research-related user study tasks.
-				</li>
-				<li>Each task requires you to <strong>select a set of visualizations</strong> from ScalaR <strong>that meet given goal</strong> requirements.
-				</li>
-				<li>The <strong>overview section</strong> of each task page <strong>describes the data set</strong> being visualized in the task, and <strong>describes the goal</strong> of the task.
-				</li>
-				<li>The goal describes the requirements for the visualizations you need to find.
-				</li>
-				<li>The task pages have <strong>collapsible sections</strong>, so you can hide what you don't need.
-				</li>
-				<li><strong>Hover over <i class="icon-question-sign"></i> icons to learn more</strong> about the various menus and buttons of ScalaR while completing the tasks.
-				</li>
-				<div class="row-fluid">
-					<div class="span5 tutorial-overlay">
-						<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/overview.png') }}">
+	<div class="accordion" id="accordion2">
+		<div class="accordion-group">
+			<div class="accordion-heading">
+				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseOverview">
+				Overview
+				</a>
+			</div>
+			<div id="collapseOverview" class="accordion-body collapse">
+				<div class="accordion-inner">
+					<h2>Overview</h2>
+					<div class="row-fluid">
+						<ul>
+							<li>
+								<h3>Leaving the User Study Website</h3>
+								<ul>
+									<li>Closing the user study browser window/tab or navigating away from the user study website will end your participation in the user study.
+									</li>
+									<li>Information is not saved when you end your participation in the study. Therefore, if you revisit the user study website, a new participation session will be created and you will not have access to your previous information.
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h3>User Study Tasks</h3>
+								<ul>
+									<li>There are 2 research-related user study tasks.
+									</li>
+									<li>Each task requires you to <strong>select a set of visualizations</strong> from ScalaR <strong>that meet given goal</strong> requirements.
+									</li>
+									<li>The <strong>overview section</strong> of each task page <strong>describes the data set</strong> being visualized in the task, and <strong>describes the goal</strong> of the task.
+									</li>
+									<li>The goal describes the requirements for the visualizations you need to find.
+									</li>
+									<li>The task pages have <strong>collapsible sections</strong>, so you can hide what you don't need.
+									</li>
+									<li><strong>Hover over <i class="icon-question-sign"></i> icons to learn more</strong> about the various menus and buttons of ScalaR while completing the tasks.
+									</li>
+									<div class="row-fluid">
+										<div class="span5 tutorial-overlay">
+											<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/overview.png') }}">
+										</div>
+									</div>
+								</ul>
+							</li>
+							<li>
+								<h3>Making Selections</h3>
+								<ul>
+									<li><strong>To select visualizations, check the checkbox</strong> just under the visualization:
+										<div class="row-fluid">
+											<div class="span8 tutorial-overlay">
+												<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/answer_selection.png') }}">
+											</div>
+										</div>
+									</li>
+									<li><strong>To undo</strong> your current selection, click the same checkbox to <strong>remove the check</strong>:
+										<div class="row-fluid">
+											<div class="span4 tutorial-overlay">
+												<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/answer_selection_checked.png') }}">
+											</div>
+										</div>
+									</li>
+									<li>Your <strong>selections are saved</strong>, so you will not lose your answers when navigating to other web pages within the user study site.
+									</li>
+								</ul>
+							</li>
+							<li>
+								<h3>Reviewing Your Selections</h3>
+								<ul>
+									<li>Go to the task's <strong>Selections page</strong> to review your selections.
+									</li>
+									<li>The Selections page allows you to remove multiple visualization selections at once.
+									</li>
+								</ul>
+							</li>
+						</ul>
 					</div>
 				</div>
-			</ul>
-		</li>
-		<li>
-			<h3>Making Selections</h3>
-			<ul>
-				<li><strong>To select visualizations, check the checkbox</strong> just under the visualization:
-					<div class="row-fluid">
-						<div class="span8 tutorial-overlay">
-							<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/answer_selection.png') }}">
-						</div>
-					</div>
-				</li>
-				<li><strong>To undo</strong> your current selection, click the same checkbox to <strong>remove the check</strong>:
-					<div class="row-fluid">
-						<div class="span4 tutorial-overlay">
-							<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/answer_selection_checked.png') }}">
-						</div>
-					</div>
-				</li>
-				<li>Your <strong>selections are saved</strong>, so you will not lose your answers when navigating to other web pages within the user study site.
-				</li>
-			</ul>
-		</li>
-		<li>
-			<h3>Reviewing Your Selections</h3>
-			<ul>
-				<li>Go to the task's <strong>Selections page</strong> to review your selections.
-				</li>
-				<li>The Selections page allows you to remove multiple visualization selections at once.
-				</li>
-			</ul>
-		</li>
-	</ul>
-	</div>
-	<h2>General Options</h2>
-	<div class="row-fluid">
-		<div class="span5 tutorial-overlay">
-			<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/options_menu.png') }}">
+			</div>
 		</div>
-	</div>
-	<div class="row-fluid">
-		<ul id="query-options-content">
-			<li>
-				<h3>Changing the Resolution</h3>
-				<ul>
-					<li>ScalaR lets you specify an <strong>upper bound</strong> on how many <strong>data points</strong> are <strong>visualized</strong> from the data set.
-					</li>
-					<li>ScalaR needs more time to retrieve and draw more data points, but the resulting visualizations are more detailed.
-					</li>
+		<div class="accordion-group">
+			<div class="accordion-heading">
+				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseGeneralOptions">
+				General Options
+				</a>
+			</div>
+			<div id="collapseGeneralOptions" class="accordion-body collapse">
+				<div class="accordion-inner">
+					<h2>General Options</h2>
 					<div class="row-fluid">
 						<div class="span5 tutorial-overlay">
-							<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/update_resolution.png') }}">
+							<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/options_menu.png') }}">
 						</div>
 					</div>
-				</ul>
-			</li>
-			<li>
-				<h3>Starting Over</h3>
-				<ul>
-					<li>To quickly return to the overview visualization of the data set (the first visualization you see), click on the "Update Resolution" button. Make sure the resolution menu is set to your desired number of data points.
-					</li>
-					<li>Use the "Reset Answers for [Task]" button to quickly remove all visualization selections for the current task. You can also do this on the task's Selection page.
-					</li>
 					<div class="row-fluid">
-						<div class="span3 tutorial-overlay">
-							<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/reset_scalar.png') }}">
+						<ul id="query-options-content">
+							<li>
+								<h3>Changing the Resolution</h3>
+								<ul>
+									<li>ScalaR lets you specify an <strong>upper bound</strong> on how many <strong>data points</strong> are <strong>visualized</strong> from the data set.
+									</li>
+									<li>ScalaR needs more time to retrieve and draw more data points, but the resulting visualizations are more detailed.
+									</li>
+									<div class="row-fluid">
+										<div class="span5 tutorial-overlay">
+											<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/update_resolution.png') }}">
+										</div>
+									</div>
+								</ul>
+							</li>
+							<li>
+								<h3>Starting Over</h3>
+								<ul>
+									<li>To quickly return to the overview visualization of the data set (the first visualization you see), click on the "Update Resolution" button. Make sure the resolution menu is set to your desired number of data points.
+									</li>
+									<li>Use the "Reset Answers for [Task]" button to quickly remove all visualization selections for the current task. You can also do this on the task's Selection page.
+									</li>
+									<div class="row-fluid">
+										<div class="span3 tutorial-overlay">
+											<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/reset_scalar.png') }}">
+										</div>
+									</div>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-group">
+			<div class="accordion-heading">
+				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseExplore">
+				Exploring the Data Set and Visualizations
+				</a>
+			</div>
+			<div id="collapseExplore" class="accordion-body collapse">
+				<div class="accordion-inner">
+					<h2>Exploring the Data Set and Visualizations</h2>
+					<div class="row-fluid">
+						<div class="span6 tutorial-overlay">
+							<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/resulting_visualization.png') }}">
 						</div>
 					</div>
-				</ul>
-			</li>
-		</ul>
-	</div>
-	<h2>Exploring the Data Set and Visualizations</h2>
-	<div class="row-fluid">
-		<div class="span6 tutorial-overlay">
-			<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/resulting_visualization.png') }}">
-		</div>
-	</div>
-	<div class="row-fluid">
-		<ul id="navigation-content">
-			<li>
-				<h3>Directional Buttons and Click Zoom</h3>
-				<ul>
-					<li>There are <strong>4 directional buttons</strong> to move up, down, left, and right through the data set:
-						<ul>
-							<li>Moving up/down tells ScalaR to retrieve and visualize neighboring data in the y-dimension (x-axis range remains the same).
+					<div class="row-fluid">
+						<ul id="navigation-content">
+							<li>
+								<h3>Directional Buttons and Click Zoom</h3>
+								<ul>
+									<li>There are <strong>4 directional buttons</strong> to move up, down, left, and right through the data set:
+										<ul>
+											<li>Moving up/down tells ScalaR to retrieve and visualize neighboring data in the y-dimension (x-axis range remains the same).
+											</li>
+											<li>Moving left/right tells ScalaR to retrieve and visualize neighboring data in the x-dimension (y-axis range remains the same).
+											</li>
+											<div class="row-fluid">
+												<div class="span2 tutorial-overlay">
+													<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/directional_buttons.png') }}">
+												</div>
+											</div>
+										</ul>
+									</li>
+									<li>ScalaR has click-zoom functionality:
+										<ul>
+											<li><strong>Left-Click</strong> on the visualization to <strong>zoom in</strong> to the area of the visualization that was clicked on. 
+											</li>
+											<li><strong>Right-click</strong> on the visualizatoin to <strong>zoom out</strong>.
+											</li>
+										</ul>
+									</li>
+								</ul>
 							</li>
-							<li>Moving left/right tells ScalaR to retrieve and visualize neighboring data in the x-dimension (y-axis range remains the same).
+							<li>
+								<h3>Reading the Visualization</h3>
+								<ul>
+									<li><strong>Each visualization</strong> in ScalaR is generated from a specific <strong>subset of data from the database</strong> called a "data tile".
+									</li>
+									<li>Each "data tile" is in the form of a <strong>2-dimensional array</strong>. Each <strong>cell</strong> can contain multiple values called <strong>attributes</strong>.
+									</li>
+									<li>In this user study, all visualizations are <strong>heatmaps</strong>. Each <strong>rectangle in the heatmap</strong> corresponds to <strong>one cell in the data tile</strong>.
+									</li>
+									<li>The axes of the heatmap are the dimensions of the data tile.
+									</li>
+									<li>The colors of the heatmap are dictated by either cell attributes or the dimensions from the data tile.
+									</li>
+								</ul>
 							</li>
-							<div class="row-fluid">
-								<div class="span2 tutorial-overlay">
-									<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/directional_buttons.png') }}">
-								</div>
-							</div>
-						</ul>
-					</li>
-					<li>ScalaR has click-zoom functionality:
-						<ul>
-							<li><strong>Left-Click</strong> on the visualization to <strong>zoom in</strong> to the area of the visualization that was clicked on. 
-							</li>
-							<li><strong>Right-click</strong> on the visualizatoin to <strong>zoom out</strong>.
-							</li>
-						</ul>
-					</li>
-				</ul>
-			</li>
-			<li>
-				<h3>Reading the Visualization</h3>
-				<ul>
-					<li><strong>Each visualization</strong> in ScalaR is generated from a specific <strong>subset of data from the database</strong> called a "data tile".
-					</li>
-					<li>Each "data tile" is in the form of a <strong>2-dimensional array</strong>. Each <strong>cell</strong> can contain multiple values called <strong>attributes</strong>.
-					</li>
-					<li>In this user study, all visualizations are <strong>heatmaps</strong>. Each <strong>rectangle in the heatmap</strong> corresponds to <strong>one cell in the data tile</strong>.
-					</li>
-					<li>The axes of the heatmap are the dimensions of the data tile.
-					</li>
-					<li>The colors of the heatmap are dictated by either cell attributes or the dimensions from the data tile.
-					</li>
-				</ul>
-			</li>
 
-		</ul>
-	</div>
-	<h2>Visualization Options</h2>
-	<div class="row-fluid">
-		<div class="span5 tutorial-overlay">
-			<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/vis_options_menu.png') }}">
+						</ul>
+					</div>
+				</div>
+			</div>
 		</div>
-	</div>
-	<div class="row-fluid">
-		<ul id="vis-options-content">
-			<li>
-				<h3>Changing the Axes</h3>
-				<ul>
-					<li>The "xAxis" and "yAxis" drop-down menus tell ScalaR what attributes from the data set should be the x-axis and y-axis of the visualization.
-					</li>
-					<li>The "zAxis" drop-down menu tells ScalaR what attribute from the data set should be used to generate the color scale for the visualization.
-					</li>
-					<li>The "invert" radio buttons tell ScalaR invert the mappings of their respective axes:
-						<ul>
-							<li>x-axis: data points mapping to the left of the visualization now map to the right of the visualization and vice versa.
+		<div class="accordion-group">
+			<div class="accordion-heading">
+				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseVisOptions">
+				Visualization Options
+				</a>
+			</div>
+			<div id="collapseVisOptions" class="accordion-body collapse">
+				<div class="accordion-inner">
+					<h2>Visualization Options</h2>
+					<div class="row-fluid">
+						<div class=" tutorial-overlay">
+							<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/vis_options_menu.png') }}">
+						</div>
+					</div>
+					<div class="row-fluid">
+						<ul id="vis-options-content">
+							<li>
+								<h3>Changing the Axes</h3>
+								<ul>
+									<li>The "xAxis" and "yAxis" drop-down menus tell ScalaR what attributes from the data set should be the x-axis and y-axis of the visualization.
+									</li>
+									<li>The "zAxis" drop-down menu tells ScalaR what attribute from the data set should be used to generate the color scale for the visualization.
+									</li>
+									<li>The "invert" radio buttons tell ScalaR invert the mappings of their respective axes:
+										<ul>
+											<li>x-axis: data points mapping to the left of the visualization now map to the right of the visualization and vice versa.
+											</li>
+											<li>y-axis: data points mapping to the bottom of the visualization now map to the top of the visualization and vice versa.
+											</li>
+											<li>z-axis: data points now map to their opposite color in the legend.
+											</li>
+										</ul>
+									</li>
+									<div class="row-fluid">
+										<div class="span3 tutorial-overlay">
+											<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/vis_menu_axes.png') }}">
+										</div>
+									</div>
+								</ul>
 							</li>
-							<li>y-axis: data points mapping to the bottom of the visualization now map to the top of the visualization and vice versa.
+							<li>
+								<h3>Changing the Color Scheme</h3>
+								<ul>
+									<li>The color scheme drop-down menu tells ScalaR what colors to use in the visualization.
+									</li>
+									<div class="row-fluid">
+										<div class="span3 tutorial-overlay">
+											<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/vis_menu_colorscheme.png') }}">
+										</div>
+									</div>
+								</ul>
 							</li>
-							<li>z-axis: data points now map to their opposite color in the legend.
+							<li>
+								<h3>Resizing the Visualization</h3>
+								<ul>
+									<li>The width and height text boxes tell ScalaR what dimensions to use to draw the visualization.
+									</li>
+									<div class="row-fluid">
+										<div class="span2 tutorial-overlay">
+											<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/new/vis_menu_windowresize.png') }}">
+										</div>
+									</div>
+								</ul>
+							</li>
+							<li>
+								<h3>Updating the Visualization your Changes</h3>
+								<ul>
+									<li>Click on the "Submit" button at the bottom of the visualization options menu to update the visualization with your changes.
+									</li>
+								</ul>
 							</li>
 						</ul>
-					</li>
-					<div class="row-fluid">
-						<div class="span3 tutorial-overlay">
-							<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/vis_menu_axes.png') }}">
-						</div>
-					</div>
-				</ul>
-			</li>
-			<li>
-				<h3>Changing the Color Scheme</h3>
-				<ul>
-					<li>The color scheme drop-down menu tells ScalaR what colors to use in the visualization.
-					</li>
-					<div class="row-fluid">
-						<div class="span3 tutorial-overlay">
-							<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/vis_menu_colorscheme.png') }}">
-						</div>
-					</div>
-				</ul>
-			</li>
-			<li>
-				<h3>Resizing the Visualization</h3>
-				<ul>
-					<li>The width and height text boxes tell ScalaR what dimensions to use to draw the visualization.
-					</li>
-					<div class="row-fluid">
-						<div class="span2 tutorial-overlay">
-							<img class="tutorial-image" src="{{ url_for('static',filename='images/scalar/tutorial/vis_menu_windowresize.png') }}">
-						</div>
-					</div>
-				</ul>
-			</li>
-			<li>
-				<h3>Updating the Visualization your Changes</h3>
-				<ul>
-					<li>Click on the "Submit" button at the bottom of the visualization options menu to update the visualization with your changes.
-					</li>
-				</ul>
-			</li>
-		</ul>
+					</div>	
+				</div>
+			</div>
+		</div>
 	</div>
 {% endblock %}
 
