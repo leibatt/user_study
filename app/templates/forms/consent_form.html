@@ -1,14 +1,7 @@
 {% extends "instructions.html" %}
 {% block my_stylesheets %}
 	{{super()}}
-	<style>
-		form#done-button {
-			/*text-align: center;*/
-			display:block;
-			margin-right: auto;
-			margin-left: auto;
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/consent.css')}}" >
 {% endblock %}
 {% block title %}Consent Form{% endblock %}
 {% block header %}CONSENT TO PARTICIPATE IN NON-BIOMEDICAL RESEARCH{% endblock %}
@@ -126,9 +119,11 @@ You are not waiving any legal claims, rights or remedies because of your partici
 	{{ super() }}
 {% endblock %}
 {% block form_content %}
-		<label id="consent-check-label" class="checkbox">
-			<input id="consent-check" name="consent-check" type="checkbox"/>I have read and understand the information above, and have decided to participate in this study.
-		</label>
+		<div id="consent-div">
+			<label id="consent-check-label" class="checkbox">
+				<input id="consent-check" name="consent-check" type="checkbox"/>I have read and understand the information above, and have decided to participate in this study.
+			</label>
+		</div>
 		{{ super() }}
 	</form>
 {% endblock %}
