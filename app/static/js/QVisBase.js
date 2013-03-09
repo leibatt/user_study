@@ -460,7 +460,10 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 			}
 
 			var neww = $('#update-width').val();
+			neww = isNaN(neww) ? width : neww;
 			var newh = $('#update-height').val();
+			newh = isNaN(newh) ? height : newh;
+			var newcolor = $('#color-scheme').val();
 			var newcolor = $('#color-scheme').val();
 
 			console.log(["selected options", zval,yval,xval]);
@@ -471,9 +474,13 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 			if ((!self.selectz || ((zval === selectedzval) && (inv[2] === inv_new[2]))) 
 				&& (!self.selecty || ((yval === selectedyval) && (inv[1] === inv_new[1]))) 
 				&& (!self.selectx || ((xval === selectedxval)  && (inv[0] === inv_new[0])))
-				&& (width === neww)
-				&& (height === newh)
-				&& (color === newcolor)) return false;
+				&& (width === neww)  // ignore if not a valid number
+				&& (height === newh) // ignore if not a valid number
+				&& (color === newcolor)) {
+				$('#update-width').val(width);
+				$('#update-height').val(height);
+				return false;
+			}
 			selectedxval = xval;
 			selectedyval = yval;
 			selectedzval = zval;
@@ -487,6 +494,10 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 				inv[i]= inv_new[i];
 			}
 			//inv = inv_new;
+			self.vis_metadata = {x_label:xval, y_label:yval, z_label:zval, // strings
+						x_inv:inv[0], y_inv:inv[1], z_inv: inv[2], // booleans
+						color:color, // string
+						width: width, height: height}; // ints
 
 			console.log(["changed radio vals: ",inv]);
 			var newlabels = {"z" : zval,"y": yval, "x":xval, "names" : _labels.names,'dimnames':_labels.dimnames,'dimwidths':_labels.dimwidths,'dimbases':_labels.dimbases,
@@ -559,7 +570,9 @@ QVis.Graph.prototype.mini_render = function(_data, _labels,_types, opts) {
 
 
 			var neww = $('#update-width').val();
+			neww = isNaN(neww) ? width : neww;
 			var newh = $('#update-height').val();
+			newh = isNaN(newh) ? height : newh;
 			var newcolor = $('#color-scheme').val();
 
 			console.log(["selected options", zval,yval,xval]);
@@ -570,9 +583,13 @@ QVis.Graph.prototype.mini_render = function(_data, _labels,_types, opts) {
 			if ((!self.selectz || ((zval === selectedzval) && (inv[2] === inv_new[2]))) 
 				&& (!self.selecty || ((yval === selectedyval) && (inv[1] === inv_new[1]))) 
 				&& (!self.selectx || ((xval === selectedxval)  && (inv[0] === inv_new[0])))
-				&& (width === neww)
+				&& (width === neww)  // ignore if not a valid number
 				&& (height === newh)
-				&& (color === newcolor)) return false;
+				&& (color === newcolor)) {
+				$('#update-width').val(width);
+				$('#update-height').val(height);
+				return false;
+			}
 			selectedxval = xval;
 			selectedyval = yval;
 			selectedzval = zval;
@@ -585,6 +602,12 @@ QVis.Graph.prototype.mini_render = function(_data, _labels,_types, opts) {
 			for(var i = 0; i <= 2; i++) {
 				inv[i]= inv_new[i];
 			}
+
+			// collect metadata for comparison purposes
+			self.vis_metadata = {x_label:xval, y_label:yval, z_label:zval, // strings
+						x_inv:inv[0], y_inv:inv[1], z_inv: inv[2], // booleans
+						color:color, // string
+						width: width, height: height}; // ints
 			//inv = inv_new;
 
 			console.log(["changed radio vals: ",inv]);
