@@ -52,6 +52,57 @@ $(document).ready(function() {
 		}
 	}
 
+	function check_same_id(new_id,zoom) {
+		for(var i = 0; i < current_id.length; i++) { // see if id changed
+			if (current_id[i] !== new_id[i]) {
+				return false;
+			}
+		}
+		return zoom === current_zoom; // id is the same, see if the zoom changed
+	}
+
+	function disable_directions(xpos,ypos) {
+		var disabled = [$('#button-up').hasClass('disabled'),
+				$('#button-down').hasClass('disabled'),
+				$('#button-left').hasClass('disabled'),
+				$('#button-right').hasClass('disabled')];
+		console.log(["disabled",disabled]);
+		console.log(["xpos",xpos,"ypos",ypos]);
+		// disable up
+		if((renderagg.inv[1] && (current_id[ypos] < (total_tiles[ypos]-1))) || 
+			(!renderagg.inv[1] && (current_id[ypos] > 0))) {
+			$('#button-up').removeClass('disabled');
+		} else if (!disabled[0]) {
+			$('#button-up').addClass('disabled');
+		}
+		// disable down
+		if((renderagg.inv[1] && (current_id[ypos] > 0)) || 
+			(!renderagg.inv[1] && (current_id[ypos] < (total_tiles[ypos]-1)))) {
+			$('#button-down').removeClass('disabled');
+		} else if (!disabled[1]) {
+			$('#button-down').addClass('disabled');
+		}
+		// disable left
+		if((renderagg.inv[0] && (current_id[xpos] < (total_tiles[xpos]-1))) || 
+			(!renderagg.inv[0] && (current_id[xpos] > 0))) {
+			$('#button-left').removeClass('disabled');
+		} else if (!disabled[2]) {
+			$('#button-left').addClass('disabled');
+		}
+		// disable right
+		if((renderagg.inv[0] && (current_id[xpos] > 0)) || 
+			(!renderagg.inv[0] && (current_id[xpos] < (total_tiles[xpos]-1)))) {
+			$('#button-right').removeClass('disabled');
+		} else if (!disabled[3]) {
+			$('#button-right').addClass('disabled');
+		}
+	}
+
+	function disable_zooms() {
+		// disable zoom in
+		// disable zoom out
+	}
+
 	function move_up() {
 		if(flip && renderagg.inv[1]) {
 			flip = false;
@@ -72,9 +123,11 @@ $(document).ready(function() {
 			new_id[ypos] = 0;
 		}
 		
-		get_redraw_data(zoom,x_label,y_label,new_id);
-		console.log(["move up: ",current_id,current_zoom,"-->",new_id,zoom]);
-		current_id = new_id;
+		if(!check_same_id(new_id,zoom)) { // if we're actually going somewhere else
+			console.log(["move up: ",current_id,current_zoom,"-->",new_id,zoom]);
+			current_id = new_id;
+			get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
+		}
 		return false;
 	}
 
@@ -98,9 +151,11 @@ $(document).ready(function() {
 			new_id[ypos] = total_tiles[ypos]-1;
 		}
 
-		get_redraw_data(zoom,x_label,y_label,new_id);
-		console.log(["move down: ",current_id,current_zoom,"-->",new_id,zoom]);
-		current_id = new_id;
+		if(!check_same_id(new_id,zoom)) { // if we're actually going somewhere else
+			console.log(["move down: ",current_id,current_zoom,"-->",new_id,zoom]);
+			current_id = new_id;
+			get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
+		}
 		return false;
 	}
 
@@ -124,9 +179,11 @@ $(document).ready(function() {
 			new_id[xpos]= 0;
 		}
 
-		get_redraw_data(zoom,x_label,y_label,new_id);
-		console.log(["move left: ",current_id,current_zoom,"-->",new_id,zoom]);
-		current_id = new_id;
+		if(!check_same_id(new_id,zoom)) { // id changed
+			console.log(["move left: ",current_id,current_zoom,"-->",new_id,zoom]);
+			current_id = new_id;
+			get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
+		}
 		return false;
 	}
 
@@ -151,9 +208,11 @@ $(document).ready(function() {
 			new_id[xpos] = total_tiles[xpos]-1;
 		}
 
-		get_redraw_data(zoom,x_label,y_label,new_id);
-		console.log(["move right: ",current_id,current_zoom,"-->",new_id,zoom]);
-		current_id = new_id;
+		if(!check_same_id(new_id,zoom)) { // if we're actually going somewhere else
+			console.log(["move right: ",current_id,current_zoom,"-->",new_id,zoom]);
+			current_id = new_id;
+			get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
+		}
 		return false;
 	}
 
@@ -173,12 +232,11 @@ $(document).ready(function() {
 		new_id[xpos] = Math.floor(new_id[xpos]/zoom_diff);
 		new_id[ypos] = Math.floor(new_id[ypos]/zoom_diff);
 
-		if(zoom != current_zoom) { // if we're actually going somewhere else
-
-			get_redraw_data(zoom,x_label,y_label,new_id);
+		if(!check_same_id(new_id,zoom)) { // if we're actually going somewhere else
 			console.log(["zoom out: ",current_id,current_zoom,"-->",new_id,zoom]);
 			current_id = new_id;
 			current_zoom = zoom;
+			get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
 		}
 		return false;
 	}
@@ -212,18 +270,17 @@ $(document).ready(function() {
 		if(zoom >= max_zoom) {
 			zoom = max_zoom - 1;
 		}
-		console.log(["zoom",zoom,"max_zoom",max_zoom]);
-		if(zoom != current_zoom) { // if we're actually going somewhere else
-
-			get_redraw_data(zoom,x_label,y_label,new_id);
+		console.log(["current_zoom",current_zoom,"zoom",zoom,"max_zoom",max_zoom]);
+		if(!check_same_id(new_id,zoom)) { // if we're actually going somewhere else
 			console.log(["zoom in: ",current_id,current_zoom,"-->",new_id,zoom]);
 			current_id = new_id;
 			current_zoom = zoom;
+			get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
 		}
 		return false;
 	}
 
-	function get_redraw_data(zoom,x_label,y_label,new_id) {
+	function get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id) {
 		$("body").css("cursor", "progress");
 		$('<div id="canvas-overlay"></div>')
 			.attr('width', this.w)
@@ -238,6 +295,8 @@ $(document).ready(function() {
 				handle_selection(jsondata['selected']);
 				$('#canvas-overlay').remove();
 				$("body").css("cursor", "auto");
+
+				disable_directions(xpos,ypos); // need to do this after total_tiles is updated
 		});
 	}
 
@@ -273,6 +332,11 @@ $(document).ready(function() {
 				$('#answer-select').addClass('show');
 				$('#aggplot-form').addClass('show');
 				$('#legend').addClass('show');
+
+				//disable directional buttons (should all be disabled)
+				var x_label = renderagg.labelsfrombase.x_label;
+				var y_label = renderagg.labelsfrombase.y_label;
+				disable_directions(indexmap[x_label],indexmap[y_label]); // need to do this after total_tiles is updated
 
 				// set index back to 0
 				current_id = new Array(numdims);
