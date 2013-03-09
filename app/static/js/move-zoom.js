@@ -52,13 +52,13 @@ $(document).ready(function() {
 		}
 	}
 
-	function check_same_id(new_id,zoom) {
+	function check_same_id(new_id) {
 		for(var i = 0; i < current_id.length; i++) { // see if id changed
 			if (current_id[i] !== new_id[i]) {
 				return false;
 			}
 		}
-		return zoom === current_zoom; // id is the same, see if the zoom changed
+		return true; // id is the same
 	}
 
 	function disable_directions(xpos,ypos) {
@@ -99,8 +99,15 @@ $(document).ready(function() {
 	}
 
 	function disable_zooms() {
-		// disable zoom in
-		// disable zoom out
+		$('#zoom-disable-div').empty();
+		$('#zoom-disable-div').removeClass('show');
+		if(current_zoom === 0) { // disable zoom out
+			$('#zoom-disable-div').addClass('show');
+			$('#zoom-disable-div').append('<span>can\'t zoom out (at highest zoom level)</span>');
+		} else if (current_zoom === (max_zoom - 1)) { // disable zoom in
+			$('#zoom-disable-div').addClass('show');
+			$('#zoom-disable-div').append('<span>can\'t zoom in (at lowest zoom level)</span>');
+		}
 	}
 
 	function move_up() {
@@ -123,7 +130,7 @@ $(document).ready(function() {
 			new_id[ypos] = 0;
 		}
 		
-		if(!check_same_id(new_id,zoom)) { // if we're actually going somewhere else
+		if(!check_same_id(new_id)) { // if we're actually going somewhere else
 			console.log(["move up: ",current_id,current_zoom,"-->",new_id,zoom]);
 			current_id = new_id;
 			get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
@@ -151,7 +158,7 @@ $(document).ready(function() {
 			new_id[ypos] = total_tiles[ypos]-1;
 		}
 
-		if(!check_same_id(new_id,zoom)) { // if we're actually going somewhere else
+		if(!check_same_id(new_id)) { // if we're actually going somewhere else
 			console.log(["move down: ",current_id,current_zoom,"-->",new_id,zoom]);
 			current_id = new_id;
 			get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
@@ -179,7 +186,7 @@ $(document).ready(function() {
 			new_id[xpos]= 0;
 		}
 
-		if(!check_same_id(new_id,zoom)) { // id changed
+		if(!check_same_id(new_id)) { // id changed
 			console.log(["move left: ",current_id,current_zoom,"-->",new_id,zoom]);
 			current_id = new_id;
 			get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
@@ -208,7 +215,7 @@ $(document).ready(function() {
 			new_id[xpos] = total_tiles[xpos]-1;
 		}
 
-		if(!check_same_id(new_id,zoom)) { // if we're actually going somewhere else
+		if(!check_same_id(new_id)) { // if we're actually going somewhere else
 			console.log(["move right: ",current_id,current_zoom,"-->",new_id,zoom]);
 			current_id = new_id;
 			get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
@@ -232,7 +239,7 @@ $(document).ready(function() {
 		new_id[xpos] = Math.floor(new_id[xpos]/zoom_diff);
 		new_id[ypos] = Math.floor(new_id[ypos]/zoom_diff);
 
-		if(!check_same_id(new_id,zoom)) { // if we're actually going somewhere else
+		if(current_zoom !== zoom) { // if we're actually going somewhere else
 			console.log(["zoom out: ",current_id,current_zoom,"-->",new_id,zoom]);
 			current_id = new_id;
 			current_zoom = zoom;
@@ -271,7 +278,7 @@ $(document).ready(function() {
 			zoom = max_zoom - 1;
 		}
 		console.log(["current_zoom",current_zoom,"zoom",zoom,"max_zoom",max_zoom]);
-		if(!check_same_id(new_id,zoom)) { // if we're actually going somewhere else
+		if(current_zoom !== zoom) { // if we're actually going somewhere else
 			console.log(["zoom in: ",current_id,current_zoom,"-->",new_id,zoom]);
 			current_id = new_id;
 			current_zoom = zoom;
@@ -297,6 +304,7 @@ $(document).ready(function() {
 				$("body").css("cursor", "auto");
 
 				disable_directions(xpos,ypos); // need to do this after total_tiles is updated
+				disable_zooms();
 		});
 	}
 
@@ -337,6 +345,7 @@ $(document).ready(function() {
 				var x_label = renderagg.labelsfrombase.x_label;
 				var y_label = renderagg.labelsfrombase.y_label;
 				disable_directions(indexmap[x_label],indexmap[y_label]); // need to do this after total_tiles is updated
+				disable_zooms();
 
 				// set index back to 0
 				current_id = new Array(numdims);

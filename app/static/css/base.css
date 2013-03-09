@@ -20,6 +20,8 @@ img.tutorial-image {
 	display: block;
 }
 
+
+
 /* remove any padding/borders from the g tags */
 g {
 	border: none;
@@ -44,8 +46,14 @@ div#update-submit-div {
 
 /* hide all the visualization components by default */
 #outer-aggplot, #aggplot, #map, #canvas, #aggplot-form, #resulting-plot-header, #nav, #answer-select, #histogram-container,
-canvas#hist1, canvas#hist2, #loading_image, #legend {
+canvas#hist1, canvas#hist2, #loading_image, #legend, #zoom-disable-div {
 	display: none;
+}
+
+/* show disable zoom div in line with directional buttons */
+#zoom-disable-div.show {
+	display: inline;
+	opacity: 0.65;
 }
 
 /* show the plot, and make position relative to confine the click rectangle to this div. 
