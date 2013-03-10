@@ -34,7 +34,16 @@ $(document).ready(function() {
 		$('#answer-select-checked-no').toggleClass('highlight');
 		if ($('#answer-select-checkbox').is(':checked')) {
 			var canvasImg = $('#canvas')[0].toDataURL('image/jpeg'); // get image data
-			$.post($SCRIPT_ROOT+'/scalar/tile-selected/',{img:canvasImg});
+			$.post($SCRIPT_ROOT+'/scalar/tile-selected/',{img:canvasImg,
+				x_label:renderagg.vis_metadata['x_label'],
+				y_label:renderagg.vis_metadata['y_label'],
+				z_label:renderagg.vis_metadata['z_label'],
+				x_inv:renderagg.vis_metadata['x_inv'],
+				y_inv:renderagg.vis_metadata['y_inv'],
+				z_inv:renderagg.vis_metadata['z_inv'],
+				color:renderagg.vis_metadata['color'],
+				width:renderagg.vis_metadata['width'],
+				height:renderagg.vis_metadata['height']});
 		} else {
 			$.get($SCRIPT_ROOT+'/scalar/tile-unselected/',{});
 		}

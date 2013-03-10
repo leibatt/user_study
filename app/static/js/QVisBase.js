@@ -433,6 +433,12 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 		var selectedyval = y_label;
 		var inv = 'inv' in _labels ? _labels['inv'] : [false,false,false];
 		console.log(['inv' in _labels,'x' in _labels]);
+
+		self.vis_metadata = {x_label:x_label, y_label:y_label, z_label:z_label, // strings
+					x_inv:inv[0], y_inv:inv[1], z_inv: inv[2], // booleans
+					color:self.colorscheme, // string
+					width: self.w, height: self.h}; // ints
+
 		$("#vis-update-submit").off('click');
 		$("#vis-update-submit").click(function() {
 			var zval = '';//$("#"+self.rootid+" .zlabel select").val();
@@ -494,6 +500,7 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 				inv[i]= inv_new[i];
 			}
 			//inv = inv_new;
+			// collect metadata for comparison purposes
 			self.vis_metadata = {x_label:xval, y_label:yval, z_label:zval, // strings
 						x_inv:inv[0], y_inv:inv[1], z_inv: inv[2], // booleans
 						color:color, // string
@@ -546,6 +553,12 @@ QVis.Graph.prototype.mini_render = function(_data, _labels,_types, opts) {
 		var color = self.colorscheme;
 		var inv = 'inv' in _labels ? _labels['inv'] : [false,false,false];
 		console.log(['inv' in _labels,'x' in _labels]);
+
+		self.vis_metadata = {x_label:selectedxval, y_label:selectedyval, z_label:selectedzval, // strings
+					x_inv:inv[0], y_inv:inv[1], z_inv: inv[2], // booleans
+					color:color, // string
+					width: width, height: height}; // ints
+
 		$("#vis-update-submit").off('click');
 		$("#vis-update-submit").click(function() {
 			console.log("got in update function");

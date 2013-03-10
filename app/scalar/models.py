@@ -37,6 +37,15 @@ class UserTileSelection(Base):
 	timestamp = Column(DateTime(timezone=True),nullable=False)
 	query = Column(Text,nullable=False) # must know what query was run
 	image = Column(Text) # image of the tile in base64 encoded string
+        x_label = Column(String)
+        y_label = Column(String)
+        z_label = Column(String)
+        x_inv = Column(Boolean)
+        y_inv = Column(Boolean)
+        z_inv = Column(Boolean)
+        color = Column(String(100))
+        width = Column(Integer)
+        height = Column(Integer)
 	user_id = Column(Integer,ForeignKey("users.id"),nullable=False)
 	dataset_id = Column(Integer,ForeignKey("data_sets.id")) # dataset used? may be null, but hopefully isn't
 
@@ -53,7 +62,7 @@ class UserTileSelection(Base):
 		self.query = query
 		self.dataset_id = dataset_id
 		self.image = image
-
+               
 	def __repr__():
 		return "UserTileSelection(%r, %r, %r, %r, %r, %r)" % (self.user_id,self.tile_id,self.query,self.dataset_id,self.timestamp)
 

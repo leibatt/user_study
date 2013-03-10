@@ -17,7 +17,7 @@ Base.query = db_session.query_property()
 
 def configure_engine(uri):
 	global sessionmaker, db_session, engine
-	engine = sqlalchemy.create_engine(uri,echo=True,convert_unicode=True)
+	engine = sqlalchemy.create_engine(uri,echo=False,convert_unicode=True)
 	sessionmaker.configure(bind=engine)
 	db_session.remove()
 

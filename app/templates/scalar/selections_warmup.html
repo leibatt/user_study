@@ -2,6 +2,23 @@
 {% block title %}Warmup Selections{% endblock %}
 {% block header %}Warmup Selections{% endblock %}
 {% block warmupselect_nav_active %}active{% endblock %}
+{% block content %}
+	<div class="row-fluid">
+		<p class="lead">
+			{% if examples|length < 4 %}Find {{4 - examples|length}} more tile{% if examples|length != 3 %}s{% endif %}
+			{% else %}All tiles found
+			{% endif %} (found tiles are dimmed):
+		</p>
+		<div id="example-images">
+			<img id="example1" class="span2{% if 1 in examples %} found{% endif %}" src="{{ url_for('static',filename='images/scalar/warmup/example1.png') }}">
+			<img id="example2" class="span2{% if 2 in examples %} found{% endif %}" src="{{ url_for('static',filename='images/scalar/warmup/example2.png') }}">
+			<img id="example3" class="span2{% if 3 in examples %} found{% endif %}" src="{{ url_for('static',filename='images/scalar/warmup/example3.png') }}">
+			<img id="example4" class="span2{% if 4 in examples %} found{% endif %}" src="{{ url_for('static',filename='images/scalar/warmup/example4.png') }}">
+		</div>
+	</div>
+	{{ super() }}
+{% endblock %}
+
 {% block delete_url %}{{url_for('scalar.delete_warmup_selections')}}{% endblock %}
 {% block next %}{{url_for('scalar.task1')}}{% endblock %}
 {% block submit_text %}Done Reviewing Warmup Selections{% endblock %}

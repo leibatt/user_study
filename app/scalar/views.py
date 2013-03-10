@@ -204,21 +204,66 @@ def fetch_tile():
 @mod.route('/tile-selected/',methods=["POST","GET"])
 @consent_required
 def tile_selected():
+    result = {}
     if request.method == 'GET':
-        img = request.args.get('img',"",type=str)
-    else:
-        img = ""
+        result['img'] = request.args.get('img',"",type=str)
+        result['x_label'] = request.args.get('x_label',"",type=str)
+        result['y_label'] = request.args.get('y_label',"",type=str)
+        result['z_label'] = request.args.get('z_label',"",type=str)
+        result['x_inv'] = request.args.get('x_inv',False,type=bool)
+        result['y_inv ']= request.args.get('x_inv',False,type=bool)
+        result['z_inv'] = request.args.get('x_inv',False,type=bool)
+        result['color'] = request.args.get('color',"",type=str)
+        result['width'] = request.args.get('width',-1,type=int)
+        result['height'] = request.args.get('height',-1,type=int)
+    else: # request.method == 'POST'
+        result = {
+        'img': "",
+        'x_label': "",
+        'y_label': "",
+        'z_label': "",
+        'x_inv': False,
+        'y_inv': False,
+        'z_inv': False,
+        'color': "",
+        'width': -1,
+        'height': -1}
         form = dict(request.form)
         for name,value in form.items():
-            if name == 'img':
-                img = value[0]
+            #if name != 'img':
+            #    current_app.logger.warning("name: %r, value: %r" % (name,value[0]))
+            if name in result:
+                if type(result[name]) is bool:
+                    try:
+                        result[name] = (value[0] in ["True","true"])
+                    except:
+                        pass
+                elif type(result[name]) is int:
+                    try:
+                        result[name] = int(value[0])
+                    except:
+                        pass
+                else:
+                    result[name] = value[0] # just take string version
+            else:
+                current_app.logger.warning("%r not in result dict" % (name))
     try:
+        img = result['img']
         if len(img) > 0:
             session['user_tile_selection'].image = img
+            session['user_tile_selection'].x_label = result['x_label']
+            session['user_tile_selection'].y_label = result['y_label']
+            session['user_tile_selection'].z_label = result['z_label']
+            session['user_tile_selection'].x_inv = result['x_inv']
+            session['user_tile_selection'].y_inv = result['y_inv']
+            session['user_tile_selection'].z_inv = result['z_inv']
+            session['user_tile_selection'].color = result['color']
+            session['user_tile_selection'].width = result['width']
+            session['user_tile_selection'].height = result['height']
         db_session.add(session['user_tile_selection']) 
         db_session.commit()
     except Exception as e:
-        current_app.logger.warning("unable to insert into database" % (e))
+        current_app.logger.warning("unable to insert into database %r" % (e))
     current_app.logger.info("got here")
     return json.dumps(str(0))
 
@@ -283,21 +328,45 @@ def delete_selections():
 
 def get_tile_selections(taskname):
     selections = []
+    examples = []
     results = []
     if taskname in session: # if there is a dataset_id already associated with this task
         results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,dataset_id=session[taskname]).all()
-    #elif g.ds is not None: # else grab the most recent data set
+        if taskname == 'warmup':
+            for item in results:
+                current_app.logger.warning("item: %r,%r,%r,%r,%r,%r" % (item.x_inv,item.y_inv,item.z_inv,item.color,item.tile_id,item.zoom_level))
+                item.correct = "correct"
+                if (not item.x_inv) and item.y_inv and item.z_inv and item.color == u'GnBu':
+                    if item.tile_id == u'[0, 0]' and item.zoom_level == 0:
+                        examples.append(1)
+                    elif item.tile_id == u'[0, 1]' and item.zoom_level == 1:
+                        examples.append(2)
+                    elif item.tile_id == u'[3, 3]' and item.zoom_level == 3:
+                        examples.append(3)
+                    elif item.tile_id == u'[1, 0]' and item.zoom_level == 1:
+                        examples.append(4)
+                    else:
+                        item.correct = "incorrect"
+                else:
+                   item.correct = "incorrect"
+            #find found examples
+                #elif g.ds is not None: # else grab the most recent data set
     #    results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,dataset_id=g.ds.id).all()
     #else: # else grab the latest query
     #    results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,query=session['query']).all()
     for result in results:
-        selections.append(dict(image=result.image,
-                               tile_id=result.tile_id,
-                               zoom_level=result.zoom_level,
-                               timestamp=result.timestamp,
-                               id=result.id)) 
+        item = dict(image=result.image,
+                   tile_id=result.tile_id,
+                   zoom_level=result.zoom_level,
+                   timestamp=result.timestamp,
+                   id=result.id)
+        try:
+            item['correct'] = result.correct
+        except:
+            pass
+        selections.append(item) 
 
-    return render_template('scalar/selections_'+taskname+'.html',selections=selections)
+    return render_template('scalar/selections_'+taskname+'.html',selections=selections,examples=examples)
     
 @mod.before_request
 def before_request(exception=None):

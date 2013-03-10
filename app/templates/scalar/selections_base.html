@@ -21,11 +21,7 @@
 							<div class="thumbnail">
 								<img alt="300x200" style="width: 300px; height: 200px" src="{{item.image}}">
 								<div class="caption">
-									<!--<ul class="unstyled">
-										<li>tile id: {{item.tile_id}}</li>
-										<li>zoom level: {{item.zoom_level}}</li>
-										<li>date chosen: {{item.datetime}}</li>
-									</ul>-->
+									{% if item.correct %}<p class="{{item.correct}}"><strong>{{item.correct}}</strong></p>{% endif %}
 									<div>
 										<label class="checkbox">
 											<input type="checkbox" class="selectionThumbnail" id="selectionThumbnail{{item.id}}" name="selectionThumbnail{{item.id}}" value="{{item.id}}">Delete
