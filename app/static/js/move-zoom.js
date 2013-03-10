@@ -369,6 +369,7 @@ $(document).ready(function() {
 				var error_string = "<div id=\"error_message\"><p>An error occured in running your query:</p>";
 				error_string = error_string + "<p>"+error_args+"</p></div>";
 				$("#resulting-plot-header").before($(error_string));
+				$('#vis-loading-modal').modal('hide');
 				return false;
 			}
 			
