@@ -5,7 +5,7 @@ import websocket
 import logging
 from app.database import db_session
 from app.models import User,DataSet
-from app.scalar.models import UserTrace,UserTileSelection
+from app.scalar.models import UserTrace,UserTileSelection,UserTileUpdate
 from sqlalchemy.orm.exc import NoResultFound
 from app.forms.decorators import consent_required
 import uuid
@@ -201,22 +201,20 @@ def fetch_tile():
     #current_app.logger.info("tile id:"+str(tile_id))
     return json.dumps(queryresultarr)
 
-@mod.route('/tile-selected/',methods=["POST","GET"])
-@consent_required
-def tile_selected():
+def get_menu_args(method,args):
     result = {}
-    if request.method == 'GET':
-        result['img'] = request.args.get('img',"",type=str)
-        result['x_label'] = request.args.get('x_label',"",type=str)
-        result['y_label'] = request.args.get('y_label',"",type=str)
-        result['z_label'] = request.args.get('z_label',"",type=str)
-        result['x_inv'] = request.args.get('x_inv',False,type=bool)
-        result['y_inv ']= request.args.get('x_inv',False,type=bool)
-        result['z_inv'] = request.args.get('x_inv',False,type=bool)
-        result['color'] = request.args.get('color',"",type=str)
-        result['width'] = request.args.get('width',-1,type=int)
-        result['height'] = request.args.get('height',-1,type=int)
-    else: # request.method == 'POST'
+    if method == 'GET':
+        result['img'] = args.get('img',"",type=str)
+        result['x_label'] = args.get('x_label',"",type=str)
+        result['y_label'] = args.get('y_label',"",type=str)
+        result['z_label'] = args.get('z_label',"",type=str)
+        result['x_inv'] = args.get('x_inv',False,type=bool)
+        result['y_inv']= args.get('y_inv',False,type=bool)
+        result['z_inv'] = args.get('z_inv',False,type=bool)
+        result['color'] = args.get('color',"",type=str)
+        result['width'] = args.get('width',-1,type=int)
+        result['height'] = args.get('height',-1,type=int)
+    elif method == 'POST':
         result = {
         'img': "",
         'x_label': "",
@@ -247,9 +245,43 @@ def tile_selected():
                     result[name] = value[0] # just take string version
             else:
                 current_app.logger.warning("%r not in result dict" % (name))
+    return result
+
+@mod.route('/tile-updated/',methods=["POST","GET"])
+@consent_required
+def menu_updated():
+    if 'user_tile_selection' in session:
+        uts = session['user_tile_selection']
+        result = get_menu_args(request.method,request.args)
+        # build a new menu update entry every time
+        utu = UserTileUpdate(tile_id=uts.tile_id,zoom_level=uts.zoom_level,query=session['query'],user_id=g.user.id,dataset_id=None)
+        print "result:",result
+        try:
+            utu.x_label = result['x_label']
+            utu.y_label = result['y_label']
+            utu.z_label = result['z_label']
+            utu.x_inv = result['x_inv']
+            utu.y_inv = result['y_inv']
+            utu.z_inv = result['z_inv']
+            utu.color = result['color']
+            utu.width = result['width']
+            utu.height = result['height']
+            db_session.add(utu) 
+            db_session.commit()
+        except Exception as e:
+            current_app.logger.warning("unable to insert into database: %r" % (e))
+            print "utu:",utu
+        current_app.logger.info("got here")
+    return json.dumps(str(0))
+
+
+@mod.route('/tile-selected/',methods=["POST","GET"])
+@consent_required
+def tile_selected():
+    result = get_menu_args(request.method,request.args)
     try:
         img = result['img']
-        if len(img) > 0:
+        if len(img) > 0: # tile_id and zoom accounted for in fetch_tile function
             session['user_tile_selection'].image = img
             session['user_tile_selection'].x_label = result['x_label']
             session['user_tile_selection'].y_label = result['y_label']
@@ -270,6 +302,7 @@ def tile_selected():
 @mod.route('/tile-unselected/',methods=["POST","GET"])
 @consent_required
 def tile_unselected():
+    result = get_menu_args(request.method,request.args)
     if 'user_tile_selection' in session:
         uts = session['user_tile_selection']
         try:

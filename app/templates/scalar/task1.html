@@ -13,12 +13,12 @@
 {% block task1_nav_active %}active{% endblock %}
 {% block instructions %}
 	<h2>Overview</h2>
-	<p>This warmup will give you an opportunity to explore the ScalaR visualization system.</p>
+	<p>In Task 1, you will identify regions around the world with high amounts of snow cover.</p>
 	<h2>What You Need to Know</h2>
-	<p><strong>About the Data Set</strong>: The warmup data set is a 2D array containing Normalized Difference Vegetation Index (NDVI) calculations from the MODIS data set. The two dimensions are latitude (x) and longitude (y). A high NDVI value (1.0) means that particular latitude/longitude area contains a high amount of vegetation (trees, shrubs, grass etc.). A low value (-1.0) means that particular part of the earth does not contain vegetation.
+	<p><strong>About the Data Set</strong>: The Task 1 data set is a 2D array containing Normalized Difference Snow Index (NDSI) calculations from the MODIS satellite imagery data set. The two dimensions are latitude (x) and longitude (y). A high NDSI value (1.0) means that particular latitude/longitude area contains a high amount of snow. A low value (-1.0) means that particular part of the earth does not contain snow. Regions that consist mainly of water (i.e. oceans, lakes, rivers) are ignored, and appear white in the visualizations.
 	</p>
 	<p>
-		<strong>Goal(s)</strong>Goal: find areas in the data set with at least 50% snow cover.
+		<strong>Goal(s)</strong>: Find visualizations where half the visualization consists of high NDSI (> 0.5) values (i.e. regions of the earth with 50% snow cover).
 	</p>
 {% endblock %}
 {% block donebutton %}Task 1{% endblock %}

@@ -42,13 +42,27 @@ QVis.Graph.prototype.update_opts = function (opts) {
 
 //data wrapper function
 QVis.Graph.prototype.get_data_obj = function(d,type){
-	if(type === 'int32' || type === 'int64' || type === 'double') {
+	if(this.isNumber(type)) {
 		return d;
 	} else if(type === 'datetime') {
 		return new Date(d*1000);
 	} else { // default
 		return d;
 	}
+}
+
+QVis.Graph.prototype.isNumber = function(type) {
+	return type === 'double' || type === 'float'
+		|| type.substring(0,4) === 'uint'
+		|| type.substring(0,3) === 'int';
+}
+
+QVis.Graph.prototype.isDate = function(type) {
+	return type === 'datetime' || type === 'datetimez';
+}
+
+QVis.Graph.prototype.isString = function(type) {
+	return type.substring(0,6) === 'string';
 }
 
 //dupe remover (for primatives and strings only) function
@@ -70,7 +84,7 @@ QVis.Graph.prototype.remove_dupes = function(arr) {
 //TODO: fix this. it's ugly
 QVis.Graph.prototype.createScale = function(_data,_types,label,axislength,axispadding,invert,color) {
 	var scale;
-	if(_types[label] === 'int32' || _types[label] === 'int64' || _types[label] === 'double') {
+	if(this.isNumber(_types[label])) {
 		minx = d3.min(_data.map(function(d){return d[label];}));
 		maxx = d3.max(_data.map(function(d){return d[label];}));
 		console.log("ranges: "+minx+","+maxx);
@@ -86,7 +100,7 @@ QVis.Graph.prototype.createScale = function(_data,_types,label,axislength,axispa
 			scale.domain([this.get_data_obj(minx,_types[label]), this.get_data_obj(maxx,_types[label])])
 				.range([axispadding,axislength-axispadding]);
 		}
-	} else if (_types[label] === "datetime") {
+	} else if (this.isDate(_types[label])) {
 		minx = d3.min(_data.map(function(d){return d[label];}));
 		maxx = d3.max(_data.map(function(d){return d[label];}));
 		console.log("ranges: "+minx+","+maxx);
@@ -105,7 +119,7 @@ QVis.Graph.prototype.createScale = function(_data,_types,label,axislength,axispa
 			scale = d3.time.scale().domain([this.get_data_obj(minx,_types[label]), this.get_data_obj(maxx,_types[label])])
 				.range([axispadding,axislength-axispadding]);
 		}
-	} else if (_types[label] === 'string') {
+	} else if (this.isString(_types[label])) {
 		self.strings = []
 		_data.map(function(d){self.strings.push(d[label]);});
 		self.strings = this.remove_dupes(self.strings);
@@ -238,7 +252,7 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 	if(this.selectz) {
 		if(_labels.z === '') {
 			for(var i = 0; i < _labels.names.length; i++) {
-				if((_types[_labels.names[i]['name']] == 'int32') || (_types[_labels.names[i]['name']] == 'int64') || (_types[_labels.names[i]['name']] == 'double')) {
+				if(this.isNumber(_types[_labels.names[i]['name']])) {
 					z_label = _labels.names[i]['name'];			
 					break;
 				}
@@ -370,17 +384,17 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 		var zaxisattrselect = zaxisselect.append($('<optgroup id="zaxis-attrs" label="attrs"></optgroup>')).find("#zaxis-attrs");
 		var zaxisdimselect = zaxisselect.append($('<optgroup id="zaxis-dims" label="dims"></optgroup>')).find("#zaxis-dims");
 		var zaxislabel = d3.selectAll(zaxisattrselect.get()).selectAll("option")
-				.data(attrnames.filter(function(d){return (_types[d] == 'int32')||(_types[d] == 'int64')||(_types[d] == 'double');}))
+				.data(attrnames.filter(function(d){return self.isNumber(_types[d]);}))
 			.enter().append("option")
 				.attr("value", function(d) { return d;})
 				.text(function(d) { return d;});
 		var zaxislabel = d3.selectAll(zaxisdimselect.get()).selectAll("option")
-				.data(dimnames.filter(function(d){return (_types[d] == 'int32')||(_types[d] == 'int64')||(_types[d] == 'double');}))
+				.data(dimnames.filter(function(d){return self.isNumber(_types[d]);}))
 			.enter().append("option")
 				.attr("value", function(d) { return d;})
 				.text(function(d) { return d;});
 		//var zaxislabel = d3.selectAll(zaxisselect.get()).selectAll("option")
-		//		.data(_labels.names.filter(function(d){return (_types[d['name']] == 'int32')||(_types[d['name']] == 'int64')||(_types[d['name']] == 'double');}))
+		//		.data(_labels.names.filter(function(d){return self.isNumber(_types[d]);}))
 		//	.enter().append("option")
 		//		.attr("value", function(d) { return d['name'];})
 		//		.text(function(d) { return d['name'];});
@@ -511,6 +525,19 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 				"max":_labels.max,"min":_labels.min, "inv":inv	};
 			
 			self.render(_data, newlabels,_types, opts);
+
+			// let the backend know the user updated the vis
+			$.get($SCRIPT_ROOT+'/scalar/tile-updated/',{
+				x_label:self.vis_metadata['x_label'],
+				y_label:self.vis_metadata['y_label'],
+				z_label:self.vis_metadata['z_label'],
+				x_inv:self.vis_metadata['x_inv'],
+				y_inv:self.vis_metadata['y_inv'],
+				z_inv:self.vis_metadata['z_inv'],
+				color:self.vis_metadata['color'],
+				width:self.vis_metadata['width'],
+				height:self.vis_metadata['height']
+			});
 			return false;
 		});
 	})();
@@ -628,6 +655,20 @@ QVis.Graph.prototype.mini_render = function(_data, _labels,_types, opts) {
 				"max":self.max,"min":self.min, "inv":inv	};
 			
 			self.render(_data, newlabels,_types, opts);
+
+			// let the backend know the user updated the vis
+			$.get($SCRIPT_ROOT+'/scalar/tile-updated/',{
+				x_label:self.vis_metadata['x_label'],
+				y_label:self.vis_metadata['y_label'],
+				z_label:self.vis_metadata['z_label'],
+				x_inv:self.vis_metadata['x_inv'],
+				y_inv:self.vis_metadata['y_inv'],
+				z_inv:self.vis_metadata['z_inv'],
+				color:self.vis_metadata['color'],
+				width:self.vis_metadata['width'],
+				height:self.vis_metadata['height']
+			});
+
 			return false;
 		});
 	})();
