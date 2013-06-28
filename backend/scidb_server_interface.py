@@ -8,7 +8,7 @@ import simplejson as json
 import math
 from datetime import datetime
 
-DEBUG_PRINT = False
+DEBUG_PRINT = True
 USE_NEW_SYNTAX = True
 LOGICAL_PHYSICAL = "explain_physical"
 RESTYPE = {'AGGR': 'aggregate', 'SAMPLE': 'sample','OBJSAMPLE': 'samplebyobj','FILTER':'filter','OBJAGGR': 'aggregatebyobj', 'BSAMPLE': 'biased_sample'}
@@ -34,8 +34,9 @@ except Exception as e:
 
 def scidbOpenConn():
 	#global db
-	db = scidb.connect("localhost",1239)
+	#db = scidb.connect("localhost",1239)
 	#db = scidb.connect("vise4.csail.mit.edu",1239)
+	db = scidb.connect("istc11.csail.mit.edu",1239)
 	return db
 
 def scidbCloseConn(db):
@@ -596,6 +597,12 @@ def daggregate(query,options):
 				attraggs += ", "
 			attraggs+= "max("+str(attrs[i])+") as max_"+attrs[i]
 
+	if attraggs != "":
+		attraggs += ", "
+	attraggs+= " count(*) as count"
+
+	equal_chunks_per_dim = max(1.0,math.floor(math.pow(threshold,1.0/dimension)))
+
 	if USE_NEW_SYNTAX:
 		chunks = ""
 		if ('chunkdims' in options) and (len(options['chunkdims']) > 0): #chunkdims specified
@@ -612,6 +619,7 @@ def daggregate(query,options):
 				else:
 					defaultchunkval = AGGR_CHUNK_DEFAULT
 			defaultchunkval = int(math.ceil(defaultchunkval)) # round up
+			#defaultchunkval = int(max(1,math.ceil(int(saved_qpresults['dimwidths'][saved_qpresults['dims'][0]])/equal_chunks_per_dim)))
 			if DEBUG_PRINT: print "chunk size:",defaultchunkval,"quotient:",quotient,",size:",options['qpsize'],",threshold:",threshold
 			chunks += saved_qpresults['truedims'][0]+" "+str(defaultchunkval)
 			#chunks += options['dimnames'][0]+" "+ str(defaultchunkval)
@@ -628,6 +636,7 @@ def daggregate(query,options):
 		elif dimension > 0: # otherwise do default chunks
 			quotient = 1.0*options['qpsize']/threshold # approximate number of base tiles
 			defaultchunkval = math.pow(quotient,1.0/dimension)
+			#defaultchunkval = int(max(1,math.ceil(int(saved_qpresults['dimwidths'][saved_qpresults['dims'][0]])/equal_chunks_per_dim)))
 			if DEBUG_PRINT: print "chunk size:",defaultchunkval,"quotient:",quotient,",size:",options['qpsize'],",threshold:",threshold
 			if quotient < 1.0:
 				if ('tile' in options) and options['tile']:

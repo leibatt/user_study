@@ -4,6 +4,8 @@
 	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/jquery-ui-1.10.1.custom.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/base.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/directional_buttons.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/slider.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/myslider.css')}}">
 {% endblock %}
 
 {% block my_scripts %}
@@ -14,6 +16,7 @@
 	<script type="text/javascript" src="{{url_for('static',filename='js/colorbrewer.js')}}" ></script>
 	<script type="text/javascript" src="{{url_for('static',filename='js/QVisBase.js')}}" ></script>
 	<script type="text/javascript" src="{{url_for('static',filename='js/QVisHeatMap.js')}}" ></script>
+	<script type="text/javascript" src="{{url_for('static',filename='js/bootstrap-slider.js')}}" ></script>
 {% block specialvars %}
 	<script type=text/javascript>
 		$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
@@ -115,6 +118,42 @@
 				</div>
 			</div>
 		</div>
+
+        <div class="accordion-group">
+			<div class="accordion-heading">
+				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseUpdateMenu">
+				Filter Options
+				</a>
+			</div>
+			<div id="collapseUpdateMenu" class="accordion-body collapse in">
+				<div class="accordion-inner">
+                  <form id="filter-form">
+						<label id="filter-select">add a filter:
+							<input type="button" id="add-filter-submit" class="btn" value="add"/>
+                        </label>
+                        
+                        <div class="myslider form-inline">
+                            <label>slider1: -20</label>
+                            <input id="slider1" type="text" value=""
+data-slider-min="-20" data-slider-max="20" data-slider-step="1"
+data-slider-value="[0,-14]" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
+                            <label>20</label>
+						    <a id="delete-slider1" class="btn"><i class="icon-arrow-up"></i></a>
+                        </div>
+                        <div class="myslider form-inline">
+                            <label>slider2: -20</label>
+                            <input id="slider2" type="text" value=""
+data-slider-min="-20" data-slider-max="20" data-slider-step="1"
+data-slider-value="[0,-14]" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
+                            <label>20</label>
+                        </div>
+                        <div id="filter-submit-div">
+							<input type="submit" id="update-filter-submit" class="btn" value="Submit"/>
+						</div>
+                  </form>
+                </div>
+            </div>
+        </div>
 		<div class="accordion-group">
 			<div class="accordion-heading">
 				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseUpdateMenu">
