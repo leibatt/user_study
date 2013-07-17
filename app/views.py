@@ -19,6 +19,15 @@ def home():
 @mod.route('/done/',methods=["POST","GET"])
 @consent_required
 def done():
+    #update user entry to say done
+    try:
+        user = db_session.query(User).filter_by(flask_session_id=session['user_id']).one()
+        user.done = True
+        db_session.add(user)
+        db_session.commit()
+    except:
+        current_app.logger.warning("unable to update done value for user %r" \
+                                       % (uts))
     if 'user_id' in session:
         session.pop('user_id') #don't let user modify selections at this point
     if 'consent' in session:

@@ -255,7 +255,7 @@ def menu_updated():
         result = get_menu_args(request.method,request.args)
         # build a new menu update entry every time
         utu = UserTileUpdate(tile_id=uts.tile_id,zoom_level=uts.zoom_level,query=session['query'],user_id=g.user.id,dataset_id=None)
-        print "result:",result
+        #print "result:",result
         try:
             utu.x_label = result['x_label']
             utu.y_label = result['y_label']
@@ -270,7 +270,7 @@ def menu_updated():
             db_session.commit()
         except Exception as e:
             current_app.logger.warning("unable to insert into database: %r" % (e))
-            print "utu:",utu
+            #print "utu:",utu
         current_app.logger.info("got here")
     return json.dumps(str(0))
 

@@ -26,7 +26,7 @@ def generate_survey_instance_form(survey_name,request_form=None):
 		form = SurveyInstanceForm()
 	else:
 		form = SurveyInstanceForm(request_form)
-		print form[question_id]()	
+		#print form[question_id]()	
 
 	return form
 
@@ -37,7 +37,7 @@ def submit_user_responses(user_id,form):
 	for question_id in form.question_ids:
 		q_id = int(question_id[len(QUESTION_PREFIX):])
 		data = form[question_id].data
-		print "here's the data:",data,",length:",len(data)
+		#print "here's the data:",data,",length:",len(data)
 		if len(data) > 0:
 			question = db_session.query(models.SurveyQuestion).filter_by(id=q_id).one() #get the question answered
 			response_id = None
@@ -51,7 +51,7 @@ def submit_user_responses(user_id,form):
 				#assume no comments for now
 				user_response = models.UserResponse(data,None,u_id,q_id,response_id)
 				db_session.add(user_response)
-				print user_response
+				#print user_response
 			elif question.input_type == "multiple":
 				# delete user's previous response
 				db_session.query(models.UserResponse).filter_by(user_id=u_id,question_id=q_id).delete()
@@ -65,7 +65,7 @@ def submit_user_responses(user_id,form):
 
 def get_survey_questions(survey_name):
 	survey = db_session.query(models.Survey).filter_by(name=survey_name).one()
-	print "survey id:",survey.id
+	#print "survey id:",survey.id
 	survey_id = survey.id # better be a number
 	questions = db_session.query(models.SurveyQuestion).filter_by(survey_id=survey_id).order_by(models.SurveyQuestion.id).all()
 	return questions
@@ -73,7 +73,7 @@ def get_survey_questions(survey_name):
 def generate_field_for_question(question):
 	if question.input_type in ["select","multiple"]: # get selections
 		if question.parent_question is not None:
-			print "parent question:",question.parent_question
+			#print "parent question:",question.parent_question
 			responses = db_session.query(models.SurveyQuestion).filter_by(id=question.parent_question).one().responses
 		else:
 			responses = question.responses
