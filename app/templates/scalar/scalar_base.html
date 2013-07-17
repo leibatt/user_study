@@ -121,36 +121,43 @@
 
         <div class="accordion-group">
 			<div class="accordion-heading">
-				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseUpdateMenu">
+				<a class="accordion-toggle" data-toggle="collapse" data-target="#collapseFilterMenu">
 				Filter Options
 				</a>
 			</div>
-			<div id="collapseUpdateMenu" class="accordion-body collapse in">
+			<div id="collapseFilterMenu" class="accordion-body collapse in">
 				<div class="accordion-inner">
-                  <form id="filter-form">
-						<label id="filter-select">add a filter:
-							<input type="button" id="add-filter-submit" class="btn" value="add"/>
-                        </label>
-                        
-                        <div class="myslider form-inline">
-                            <label>slider1: -20</label>
-                            <input id="slider1" type="text" value=""
+                    <form id="filter-form">
+                        <div id="filter-select-div" class="form-inline">
+						    <label id="filter-select-label">add a filter:</label>
+						    <a id="add-filter-submit" class="btn" ><i class="icon-plus"></i></a>
+                        </div>
+                       
+                        <div id="sliders-div"> 
+<!--
+                            <div id="filter-avg-ndvi" class="myslider form-inline">
+                                <label>slider1: -20</label>
+                                <input id="slider1" type="text" value=""
+data-slider-min="-20" data-slider-max="20" data-slider-step="1"
+data-slider-value="0" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
+                                <label>20</label>
+						        <a id="delete-slider1" class="btn"><i
+class="icon-remove"></i></a>
+                            </div>
+                            <div class="myslider form-inline">
+                                <label>slider2: -20</label>
+                                <input id="slider2" type="text" value=""
 data-slider-min="-20" data-slider-max="20" data-slider-step="1"
 data-slider-value="[0,-14]" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
-                            <label>20</label>
-						    <a id="delete-slider1" class="btn"><i class="icon-arrow-up"></i></a>
+                                <label>20</label>
+                            </div>
+-->
                         </div>
-                        <div class="myslider form-inline">
-                            <label>slider2: -20</label>
-                            <input id="slider2" type="text" value=""
-data-slider-min="-20" data-slider-max="20" data-slider-step="1"
-data-slider-value="[0,-14]" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
-                            <label>20</label>
-                        </div>
-                        <div id="filter-submit-div">
-							<input type="submit" id="update-filter-submit" class="btn" value="Submit"/>
+                        <div id="filter-apply-div">
+							<input type="submit" id="apply-filter-submit" class="btn" value="Apply Filter Effects"/>
+							<input type="submit" id="clear-filter-submit" class="btn" value="Clear Filter Effects"/>
 						</div>
-                  </form>
+                    </form>
                 </div>
             </div>
         </div>

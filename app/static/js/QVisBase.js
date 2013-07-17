@@ -11,6 +11,8 @@ QVis.Graph = function(rootid,opts) {
 
 	this.jsvg = null;
 	this.jlegend = null;
+    this.filterdiv = null;
+    this.slidersdiv = null;
 	this.xlabeldiv = null;
 	this.ylabeldiv = null;
 	this.svg = null;
@@ -115,7 +117,6 @@ QVis.Graph.prototype.createScale = function(_data,_types,label,axislength,axispa
 				scale = d3.time.scale().domain([this.get_data_obj(maxx,_types[label]), this.get_data_obj(minx,_types[label])])
 					.range([axispadding,axislength-axispadding]);
 		} else {
-			console.log("date got here");
 			scale = d3.time.scale().domain([this.get_data_obj(minx,_types[label]), this.get_data_obj(maxx,_types[label])])
 				.range([axispadding,axislength-axispadding]);
 		}
@@ -149,10 +150,13 @@ QVis.Graph.prototype.clear = function() {
 	this.map = $("#"+this.rootid + " #map");
 	this.jsvg = $("#"+this.rootid + " svg");
 	this.jlegend = $("#"+this.rootid+" .legend");
+	this.filterdiv = $("#filter-select-div");
+	this.slidersdiv = $("#sliders-div");
 	this.xlabeldiv = $("#"+this.rootid+"-form .xlabel");	
 	this.ylabeldiv = $("#"+this.rootid+"-form .ylabel");	
 	this.zlabeldiv = $("#"+this.rootid+"-form .zlabel");	
 	this.legend = $("#legend-content");
+    this.filterdiv.find("select").remove();
 	this.xlabeldiv.find("select").remove();//.empty();
 	this.ylabeldiv.find("select").remove();//.empty();
 	this.zlabeldiv.find("select").remove();//.empty();
@@ -182,6 +186,10 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 
 	// you should know why this is necessary
 	var self = this;
+
+    if(!self.hasOwnProperty('filter_labels')) {
+        self.filter_labels = [];
+    }
 
 	this.max = _labels['max'];
 	this.min = _labels['min'];
@@ -222,7 +230,6 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 
 	if(this.dimsonly && labelnames.length > 0) { // fixup xlabel and ylabel
 		if(!found_xlabel) {
-			console.log("got here");
 			_labels.x = labelnames[0]['name'];
 		}
 		if(!found_ylabel) {
@@ -431,6 +438,44 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 		})();*/
 	}
 
+        // setup select menu for filters
+		this.filterdiv.find("#filter-select-label").after($("<select name=\"filter-select\" id=\"filter-select\" class=\"span2\"></select>"));
+		var filterselect = this.filterdiv.find("select");
+		var filterattrselect = filterselect.append($('<optgroup id="filter-attrs" label="attrs"></optgroup>')).find("#filter-attrs");
+		var filterdimselect = filterselect.append($('<optgroup id="filter-dims" label="dims"></optgroup>')).find("#filter-dims");
+        var filterlabel = d3.selectAll(filterattrselect.get()).selectAll("option")
+				.data(attrnames.filter(function(d){return self.isNumber(_types[d]);}))
+			.enter().append("option")
+				.attr("value", function(d) { return d;})
+				.text(function(d) { return d;});
+/* don't include dimensions for now
+        var filterlabel = d3.selectAll(filterdimselect.get()).selectAll("option")
+				.data(dimnames.filter(function(d){return self.isNumber(_types[d]);}))
+			.enter().append("option")
+				.attr("value", function(d) { return d;})
+				.text(function(d) { return d;});
+*/
+		console.log(['filterselect',filterselect]);
+		filterselect.val(z_label);
+
+        // setup the apply filters button
+        $('#apply-filter-submit').unbind('click');
+        $('#apply-filter-submit').click(function() {
+            self.use_filters = true;
+            self.get_filter_ranges();
+            self.render(_data, _labels,_types, opts);
+            console.log('look I return false!!!');
+            return false;
+        });
+
+        // setup the clear filters button
+        $('#clear-filter-submit').unbind('click');
+        $('#clear-filter-submit').click(function() {
+            self.use_filters = false;
+            self.render(_data, _labels,_types, opts);
+            return false;
+        });
+
 	//set to the current width and height
 	$('#update-width').val(self.w);
 	$('#update-height').val(self.h);
@@ -538,6 +583,7 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 				width:self.vis_metadata['width'],
 				height:self.vis_metadata['height']
 			});
+            self.update_filters(newlabels);
 			return false;
 		});
 	})();
@@ -564,6 +610,22 @@ QVis.Graph.prototype.mini_render = function(_data, _labels,_types, opts) {
 	$('#update-height').val(self.h);
 	$('#color-scheme').val(self.colorscheme);
 
+    // setup the apply filters button
+    $('#apply-filter-submit').unbind('click');
+    $('#apply-filter-submit').click(function() {
+        self.use_filters = true;
+        self.get_filter_ranges();
+        self.render(_data, _labels,_types, opts);
+        return false;
+    });
+
+    // setup the clear filters button
+    $('#clear-filter-submit').unbind('click');
+    $('#clear-filter-submit').click(function() {
+        self.use_filters = false;
+        self.render(_data, _labels,_types, opts);
+        return false;
+     });
 	//
 	// I create and execute this anonymous function so
 	// selectedval will be private to and accessible by the .change() callback function
@@ -668,10 +730,166 @@ QVis.Graph.prototype.mini_render = function(_data, _labels,_types, opts) {
 				width:self.vis_metadata['width'],
 				height:self.vis_metadata['height']
 			});
+            self.update_filters(newlabels);
 
 			return false;
 		});
 	})();
+}
+/*
+	this.filterdiv.find("#filter-select-label").after($("<select name=\"filter-select\" id=\"filter-select\" class=\"span2\"></select>"));
+		var filterselect = this.filterdiv.find("select");
+		var filterattrselect = filterselect.append($('<optgroup id="filter-attrs" label="attrs"></optgroup>')).find("#filter-attrs");
+		var filterdimselect = filterselect.append($('<optgroup id="filter-dims" label="dims"></optgroup>')).find("#filter-dims");
+        var filterlabel = d3.selectAll(filterattrselect.get()).selectAll("option")
+				.data(attrnames.filter(function(d){return self.isNumber(_types[d]);}))
+			.enter().append("option")
+				.attr("value", function(d) { return d;})
+				.text(function(d) { return d;});
+
+        var filterlabel = d3.selectAll(filterdimselect.get()).selectAll("option")
+				.data(dimnames.filter(function(d){return self.isNumber(_types[d]);}))
+			.enter().append("option")
+				.attr("value", function(d) { return d;})
+				.text(function(d) { return d;});
+
+		console.log(['filterselect',filterselect]);
+		filterselect.val(z_label);
+$("#vis-update-submit").off('click');
+		$("#vis-update-submit").click(function() {
+			var zval = '';//$("#"+self.rootid+" .zlabel select").val();
+			var yval = '';//$("#"+self.rootid+" .zlabel select").val();
+			var xval = '';//$("#"+self.rootid+" .zlabel select").val();
+
+			var width = self.w;
+*/			
+QVis.Graph.prototype.add_filter = function() {
+    var self = this;
+    var precision = 5;
+    var step = 100;
+    $("#add-filter-submit").off('click');
+	$("#add-filter-submit").on('click',function() {
+
+        //get the attribute
+        var attr = self.filterdiv.find("select").val();
+        // strip what we don't need from the attribute name
+        var trueattr = attr.replace('attrs.','attrs-');
+        trueattr = trueattr.replace('dims.','dims-');
+        var attrlabel = trueattr.replace('_','-');
+        console.log(['attr val',attr]);
+
+        //check if there is already a filter
+        var exists = false;
+        self.slidersdiv.children("div#filter-"+attrlabel+".myslider").each(function() {
+            exists = true;
+        });
+
+        if(exists) {
+            console.log("filter already exists for attribute");
+            return false;
+        }
+
+        if(!self.hasOwnProperty('filter_labels')) {
+            self.filter_labels = [];
+        }
+        self.filter_labels.push(attr);
+        //get min and max values
+        var attrmin =self.min[attr];
+        var attrmax = self.max[attr];
+
+        //calculate step
+        var offset = Math.pow(10,precision);
+        var finalstep = Math.ceil((attrmax - attrmin)*offset/step)/offset;
+        console.log(["step",finalstep]);
+
+        // round after computing step width
+        attrmin = Math.floor(self.min[attr]*offset)/offset;
+        attrmax = Math.ceil(self.max[attr]*offset)/offset;
+
+        //add div to sliders div
+        //add input object to div with min/max
+        var sliderdiv = self.slidersdiv.append(' \
+            <div id="filter-'+attrlabel+'" class="myslider form-inline"> \
+                <label>'+attr+': '+attrmin+'</label> \
+                <input id="slider1" type="text" value="" \
+                    data-slider-min="'+attrmin+'" \
+                    data-slider-max="'+attrmax+'" \
+                    data-slider-step="'+finalstep+'" \
+                    data-slider-value="['+attrmin+','
+                        +attrmax+']" \
+                    data-slider-orientation="horizontal" \
+                    data-slider-selection="after" data-slider-tooltip="show"> \
+                <label>'+attrmax+'</label> \
+			    <a id="delete-filter-'+attrlabel+'" class="btn"><i class="icon-remove"></i></a> \
+            </div>\
+        ');
+        //activate slider
+        sliderdiv.find('input[type=text]').slider();
+
+        //add delete button
+        $('#delete-filter-'+attrlabel).click(function() {
+            console.log("deleting div");
+            $(this).unbind('click');
+            $('#filter-'+attrlabel).remove();
+            var index = $.inArray(attr,self.filter_labels);
+            if(index > -1) {
+                self.filter_labels.splice(index,1);
+            }
+            return false;
+        });
+        return false;
+	});
+    return false;
+}
+
+// as the code stands, this will never happen!
+QVis.Graph.prototype.update_filters = function(_labels) {
+    var self = this;
+    // remove outdated filters
+    var results = [];
+    self.slidersdiv.children("div.myslider").each(function() {
+        var id = $(this).attr('id');
+        var name = $(this).attr('id');
+        name = name.replace('filter-','');
+        name = name.replace('attrs-','attrs.');
+        name = name.replace('dims-','dims.');
+        name = name.replace('-','_');
+        //console.log(['attr name',name]);
+        var outdated = true;
+        for(var i = 0; i < _labels.names.length ; i++) {
+           label = _labels.names[i]['name'];
+           //console.log(['name', label]);
+           if(label === name) {
+                outdated = false;
+                break;
+           }
+        }
+        if(outdated) {
+            $('#delete-'+id).unbind(); // remove handler on filter delete button
+            $(this).remove(); // remove the outdated filter
+            var index = $.inArray(attr,self.filter_labels);
+            if(index > -1) {
+                self.filter_labels.splice(index,1);
+            }
+        }
+    });
+    return false;
+}
+
+QVis.Graph.prototype.get_filter_ranges = function() {
+    var self = this;
+
+    // get the filter ranges and save them.
+    // new filters are appended to the end of the div
+    // so this should always be in the right order.
+    self.filter_ranges = [];
+    self.slidersdiv.children("div.myslider").each(function() {
+        $(this).find("input[type=text]").each(function() {
+            self.filter_ranges.push($(this).data('slider').getValue());
+        });
+    });
+    console.log(['slider val',self.filter_ranges,'slider label', self.filter_labels]);
+    return false;
 }
 
 /*
@@ -875,7 +1093,6 @@ QVis.Graph.prototype.drawRects = function(container,_data,_types,xscale,yscale,x
 		.on("click",function(d,i){console.log(d3.mouse(this))});
 */
 	var end = Math.round((new Date().getTime())/1000);
-	console.log("got here");
 	console.log(["draw rect duration",end-start]);
 }
 
@@ -883,6 +1100,10 @@ QVis.Graph.prototype.drawRectsCanvas = function(ctx,_data,_types,xscale,yscale,x
 	//var ctx = canvas.getContext('2d');
 	var temp = this;
 	var start = Math.round((new Date().getTime())/1000);
+    //console.log(['use filters',temp.use_filters]);
+    if(temp.use_filters) {
+        color = temp.wrap_color_with_filters(color);
+    }
 	ctx.fillStyle = "#FFFFFF";
 	ctx.fillRect(0,0,this.w,this.h); // set the back to be white first
 	for(var drawindex = 0; drawindex < _data.length; drawindex++) {
@@ -895,6 +1116,37 @@ QVis.Graph.prototype.drawRectsCanvas = function(ctx,_data,_types,xscale,yscale,x
 	}
 	var end = Math.round((new Date().getTime())/1000);
 	console.log(["draw rect duration",end-start]);
+}
+
+QVis.Graph.prototype.wrap_color_with_filters = function(color) {
+    var self = this;
+    return function(d) {
+        if(self.passes_filters(d)) {
+            return color(d);
+        } else {
+            //console.log(['greying',self.filterscale(d[self.labelsfrombase.z_label])]);
+		    return self.filterscale(d[self.labelsfrombase.z_label]);
+        }
+    };
+}
+
+/*
+returns true if given data point satisfies all filter requirements
+only check filters if use_filters flag is set
+*/
+QVis.Graph.prototype.passes_filters = function(d) {
+    var self = this;
+    for(var filterid = 0; filterid < self.filter_labels.length; filterid++) {
+        var filter_label = self.filter_labels[filterid];
+        var filter_range = self.filter_ranges[filterid];
+        //console.log(['label',filter_label,'range',filter_range]);
+        var p = d[filter_label];
+        if((p < filter_range[0]) || (p > filter_range[1])) {
+            return false;
+        }
+    }
+    //console.log('pass');
+    return true;
 }
 
 /*

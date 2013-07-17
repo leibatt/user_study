@@ -43,12 +43,15 @@ QVis.HeatMap.prototype.render_canvas = function(_data, _labels,_types, opts) {
 	//console.log(_labels.dimwidths[ydimname]);
 	//console.log(Number(_labels.dimwidths[ydimname]+_labels.dimbases[ydimname]));
 	console.log("color scheme in heatmap:"+this.colorscheme);
+    self.filterscale = this.createScale(_data,_types,self.labelsfrombase.z_label,this.w,this.px,this.inv[2]/*true*/,true).range(colorbrewer["ModifiedGreys"][8]);
 	self.zscale = this.createScale(_data,_types,self.labelsfrombase.z_label,this.w,this.px,this.inv[2]/*true*/,true).range(colorbrewer[this.colorscheme][9]);
 	if((self.labelsfrombase.z_label in this.min) && (self.labelsfrombase.z_label in this.max)) {
 		if(this.inv[2]){
 			self.zscale.domain([this.max[self.labelsfrombase.z_label],this.min[self.labelsfrombase.z_label]]);
+			self.filterscale.domain([this.max[self.labelsfrombase.z_label],this.min[self.labelsfrombase.z_label]]);
 		} else {
 			self.zscale.domain([this.min[self.labelsfrombase.z_label],this.max[self.labelsfrombase.z_label]]);
+			self.filterscale.domain([this.min[self.labelsfrombase.z_label],this.max[self.labelsfrombase.z_label]]);
 		}
 	}
 	console.log(["color domain:",self.zscale.domain()]);
@@ -206,12 +209,18 @@ QVis.HeatMap.prototype.mini_render_canvas = function(_data, _labels,_types, opts
 	//console.log(_labels.dimbases[ydimname]);
 	//console.log(_labels.dimwidths[ydimname]);
 	//console.log(Number(_labels.dimwidths[ydimname]+_labels.dimbases[ydimname]));
+
+    //this is used to make parts of the vis greyed out according to filters
+    self.filterscale = this.createScale(_data,_types,self.labelsfrombase.z_label,this.w,this.px,this.inv[2]/*true*/,true).range(colorbrewer["ModifiedGreys"][8]);
+
 	self.zscale = this.createScale(_data,_types,self.labelsfrombase.z_label,this.w,this.px,this.inv[2]/*true*/,true).range(colorbrewer[this.colorscheme][9]);
 	if((self.labelsfrombase.z_label in this.min) && (self.labelsfrombase.z_label in this.max)) {
 		if(this.inv[2]){
 			self.zscale.domain([this.max[self.labelsfrombase.z_label],this.min[self.labelsfrombase.z_label]]);
+			self.filterscale.domain([this.max[self.labelsfrombase.z_label],this.min[self.labelsfrombase.z_label]]);
 		} else {
 			self.zscale.domain([this.min[self.labelsfrombase.z_label],this.max[self.labelsfrombase.z_label]]);
+			self.filterscale.domain([this.min[self.labelsfrombase.z_label],this.max[self.labelsfrombase.z_label]]);
 		}
 	}
 	console.log(["color domain:",self.zscale.domain()]);

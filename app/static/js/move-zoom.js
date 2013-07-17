@@ -21,7 +21,7 @@ var once =0;
 $(document).ready(function() {
 	$('ul.nav-list > li.disabled > a').click(function () { return false; }); // don't let IE users click on disabled nav links
 	$('[rel=tooltip]').tooltip(); // enable tooltips
-    $('.myslider input[type=text]').slider();
+    $('#sliders-div div.myslider input[type=text]').slider();
 	$('#sql-query-submit').on('click',user_query_handler);
 	$('#button-up').on('click',move_up);
 	$('#button-down').on('click',move_down);
@@ -333,6 +333,7 @@ $(document).ready(function() {
 		once = 0;
 		if(renderagg) {
 			renderagg.clear();
+            renderagg.slidersdiv.empty(); // remove all sliders
 		}
 		current_zoom = 0;
 		resolution_lvl = $('#resolution-lvl-menu').val();
@@ -478,7 +479,8 @@ $(document).ready(function() {
 		var opts = {overlap:-0, r:1.5};
 		var use_dims = true;
 		renderagg = new QVis.HeatMap('aggplot', opts);
-		
+		renderagg.add_filter();
+
 		var data = jsondata['data'];
 
 		// set x and y labels
