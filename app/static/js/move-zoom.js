@@ -284,12 +284,7 @@ $(document).ready(function() {
 		} else if (y_offset >= future_tiles[ypos]) {
 			y_offset = future_tiles[ypos] - 1;
 		}
-		if(renderagg.inv[0]) {
-			x_offset = future_tiles[xpos] - x_offset - 1;
-		}
-		if(renderagg.inv[1]) {
-			y_offset = future_tiles[ypos] - y_offset - 1;
-		}
+
 		var new_id = current_id.slice(0);
 		new_id[xpos] = current_id[xpos] * zoom_diff + x_offset;
 		new_id[ypos] = current_id[ypos] * zoom_diff + y_offset;
@@ -562,7 +557,7 @@ $(document).ready(function() {
 		// adjust for padding in graph
 		var xdim = 1.0*coords[0] - renderagg.px;
 		var ydim = 1.0*coords[1] - renderagg.py;
-		if(renderagg.inv[0]) {
+		if(renderagg.inv[0]) { // if inverted, get reflection for indexing
 			xdim = 1.0*renderagg.w - xdim;
 		}
 		if(renderagg.inv[1]){
