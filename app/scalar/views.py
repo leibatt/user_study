@@ -416,6 +416,7 @@ def before_request(exception=None):
         session['user_id'] = str(uuid.uuid4())
     try:
         g.user = db_session.query(User).filter_by(flask_session_id=session['user_id']).one()
+        g.user.set_last_update()
     except NoResultFound: # user not found
         g.user = User(session['user_id'])
         db_session.add(g.user)
@@ -423,6 +424,16 @@ def before_request(exception=None):
 
 @mod.teardown_request
 def teardown_request(exception=None):
+    if 'user_id' in session:
+        try:
+            user = db_session.query(User).filter_by(flask_session_id=session['user_id']).one()
+            user.set_last_update()
+            db_session.add(user)
+            db_session.commit()
+        except:
+            current_app.logger.warning("unable to update last update time for user %r" \
+                                       % (user))
+
     db_session.remove()
 
 

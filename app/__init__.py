@@ -3,19 +3,9 @@ import logging
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
 
-app = Flask(__name__)
+app = Flask(__name__,static_folder='static')
 #add app configurations
 app.config.from_object('config')
-
-#setup logger
-if not app.debug:
-	file_handler = RotatingFileHandler(app.config['LOGFILE'], maxBytes=10000, backupCount=1)
-        file_handler.setFormatter(Formatter(
-            '%(asctime)s %(levelname)s: %(message)s '
-            '[in %(pathname)s:%(lineno)d]'
-        ))
-        file_handler.setLevel(logging.WARNING)
-        app.logger.addHandler(file_handler)
 
 # needs to be done at the end of the file
 __all__ = ['forms','scalar','bootstrap','models','views','database']
