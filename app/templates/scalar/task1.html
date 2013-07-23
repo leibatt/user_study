@@ -1,25 +1,31 @@
 {% extends "scalar/scalar_base.html" %}
 {% block title %}Task 1{% endblock %}
 {% block specialvars %}
-	{{ super() }}
-	<script type=text/javascript>
-		$DATA_SET = "us100";
-		$NEXT_TASK_PAGE = "{{url_for('scalar.task2')}}";
-		$TASK = "task1";
-	</script>
+    {{ super() }}
+    <script type=text/javascript>
+        $DATA_SET = "us100";
+        $NEXT_TASK_PAGE = "{{url_for('scalar.task2')}}";
+        $TASK = "task1";
+    </script>
 {% endblock %}
 {% block header %}Task 1{% endblock %}
 {% block taskname %} Task 1{% endblock %}
 {% block task1_nav_active %}active{% endblock %}
 {% block instructions %}
-	<h2>Overview</h2>
-	<p>In Task 1, you will identify regions around the world with high amounts of snow cover.</p>
-	<h2>What You Need to Know</h2>
-	<p><strong>About the Data Set</strong>: The Task 1 data set is a 2D array containing Normalized Difference Snow Index (NDSI) calculations from the MODIS satellite imagery data set. The two dimensions are latitude (x) and longitude (y). A high NDSI value (1.0) means that particular latitude/longitude area contains a high amount of snow. A low value (-1.0) means that particular part of the earth does not contain snow. Regions that consist mainly of water (i.e. oceans, lakes, rivers) are ignored, and appear white in the visualizations.
-	</p>
-	<p>
-		<strong>Goal(s)</strong>: Find visualizations where half the visualization consists of high NDSI (> 0.5) values (i.e. regions of the earth with 50% snow cover).
-	</p>
+    <h2>Overview</h2>
+    <p>
+In Task 1, you will identify regions in [location] with high amounts of snow cover.
+You will need to navigate to the tiles representing [location] in the data set, 
+and find as many tiles as you can within [locaiton] that meet the goal requirements described below.
+    </p>
+    <h2>What You Need to Know</h2>
+    <p><strong>About the Data Set</strong>
+: The Task 1 data set is a 2D array containing Normalized Difference Snow Index (NDSI) calculations from the MODIS satellite imagery data set. The two dimensions are latitude (x) and longitude (y). A high NDSI value (1.0) means that particular latitude/longitude area contains a high amount of snow. A low value (-1.0) means that particular part of the earth does not contain snow. Regions that consist mainly of water (i.e. oceans, lakes, rivers) are ignored, and appear white in the visualizations.
+    </p>
+    <p>
+        <strong>Goal(s)</strong>
+: Find tiles in [location] where half the visualization consists of high NDSI (> 0.5) values (i.e. regions of the earth with 50% snow cover).
+    </p>
 {% endblock %}
 {% block donebutton %}Task 1{% endblock %}
 {% block next %}{{ url_for('scalar.task1_selections')}}{% endblock %}
