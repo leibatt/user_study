@@ -455,26 +455,32 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
                 .attr("value", function(d) { return d;})
                 .text(function(d) { return d;});
 */
-        console.log(['filterselect',filterselect]);
-        filterselect.val(z_label);
+    console.log(['filterselect',filterselect]);
+    filterselect.val(z_label);
 
-        // setup the apply filters button
-        $('#apply-filter-submit').unbind('click');
-        $('#apply-filter-submit').click(function() {
-            self.use_filters = true;
-            self.get_filter_ranges();
-            self.render(_data, _labels,_types, opts);
-            console.log('look I return false!!!');
-            return false;
+    // setup the apply filters button
+    $('#apply-filter-submit').unbind('click');
+    $('#apply-filter-submit').click(function() {
+        self.use_filters = true;
+        self.get_filter_ranges();
+        $.get($SCRIPT_ROOT+'/scalar/filters-applied/',{
+            'filter_labels[]':self.filter_labels,
+            'filter_lowers[]':self.filter_lowers,
+            'filter_uppers[]':self.filter_uppers
         });
 
-        // setup the clear filters button
-        $('#clear-filter-submit').unbind('click');
-        $('#clear-filter-submit').click(function() {
-            self.use_filters = false;
-            self.render(_data, _labels,_types, opts);
-            return false;
-        });
+        self.render(_data, _labels,_types, opts);
+        return false;
+    });
+
+    // setup the clear filters button
+    $('#clear-filter-submit').unbind('click');
+    $('#clear-filter-submit').click(function() {
+        $.get($SCRIPT_ROOT+'/scalar/filters-cleared/',{});
+        self.use_filters = false;
+        self.render(_data, _labels,_types, opts);
+        return false;
+    });
 
     //set to the current width and height
     $('#update-width').val(self.w);
@@ -615,6 +621,12 @@ QVis.Graph.prototype.mini_render = function(_data, _labels,_types, opts) {
     $('#apply-filter-submit').click(function() {
         self.use_filters = true;
         self.get_filter_ranges();
+        $.get($SCRIPT_ROOT+'/scalar/filters-applied/',{
+                filter_labels:self.filter_labels,
+                filter_lowers:self.filter_lowers,
+                filter_uppers:self.filter_uppers
+        });
+
         self.render(_data, _labels,_types, opts);
         return false;
     });
@@ -622,6 +634,7 @@ QVis.Graph.prototype.mini_render = function(_data, _labels,_types, opts) {
     // setup the clear filters button
     $('#clear-filter-submit').unbind('click');
     $('#clear-filter-submit').click(function() {
+        $.get($SCRIPT_ROOT+'/scalar/filters-cleared/',{});
         self.use_filters = false;
         self.render(_data, _labels,_types, opts);
         return false;
@@ -883,9 +896,14 @@ QVis.Graph.prototype.get_filter_ranges = function() {
     // new filters are appended to the end of the div
     // so this should always be in the right order.
     self.filter_ranges = [];
+    self.filter_lowers = [];
+    self.filter_uppers = [];
     self.slidersdiv.children("div.myslider").each(function() {
         $(this).find("input[type=text]").each(function() {
-            self.filter_ranges.push($(this).data('slider').getValue());
+            var range = $(this).data('slider').getValue()
+            self.filter_lowers.push(range[0]);
+            self.filter_uppers.push(range[1]);
+            self.filter_ranges.push(range);
         });
     });
     console.log(['slider val',self.filter_ranges,'slider label', self.filter_labels]);

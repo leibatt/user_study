@@ -5,7 +5,7 @@ import websocket
 import logging
 from app.database import db_session
 from app.models import User,DataSet
-from app.scalar.models import UserTrace,UserTileSelection,UserTileUpdate
+from app.scalar.models import UserTrace,UserTileSelection,UserTileUpdate,UserFilterUpdate
 from sqlalchemy.orm.exc import NoResultFound
 from app.forms.decorators import consent_required
 import uuid
@@ -78,7 +78,7 @@ def fetch_first_tile():
             try:
                 ds = db_session.query(DataSet).filter_by(name=data_set).one()
                 query = ds.query
-		session['data_set'] = ds
+                session['data_set'] = ds
                 if len(taskname) > 0 and taskname not in session: # record what data set was used for this task
                     session[taskname]=ds.id
             except:
@@ -89,7 +89,7 @@ def fetch_first_tile():
     options = {'user_id':session['user_id']}
     session['usenumpy'] = request.args.get('usenumpy',False,type=bool)
     if data_threshold > 0:
-	options['data_threshold'] = data_threshold
+        options['data_threshold'] = data_threshold
     if session['usenumpy']:
         options['usenumpy'] = False
     server_request = {'query':query,'options':options,'function':'fetch_first_tile'}
@@ -109,11 +109,11 @@ def fetch_first_tile():
         user_trace = UserTrace(tile_id=str(tile_id),zoom_level=0,query=session['query'],user_id=g.user.id,dataset_id=None)
         # save current tile info for tracking tile selection
         uts = UserTileSelection(tile_id=str(tile_id),zoom_level=0,query=session['query'],user_id=g.user.id,dataset_id=None,image=None)
-	if ds is not None: #there is an associated data set
+    if ds is not None: #there is an associated data set
             user_trace.dataset_id = ds.id
             uts.dataset_id = ds.id
-        else:
-            current_app.logger.warning("data set not passed")
+    else:
+        current_app.logger.warning("data set not passed")
         db_session.add(user_trace)
         db_session.commit()
         #log the tile request
@@ -275,6 +275,72 @@ def menu_updated():
     return json.dumps(str(0))
 
 
+@mod.route('/filters-cleared/',methods=["POST","GET"])
+@consent_required
+def filters_cleared():
+    ds = None
+    query = None
+    if 'data_set' in session:
+        ds = session['data_set']
+    else: # we need to know the dataset
+        current_app.logger.warning("no dataset recorded for user: %r" % (session['user_id']))
+        return json.dumps(str(0))
+
+    if 'query' in session:
+        query = session['query']
+    try:
+        ufu = UserFilterUpdate(filter_name="SCALAR_FILTER_CLEAR",
+                                    lower=0.0,
+                                    upper=0.0,
+                                    applied=False,
+                                    query=query,
+                                    user_id=g.user.id,
+                                    dataset_id=ds.id)
+        db_session.add(ufu)
+        db_session.commit()
+    except Exception as e:
+        current_app.logger.warning("unable to insert filter update into database: %r" % (e))
+    return json.dumps(str(0))
+
+
+@mod.route('/filters-applied/',methods=["POST","GET"])
+@consent_required
+def filters_applied():
+    ds = None
+    query = None
+    if 'data_set' in session:
+        ds = session['data_set']
+    else:
+        current_app.logger.warning("no dataset recorded for user: %r" % (session['user_id']))
+        return json.dumps(str(0))
+
+    if 'query' in session:
+        query = session['query']
+
+    filter_names = request.values.getlist('filter_labels[]')
+    filter_lowers = request.values.getlist('filter_lowers[]')
+    filter_uppers = request.values.getlist('filter_uppers[]')
+    print "filter names:",filter_names
+    print "filter lowers:",filter_lowers
+    print  request.args.get('filter_labels',"",type=str)
+    for i in range(len(filter_names)):
+        try:
+            print "lower:",float(filter_lowers[i])
+            ufu = UserFilterUpdate(filter_name=filter_names[i],
+                                    lower=float(filter_lowers[i]),
+                                    upper=float(filter_uppers[i]),
+                                    applied=True,
+                                    query=query,
+                                    user_id=g.user.id,
+                                    dataset_id=ds.id)
+            db_session.add(ufu)
+            db_session.commit()
+        except Exception as e:
+            current_app.logger.warning("unable to insert filter update into database: %r" % (e))
+    return json.dumps(str(0))
+
+
+
 @mod.route('/tile-selected/',methods=["POST","GET"])
 @consent_required
 def tile_selected():
@@ -432,7 +498,7 @@ def teardown_request(exception=None):
             db_session.commit()
         except:
             current_app.logger.warning("unable to update last update time for user %r" \
-                                       % (user))
+                                       % (session['user_id']))
 
     db_session.remove()
 
