@@ -86,6 +86,7 @@ def fetch_first_tile():
                                            data_set)
     session['query'] = query
     data_threshold = request.args.get('data_threshold',0,type=int)
+    session['threshold'] = data_threshold
     options = {'user_id':session['user_id']}
     session['usenumpy'] = request.args.get('usenumpy',False,type=bool)
     if data_threshold > 0:
@@ -106,9 +107,9 @@ def fetch_first_tile():
         tile_id = [0,0]
         if 'saved_qpresults' in queryresultarr:
             tile_id = [0] * int(queryresultarr['saved_qpresults']['numdims'])
-        user_trace = UserTrace(tile_id=str(tile_id),zoom_level=0,query=session['query'],user_id=g.user.id,dataset_id=None)
+        user_trace = UserTrace(tile_id=str(tile_id),zoom_level=0,threshold=data_threshold,query=session['query'],user_id=g.user.id,dataset_id=None)
         # save current tile info for tracking tile selection
-        uts = UserTileSelection(tile_id=str(tile_id),zoom_level=0,query=session['query'],user_id=g.user.id,dataset_id=None,image=None)
+        uts = UserTileSelection(tile_id=str(tile_id),zoom_level=0,threshold=data_threshold,query=session['query'],user_id=g.user.id,dataset_id=None,image=None)
         if ds is not None: #there is an associated data set
             user_trace.dataset_id = ds.id
             uts.dataset_id = ds.id
@@ -164,6 +165,7 @@ def fetch_tile():
     if 'saved_qpresults' in queryresultarr:
         session['saved_qpresults'] = queryresultarr['saved_qpresults']
         user_trace = UserTrace(tile_id=str(tile_id),zoom_level=level,
+                                                    threshold=session['threshold'],
                                                     query=session['query'],
                                                     user_id=g.user.id,
                                                     dataset_id=None)
@@ -171,6 +173,7 @@ def fetch_tile():
         # save current tile info for tracking tile selection
         uts = UserTileSelection(tile_id=str(tile_id),
                                 zoom_level=level,
+                                threshold=session['threshold'],
                                 query=session['query'],
                                 user_id=g.user.id,
                                 dataset_id=None,

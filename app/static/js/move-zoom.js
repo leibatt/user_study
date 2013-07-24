@@ -22,6 +22,7 @@ $(document).ready(function() {
     $('ul.nav-list > li.disabled > a').click(function () { return false; }); // don't let IE users click on disabled nav links
     $('[rel=tooltip]').tooltip(); // enable tooltips
     $('#sliders-div div.myslider input[type=text]').slider();
+    $('#resolution-lvl-menu').val('10000');
     $('#sql-query-submit').on('click',user_query_handler);
     $('#button-up').on('click',move_up);
     $('#button-down').on('click',move_down);
