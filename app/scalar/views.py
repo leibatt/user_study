@@ -320,12 +320,12 @@ def filters_applied():
     filter_names = request.values.getlist('filter_labels[]')
     filter_lowers = request.values.getlist('filter_lowers[]')
     filter_uppers = request.values.getlist('filter_uppers[]')
-    print "filter names:",filter_names
-    print "filter lowers:",filter_lowers
-    print  request.args.get('filter_labels',"",type=str)
+    #print "filter names:",filter_names
+    #print "filter lowers:",filter_lowers
+    #print  request.args.get('filter_labels',"",type=str)
     for i in range(len(filter_names)):
         try:
-            print "lower:",float(filter_lowers[i])
+            #print "lower:",float(filter_lowers[i])
             ufu = UserFilterUpdate(filter_name=filter_names[i],
                                     lower=float(filter_lowers[i]),
                                     upper=float(filter_uppers[i]),
