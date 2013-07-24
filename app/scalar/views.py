@@ -109,11 +109,11 @@ def fetch_first_tile():
         user_trace = UserTrace(tile_id=str(tile_id),zoom_level=0,query=session['query'],user_id=g.user.id,dataset_id=None)
         # save current tile info for tracking tile selection
         uts = UserTileSelection(tile_id=str(tile_id),zoom_level=0,query=session['query'],user_id=g.user.id,dataset_id=None,image=None)
-    if ds is not None: #there is an associated data set
+        if ds is not None: #there is an associated data set
             user_trace.dataset_id = ds.id
             uts.dataset_id = ds.id
-    else:
-        current_app.logger.warning("data set not passed")
+        else:
+            current_app.logger.warning("data set not passed")
         db_session.add(user_trace)
         db_session.commit()
         #log the tile request
@@ -129,7 +129,7 @@ def fetch_first_tile():
             queryresultarr['selected'] = False
         except: # uh oh, something bad happened here
             current_app.logger.warning("error occured when querying \
-                                       for user's selections")
+                                   for user's selections")
     return json.dumps(queryresultarr)
 
 @mod.route('/fetch-tile',methods=["POST", "GET"])
