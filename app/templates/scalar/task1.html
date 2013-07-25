@@ -3,7 +3,7 @@
 {% block specialvars %}
     {{ super() }}
     <script type=text/javascript>
-        $DATA_SET = "us100";
+        $DATA_SET = "ndsi_agg_istc11";//"us100";
         $NEXT_TASK_PAGE = "{{url_for('scalar.task2')}}";
         $TASK = "task1";
     </script>
@@ -20,7 +20,9 @@ and find as many tiles as you can within [locaiton] that meet the goal requireme
     </p>
     <h2>What You Need to Know</h2>
     <p><strong>About the Data Set</strong>
-: The Task 1 data set is a 2D array containing Normalized Difference Snow Index (NDSI) calculations from the MODIS satellite imagery data set. The two dimensions are latitude (x) and longitude (y). A high NDSI value (1.0) means that particular latitude/longitude area contains a high amount of snow. A low value (-1.0) means that particular part of the earth does not contain snow. Regions that consist mainly of water (i.e. oceans, lakes, rivers) are ignored, and appear white in the visualizations.
+: The Task 1 data set is a 2D array containing Normalized Difference Snow Index (NDSI) calculations from the MODIS satellite imagery data set. The two dimensions are latitude (x) and longitude (y). A high NDSI value (1.0) means that particular latitude/longitude area contains a high amount of snow. A low value (-1.0) means that particular part of the earth does not contain snow. Large bodies of water of water (i.e.
+oceans, lakes, rivers) appear as if they contain high amounts of snow. Add a land/sea mask filter to ignore them.
+
     </p>
     <p>
         <strong>Goal(s)</strong>

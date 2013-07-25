@@ -1119,7 +1119,7 @@ QVis.Graph.prototype.drawZoomGrid = function(ctx,x_interval,y_interval,xinv,yinv
         ctx.moveTo(x1,y1);
         ctx.lineTo(x2,y2);
         ctx.lineWidth = 3;
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = '#000000';//'#ffffff';
         ctx.stroke();
     }
     var self = this;

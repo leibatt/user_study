@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime
-from app.database import Base
+from app.util.database.database import Base
 import datetime
 
 #table storing all users by flask session id,

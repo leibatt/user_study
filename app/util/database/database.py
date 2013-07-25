@@ -22,7 +22,7 @@ def configure_engine(uri):
 	db_session.remove()
 
 def init_db():
-	import app.models #base models
+	import app.home.models #base models
 	import app.forms.models
 	import app.scalar.models
 	Base.metadata.create_all(bind=engine)

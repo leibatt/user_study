@@ -1,12 +1,18 @@
 from flask import Flask, current_app, Blueprint,flash, session, request, render_template, g, redirect, send_file, url_for, send_from_directory
+from celery import Celery
+import app.util.celery.tasks as tasks
 import app.forms.forms as forms
-from app.models import User
-from app.database import db_session
+from app.home.models import User
+from app.util.database.database import db_session
 from sqlalchemy.orm.exc import NoResultFound
 from app.forms.decorators import consent_required
 import uuid
 
 mod = Blueprint('home',__name__)
+
+@mod.route('/celery/test')
+def celery_test():
+    return json.dumps({})
 
 @mod.route('/robots.txt')
 def static_from_root():

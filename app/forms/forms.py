@@ -1,6 +1,6 @@
 from wtforms import Form, BooleanField, TextField, TextAreaField, validators
-from app.bootstrap.fields import BootstrapRadioField as BRadioField, BootstrapCheckBoxField as BCheckBoxField
-from app.database import db_session
+from app.util.bootstrap.fields import BootstrapRadioField as BRadioField, BootstrapCheckBoxField as BCheckBoxField
+from app.util.database.database import db_session
 import app.forms.models as models
 
 QUESTION_PREFIX = "q_"

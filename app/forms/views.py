@@ -1,7 +1,7 @@
 from flask import Flask, Blueprint,flash, session, request, render_template, g, redirect, send_file, url_for
 import app.forms.forms as forms
-from app.models import User
-from app.database import db_session
+from app.home.models import User
+from app.util.database.database import db_session
 from sqlalchemy.orm.exc import NoResultFound
 from app.forms.decorators import consent_required
 import uuid

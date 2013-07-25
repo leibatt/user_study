@@ -3,12 +3,13 @@ import simplejson as json
 import traceback
 import websocket
 import logging
-from app.database import db_session
-from app.models import User,DataSet
+from app.util.database.database import db_session
+from app.home.models import User,DataSet
 from app.scalar.models import UserTrace,UserTileSelection,UserTileUpdate,UserFilterUpdate
 from sqlalchemy.orm.exc import NoResultFound
 from app.forms.decorators import consent_required
 import uuid
+import app.util.celery.tasks as tasks
 
 mod = Blueprint('scalar',__name__,url_prefix='/scalar')
 
@@ -39,6 +40,24 @@ def send_request(request):
     current_app.logger.info("received data from '"+current_app.config['CONN_STRING']+"'")
     close_connection_to_backend()
     return json.loads(response)
+
+@mod.route('/test/', methods=["POST", "GET"])
+@consent_required
+def test():
+    result = tasks.test.delay(10)   
+    taskid = result.task_id
+    return json.dumps(taskid)
+
+@mod.route('/test/result/<task_id>', methods=["POST", "GET"])
+@consent_required
+def test_result(task_id):
+    result = tasks.test.AsyncResult(task_id)
+    if result.failed():
+        return 'result failed'
+    elif not result.ready():
+        return 'result not ready yet'
+    returnval = result.result
+    return json.dumps(returnval)
 
 @mod.route('/tutorial/', methods=["POST", "GET"])
 @consent_required

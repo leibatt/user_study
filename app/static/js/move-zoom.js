@@ -22,7 +22,6 @@ $(document).ready(function() {
     $('ul.nav-list > li.disabled > a').click(function () { return false; }); // don't let IE users click on disabled nav links
     $('[rel=tooltip]').tooltip(); // enable tooltips
     $('#sliders-div div.myslider input[type=text]').slider();
-    $('#resolution-lvl-menu').val('10000');
     $('#sql-query-submit').on('click',user_query_handler);
     $('#button-up').on('click',move_up);
     $('#button-down').on('click',move_down);
@@ -324,6 +323,74 @@ $(document).ready(function() {
         });
     }
 
+    function user_query_handler_callback(jsondata) {
+        console.log(jsondata);
+        //$('#loading_image').removeClass('show');
+        if(!("error" in jsondata)) {
+            //mapping of labels to id numbers
+            indexmap = jsondata['indexes'];
+
+            draw_graph(jsondata);
+            handle_selection(jsondata['selected']);
+            $('#resulting-plot-header').addClass('show');
+            $('#nav').addClass('show');
+            $('#aggplot').addClass('show');
+            $('#answer-select').addClass('show');
+            $('#aggplot-form').addClass('show');
+            $('#legend').addClass('show');
+
+            //disable directional buttons (should all be disabled)
+            var x_label = renderagg.labelsfrombase.x_label;
+            var y_label = renderagg.labelsfrombase.y_label;
+            disable_directions(indexmap[x_label],indexmap[y_label]); // need to do this after total_tiles is updated
+            disable_zooms();
+
+            // set index back to 0
+            current_id = new Array(numdims);
+            for (var i = 0; i < numdims; i++) {current_id[i] = 0;}
+
+        } else {
+            console.log(["error!!!!! OMGOMGOMG",jsondata['error'],jsondata['error']['args'][0].indexOf("\n")]);
+            var error_args = jsondata['error']['args'][0].replace(/\n/g,"<br>");
+            error_args = error_args.replace(/ /g,"&nbsp");
+            var error_string = "<div id=\"error_message\"><p>An error occured in running your query:</p>";
+            error_string = error_string + "<p>"+error_args+"</p></div>";
+            $("#resulting-plot-header").before($(error_string));
+            $('#vis-loading-modal').modal('hide');
+            return false;
+        }
+            
+        $('#vis-loading-modal').modal('hide');
+        $("body").css("cursor", "auto");
+
+    }
+
+    function user_query_handler_ajax(url,data,callback) {
+        //$.getJSON
+        $.ajax({
+            dataType: "json",
+            url:url,//$SCRIPT_ROOT+'/scalar/fetch-first-tile',
+            data:data,//{data_set: $DATA_SET,task:$TASK,data_threshold:resolution_lvl},
+            tryCount: 0,
+            retryLimit: 3,
+            success:callback,//user_query_handler_callback,
+            error: function(xhr, textStatus, errorThrown ) {
+                if (textStatus == 'timeout') {
+                    this.tryCount++;
+                    if (this.tryCount <= this.retryLimit) {
+                        //try again
+                        $.ajax(this);
+                        return;
+                    } else {
+                        user_query_handler_callback({'error':{'type':'timeout','args':['']}});
+                    }
+                } else {
+                    user_query_handler_callback({'error':{'type':textStatus,'args':['']}});
+                }
+            }
+        });
+    }
+
     function user_query_handler() {
         max_zoom = QVis.DEFAULT_MAX_ZOOM;
         once = 0;
@@ -345,46 +412,11 @@ $(document).ready(function() {
         //$('#loading_image').addClass('show');
         $("body").css("cursor", "progress");
         $('#vis-loading-modal').modal('show');
-        $.getJSON($SCRIPT_ROOT+'/scalar/fetch-first-tile',{data_set: $DATA_SET, task:$TASK,data_threshold:resolution_lvl},function(jsondata){
-            console.log(jsondata);
-            //$('#loading_image').removeClass('show');
-            if(!("error" in jsondata)) {
-                //mapping of labels to id numbers
-                indexmap = jsondata['indexes'];
+        //user_query_handler_ajax(resolution_lvl);
+        user_query_handler_ajax($SCRIPT_ROOT+'/scalar/fetch-first-tile',
+                                {data_set: $DATA_SET,task:$TASK,data_threshold:resolution_lvl},
+                                user_query_handler_callback);
 
-                draw_graph(jsondata);
-                handle_selection(jsondata['selected']);
-                $('#resulting-plot-header').addClass('show');
-                $('#nav').addClass('show');
-                $('#aggplot').addClass('show');
-                $('#answer-select').addClass('show');
-                $('#aggplot-form').addClass('show');
-                $('#legend').addClass('show');
-
-                //disable directional buttons (should all be disabled)
-                var x_label = renderagg.labelsfrombase.x_label;
-                var y_label = renderagg.labelsfrombase.y_label;
-                disable_directions(indexmap[x_label],indexmap[y_label]); // need to do this after total_tiles is updated
-                disable_zooms();
-
-                // set index back to 0
-                current_id = new Array(numdims);
-                for (var i = 0; i < numdims; i++) {current_id[i] = 0;}
-
-            } else {
-                console.log(["error!!!!! OMGOMGOMG",jsondata['error'],jsondata['error']['args'][0].indexOf("\n")]);
-                var error_args = jsondata['error']['args'][0].replace(/\n/g,"<br>");
-                error_args = error_args.replace(/ /g,"&nbsp");
-                var error_string = "<div id=\"error_message\"><p>An error occured in running your query:</p>";
-                error_string = error_string + "<p>"+error_args+"</p></div>";
-                $("#resulting-plot-header").before($(error_string));
-                $('#vis-loading-modal').modal('hide');
-                return false;
-            }
-            
-            $('#vis-loading-modal').modal('hide');
-            $("body").css("cursor", "auto");
-        });
         return false;
     }
 

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, Text, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
-from app.database import Base
-from app.models import User, DataSet
+from app.util.database.database import Base
+from app.home.models import User, DataSet
 import datetime
 
 
