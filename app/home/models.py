@@ -37,7 +37,7 @@ class DataSet(Base):
         self.name = name
         self.query = query
 
-    def __repr__():
+    def __repr__(self):
         return "DataSet(%r, %r)" % (self.name,self.query)
 
 

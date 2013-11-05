@@ -16,13 +16,14 @@ Base = sqlalchemy.ext.declarative.declarative_base()
 Base.query = db_session.query_property()
 
 def configure_engine(uri):
-	global sessionmaker, db_session, engine
-	engine = sqlalchemy.create_engine(uri,echo=False,convert_unicode=True)
-	sessionmaker.configure(bind=engine)
-	db_session.remove()
+  global sessionmaker, db_session, engine
+  engine = sqlalchemy.create_engine(uri,echo=False,convert_unicode=True)
+  sessionmaker.configure(bind=engine)
+  db_session.remove()
 
 def init_db():
-	import app.home.models #base models
-	import app.forms.models
-	import app.scalar.models
-	Base.metadata.create_all(bind=engine)
+  import app.home.models #base models
+  import app.forms.models
+  import app.scalar.models
+  import app.util.queue.models
+  Base.metadata.create_all(bind=engine)
