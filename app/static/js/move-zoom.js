@@ -308,19 +308,178 @@ $(document).ready(function() {
             .attr('width', this.w)
             .attr('height', this.h)
             .appendTo('#aggplot');
-        $.getJSON($SCRIPT_ROOT+'/scalar/fetch-tile',{tile_xid: -1,tile_yid:-1,level:zoom,
-            x_label:x_label,y_label:y_label,
-            temp_id:new_id,data_set: $DATA_SET},
-            function(jsondata){
-                console.log(jsondata);
-                redraw_graph(jsondata);
-                handle_selection(jsondata['selected']);
-                $('#canvas-overlay').remove();
-                $("body").css("cursor", "auto");
+        fetch_tile(zoom,x_label,y_label,new_id);
+    }
 
-                disable_directions(xpos,ypos); // need to do this after total_tiles is updated
-                disable_zooms();
-        });
+    function get_redraw_data_callback(jsondata) {
+        $('#canvas-overlay').remove();
+        $("body").css("cursor", "auto");
+        if(!("error" in jsondata)) {
+            console.log('redraw data callback called');
+            console.log(['jsondata',jsondata,jsondata['selected']]);
+            redraw_graph(jsondata);
+            handle_selection(jsondata['selected']);
+            indexmap = jsondata['indexes'];
+            var x_label = renderagg.labelsfrombase.x_label;
+            var y_label = renderagg.labelsfrombase.y_label;
+            disable_directions(indexmap[x_label],indexmap[y_label]); // need to do this after total_tiles is updated
+
+            disable_zooms();
+        } else {
+            $('#resulting-plot-header').removeClass('show');
+            $('#nav').removeClass('show');
+            $('#aggplot').removeClass('show');
+            $('#answer-select').removeClass('show');
+            $('#aggplot-form').removeClass('show');
+            $('#legend').removeClass('show');
+
+            console.log(["error!!!!! OMGOMGOMG",jsondata['error'],jsondata['error']['args'][0].indexOf("\n")]);
+            var error_args = jsondata['error']['args'][0].replace(/\n/g,"<br>");
+            error_args = error_args.replace(/ /g,"&nbsp");
+            var error_string = "<div id=\"error_message\"><p>An error occured in running your query:</p>";
+            error_string = error_string + "<p>"+error_args+"</p></div>";
+            $("#resulting-plot-header").before($(error_string));
+        }
+        return false;
+    }
+
+    function fetch_tile(zoom,x_label,y_label,new_id) {
+        var self = this;
+        var tries = 1;
+        var maxtries = 5;
+
+        self.getJSON = function(url,data,callback,error_string) {
+            $.ajax({
+                dataType: "json",
+                url:url,
+                data:data,
+                success:callback,
+                error: function(xhr, textStatus, errorThrown ) {
+                    console.log('error handler called');
+                    console.log(['errors',xhr,textStatus,errorThrown]);
+                    callback(error_string);
+                }
+            });
+        };
+        var get_results = function(results) {
+            console.log('get_results called');
+            console.log(['results',results]);
+            if(results === 'fail' || results.length == 0) {
+                console.log('task failed');
+                get_redraw_data_callback({'error':{'type':'','args':['task fail']}});
+            } else if (results === 'wait') {
+                console.log('task in progress');
+                if(tries > maxtries) {
+                    get_redraw_data_callback({'error':{'type':'','args':['timeout']}});
+                } else {
+                    // call this function again in 10 seconds
+                    console.log("got a wait response, trying again in 2 seconds");
+                    tries++;
+                    setTimeout(self.f,2000); // try to get data again in 2 seconds
+                }
+            } else {
+                console.log('task completed, initiating callback');
+                console.log(['results',results]);
+                get_redraw_data_callback(results);
+            }
+        };
+
+        var get_jobid = function(jsondata) {
+            var jobid = jsondata;
+            if(jobid > 0) {
+                // get results here bc this is when we have the jobid
+                self.f = function() {
+                    console.log('calling f');
+                    self.getJSON(
+                        $SCRIPT_ROOT+'/scalar/fetch-tile/result/'+jobid,
+                        {},
+                        get_results,
+                        'fail' // error string should be fail
+                    );
+                };
+                self.f();
+            }
+        };
+        
+        // get the results
+        self.getJSON(
+            $SCRIPT_ROOT+'/scalar/fetch-tile',
+            {tile_xid: -1,tile_yid:-1,level:zoom,
+                x_label:x_label,y_label:y_label,
+                temp_id:new_id,data_set: $DATA_SET},
+            get_jobid,
+            '' // error string should be empty string
+        );
+       
+    }
+
+    function fetch_first_tile(data,resolution_lvl) {
+        var self = this;
+        var tries = 1;
+        var maxtries = 5;
+
+        self.getJSON = function(url,data,callback,error_string) {
+            $.ajax({
+                dataType: "json",
+                url:url,
+                data:data,
+                success:callback,
+                error: function(xhr, textStatus, errorThrown ) {
+                    console.log('error handler called');
+                    console.log(['errors',xhr,textStatus,errorThrown]);
+                    callback(error_string);
+                }
+            });
+        };
+        var get_results = function(results) {
+            console.log('get_results called');
+            console.log(['results',results]);
+            if(results === 'fail' || results.length == 0) {
+                console.log('task failed');
+                user_query_handler_callback({'error':{'type':'','args':['task fail']}});
+            } else if (results === 'wait') {
+                console.log('task in progress');
+                if(tries > maxtries) {
+                    user_query_handler_callback({'error':{'type':'','args':['timeout']}});
+                } else {
+                    // call this function again in 10 seconds
+                    console.log("got a wait response, trying again in 2 seconds");
+                    tries++;
+                    setTimeout(self.f,2000); // try to get data again in 2 seconds
+                }
+            } else {
+                console.log('task completed, initiating callback');
+                console.log(['results',results]);
+                user_query_handler_callback(results);
+            }
+        };
+
+        var get_jobid = function(jsondata) {
+            var jobid = jsondata;
+            console.log(["jobid",jobid,"length",jobid > 0]);
+            if(jobid > 0) {
+                // get results here bc this is when we have the jobid
+                self.f = function() {
+                    console.log('calling f');
+                    self.getJSON(
+                        $SCRIPT_ROOT+'/scalar/fetch-first-tile/result/'+jobid,
+                        {},
+                        get_results,
+                        'fail' // error string should be fail
+                    );
+                };
+                self.f();
+            }
+        };
+        
+        // get the results
+        self.getJSON(
+            $SCRIPT_ROOT+'/scalar/fetch-first-tile',
+            {data_set: $DATA_SET,task:$TASK,data_threshold:resolution_lvl},
+            get_jobid,
+            '' // error string should be empty string
+        );
+       
     }
 
     function user_query_handler_callback(jsondata) {
@@ -365,19 +524,21 @@ $(document).ready(function() {
 
     }
 
+
+
     function user_query_handler_ajax(url,data,callback) {
         //$.getJSON
         $.ajax({
             dataType: "json",
-            url:url,//$SCRIPT_ROOT+'/scalar/fetch-first-tile',
-            data:data,//{data_set: $DATA_SET,task:$TASK,data_threshold:resolution_lvl},
+            url:url,
+            data:data,
             tryCount: 0,
             retryLimit: 3,
-            success:callback,//user_query_handler_callback,
+            success:callback,
             error: function(xhr, textStatus, errorThrown ) {
                 if (textStatus == 'timeout') {
                     this.tryCount++;
-                    if (this.tryCount <= this.retryLimit) {
+                    if (this.tryCount < this.retryLimit) {
                         //try again
                         $.ajax(this);
                         return;
@@ -413,10 +574,15 @@ $(document).ready(function() {
         $("body").css("cursor", "progress");
         $('#vis-loading-modal').modal('show');
         //user_query_handler_ajax(resolution_lvl);
+        /*
         user_query_handler_ajax($SCRIPT_ROOT+'/scalar/fetch-first-tile',
                                 {data_set: $DATA_SET,task:$TASK,data_threshold:resolution_lvl},
                                 user_query_handler_callback);
-
+        */
+        fetch_first_tile(
+            {data_set: $DATA_SET,task:$TASK,data_threshold:resolution_lvl},
+            resolution_lvl
+        );
         return false;
     }
 
@@ -428,6 +594,7 @@ $(document).ready(function() {
         var z_label = renderagg.labelsfrombase.z_label;
         var opts = {overlap:-0, r:1.5};
         var data = jsondata['data'];
+        console.log(['data',data]);
         var labels={'names' : jsondata['names'],
                    'x' : x_label,
            'y' : y_label,
@@ -440,24 +607,23 @@ $(document).ready(function() {
            'inv':renderagg.inv};
         var types = jsondata['types'];
         
-        console.log(jsondata['dimbases']);
-        console.log(jsondata['dimwidths']);
+        console.log(['dimbases',jsondata['dimbases']]);
+        console.log(['dimwidths',jsondata['dimwidths']]);
 
         numdims =jsondata['numdims'];
         max_zoom = jsondata['max_zoom'];
+        /*
         total_xtiles = jsondata['total_xtiles'];
         total_ytiles = jsondata['total_ytiles'];
         future_xtiles_exact = jsondata['future_xtiles_exact'];
         future_ytiles_exact = jsondata['future_ytiles_exact'];
         future_xtiles = jsondata['future_xtiles'];
         future_ytiles = jsondata['future_ytiles'];
-
+        */
         future_tiles_exact = jsondata['future_tiles_exact'];
         future_tiles = jsondata['future_tiles'];
         total_tiles = jsondata['total_tiles'];
         console.log("max zoom: "+max_zoom);
-        console.log("total x/y tiles: ",total_xtiles+","+total_ytiles);
-        console.log("future x/y tiles: ",future_xtiles+","+future_ytiles);
 
         if(once == 1) {
             once += 1;
@@ -484,6 +650,7 @@ $(document).ready(function() {
             })();
         }
         renderagg.mini_render(data, labels, types, opts);
+        console.log(["after mini render call:",current_id,current_zoom]);
 
 /*
         renderagg.mini_render(data, labels,types);

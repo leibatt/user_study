@@ -1,1 +1,1 @@
-__all__=['database','bootstrap','celery']
+__all__=['database','bootstrap','queue']

@@ -1,112 +1,89 @@
-from app.util.database.database import db_session
-from app.util.queue.models import QueuedJobStatus, JobRecord, QueuedJob
+from database import Session, session_scope
+from queue.models import QueuedJobStatus, JobRecord, QueuedJob
 import os
 from time import sleep
 import json
 import datetime
-from functools import wraps
+
 
 # class holding functions for interacting with the queue.
 # note that this code assumes the db_session scope is managed 
 # elsewhere (i.e. database is initialized and sessions setup/scoped
 # somewhere else globally)
-# this file is specificially for use by the app (not the backend!)
 class JobsQueue(object):
-  def __init__(self,db_session,manage_transactions=False):
-    self.db_session = db_session
-    self.manage_transactions = manage_transactions
+  def __init__(self):
+    pass
 
-  #decorator to handle db_session refresh if necessary
-  def getNewSession(f):
-    @wraps(f)
-    def decorated_function(*args,**kwargs):
-      self = args[0]
-      result = f(*args,**kwargs)
-      if(self.manage_transactions):
-        self.db_session.remove()
-      return result
-    return decorated_function
-
-  @getNewSession
   def __len__(self):
-    all_jobs = self.db_session.query(QueuedJob).all()
-    return len(all_jobs)
+    with session_scope() as db_session:
+      all_jobs = db_session.query(QueuedJob).all()
+      return len(all_jobs)
 
   # creates a new job record, and adds the new job to the queue.
   # returns the id assigned to the new job
-  @getNewSession
   def addJobRecord(self, function_id, function_inputs_dict):
-    jid = None
-    new_job = None
-    try:
-      new_job = JobRecord(function_id,json.dumps(function_inputs_dict))
-      self.db_session.add(new_job)
-      self.db_session.commit()
-    except:
-      jid = -1
-    if new_job is not None:
+    with session_scope() as db_session:
+      jid = None
+      try:
+        new_job = JobRecord(function_id,json.dumps(function_inputs_dict))
+        db_session.add(new_job)
+        db_session.commit()
+      except:
+        jid= -1
       try:
         new_queued_job = QueuedJob(new_job.id)
-        self.db_session.add(new_queued_job)
-        self.db_session.commit()
+        db_session.add(new_queued_job)
+        db_session.commit()
         jid = new_job.id
       except:
-        self.db_session.delete(new_job)
-        self.db_session.commit()
+        db_session.delete(new_job)
+        db_session.commit()
         jid = -1
-    return jid
+      return jid
 
-  
   # outward facing function for getting job record
-  @getNewSession
   def getJobRecord(self,job_id):
     return self.__get_job_record(job_id)
 
-  @getNewSession
   def removeJobRecord(self,job_id):
     job_record = self.__get_job_record(job_id)
-    self.db_session.delete(job_record)
-    self.db_session.commit()
-    return job_record
+    with session_scope() as db_session:
+      db_session.delete(job_record)
+      db_session.commit()
+      return job_record
 
-  @getNewSession
   def setJobRecordFail(self, job_id, error):
     self.__set_job_record_status(job_id, QueuedJobStatus.FAIL, error)
   
-  @getNewSession
   def setJobRecordStarted(self, job_id):
     self.__set_job_record_status(job_id, QueuedJobStatus.STARTED)
 
-  @getNewSession
   def setJobRecordSuccess(self, job_id, result):
     self.__set_job_record_status(job_id, QueuedJobStatus.SUCCESS, result)
    
   # returns record associated with next job in the queue
   # and removes this job from the queue.
-  @getNewSession
   def popNextQueuedJob(self):
+    if self.__len__() == 0:
+      return None
     try:
-      if self.__len__() == 0:
-        return None
       queued_job = self.__get_next_queued_job()
       queued_job_record = self.__get_job_record(queued_job.job_id)
-      self.db_session.delete(queued_job) # remove this job from the queue
-      self.db_session.commit()
-      return queued_job_record
+      with session_scope() as db_session:
+        db_session.delete(queued_job) # remove this job from the queue
+        db_session.commit()
+        return queued_job_record
     except:
       return None
 
-  @getNewSession
   def checkJobFinished(self, job_id):
     job_status =  self.__check_job_status(job_id)
     return job_status in [QueuedJobStatus.FAIL, QueuedJobStatus.SUCCESS]
 
-  @getNewSession
   def checkJobSuccess(self, job_id):
     job_status =  self.__check_job_status(job_id)
     return job_status == QueuedJobStatus.SUCCESS
 
-  @getNewSession
   def checkJobFail(self, job_id):
     job_status =  self.__check_job_status(job_id)
     return job_status == QueuedJobStatus.FAIL
@@ -116,10 +93,12 @@ class JobsQueue(object):
   # decorated class functions
 
   def __get_job_record(self,job_id):
-    return self.db_session.query(JobRecord).filter_by(id=job_id).one()
+    with session_scope() as db_session:
+      return db_session.query(JobRecord).filter_by(id=job_id).one()
 
   def __get_next_queued_job(self):
-    return self.db_session.query(QueuedJob).order_by(QueuedJob.id).first()
+    with session_scope() as db_session:
+      return db_session.query(QueuedJob).order_by(QueuedJob.id).first()
 
   def __set_job_record_status(self, job_id, status, result = None):
     job_record = self.__get_job_record(job_id)
@@ -127,7 +106,9 @@ class JobsQueue(object):
     if status in [QueuedJobStatus.FAIL, QueuedJobStatus.SUCCESS]:
       job_record.job_result = json.dumps(result)
       job_record.timestamp = datetime.datetime.now()
-    self.db_session.commit()
+    with session_scope() as db_session:
+      db_session.add(job_record)
+      db_session.commit()
 
   # returns integer representing the status of this job.
   # see model file for status definitions.

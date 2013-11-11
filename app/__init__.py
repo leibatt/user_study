@@ -1,6 +1,5 @@
 from flask import Flask
 from app.util.database.database_config import initialize_database
-from app.util.celery.celery_config import initialize_celery
 
 app = Flask(__name__,static_folder='static')
 #add app configurations
@@ -11,9 +10,6 @@ __all__ = ['forms','scalar','bootstrap','models','views','database']
 
 #intialize database
 initialize_database(app)
-
-#initialize celery
-initialize_celery(app)
 
 #must happen last
 from app.home.views import mod as homeModule

@@ -399,7 +399,7 @@ def fetch_tile2(tile_id,level,options):
 #required options: afl, predicate (if filter specified)
 #TODO: make these reduce types match the scidb interface api reduce types
 def setup_reduce_type(reduce_type,options):
-        saved_qpresults = options['saved_qpresults']
+  saved_qpresults = options['saved_qpresults']
 	returnoptions = {'qpresults':saved_qpresults,'afl':options['afl']}
 	returnoptions['reduce_type'] = sdbi.RESTYPE[reduce_type]
 	#if reduce_type == 'agg':
@@ -420,24 +420,24 @@ def setup_reduce_type(reduce_type,options):
  
 # used to manage requests
 class WSHandler(tornado.websocket.WebSocketHandler):
-    def open(self):
-        print 'new connection'
+  def open(self):
+    print 'new connection'
       
-    def on_message(self, message):
-        print 'message received %s' % message
-	response = process_request(str(message)) # get response for client
-	self.write_message(response) # send response to client
+  def on_message(self, message):
+    print 'message received %s' % message
+    response = process_request(str(message)) # get response for client
+    self.write_message(response) # send response to client
  
-    def on_close(self):
-      print 'connection closed'
+  def on_close(self):
+    print 'connection closed'
  
  
 application = tornado.web.Application([
-    (r'/', WSHandler),
+  (r'/', WSHandler),
 ])
  
  
 if __name__ == "__main__":
-    http_server = tornado.httpserver.HTTPServer(application)
-    http_server.listen(PORT)
-    tornado.ioloop.IOLoop.instance().start()
+  http_server = tornado.httpserver.HTTPServer(application)
+  http_server.listen(PORT)
+  tornado.ioloop.IOLoop.instance().start()
