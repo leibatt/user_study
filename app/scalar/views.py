@@ -143,7 +143,7 @@ def fetch_first_tile():
                     session[taskname]=ds.id
             except:
                 current_app.logger.warning("could not locate data set %r" % \
-                                           (data_set))
+                                           (str(data_set)))
     session['query'] = query
     user_metadata.original_query = query
     data_threshold = request.args.get('data_threshold',0,type=int)
@@ -405,7 +405,7 @@ def menu_updated():
             db_session.add(utu) 
             db_session.commit()
         except Exception as e:
-            current_app.logger.warning("unable to insert into database: %r" % (e))
+            current_app.logger.warning("unable to insert into database: %r" % (str(e)))
             #print "utu:",utu
         current_app.logger.info("got here")
     return json.dumps(str(0))
@@ -432,7 +432,7 @@ def filters_cleared():
         db_session.add(ufu)
         db_session.commit()
     except Exception as e:
-        current_app.logger.warning("unable to insert filter update into database: %r" % (e))
+        current_app.logger.warning("unable to insert filter update into database: %r" % (str(e)))
     return json.dumps(str(0))
 
 
@@ -466,7 +466,7 @@ def filters_applied():
             db_session.add(ufu)
             db_session.commit()
         except Exception as e:
-            current_app.logger.warning("unable to insert filter update into database: %r" % (e))
+            current_app.logger.warning("unable to insert filter update into database: %r" % (str(e)))
     return json.dumps(str(0))
 
 
@@ -491,7 +491,7 @@ def tile_selected():
         db_session.add(session['user_tile_selection']) 
         db_session.commit()
     except Exception as e:
-        current_app.logger.warning("unable to insert into database %r" % (e))
+        current_app.logger.warning("unable to insert into database %r" % (str(e)))
     current_app.logger.info("got here")
     return json.dumps(str(0))
 
@@ -510,7 +510,7 @@ def tile_unselected():
         except:
             pass #didn't work but oh well
             current_app.logger.warning("unable to remove %r from database" \
-                                       % (uts))
+                                       % (str(uts)))
     return json.dumps(str(0))
 
 @mod.route('/warmup/selections/',methods=["POST","GET"])
@@ -563,7 +563,7 @@ def get_tile_selections(taskname):
         results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,dataset_id=session[taskname]).all()
         if taskname == 'warmup':
             for item in results:
-                current_app.logger.warning("item: %r,%r,%r,%r,%r,%r" % (item.x_inv,item.y_inv,item.z_inv,item.color,item.tile_id,item.zoom_level))
+                current_app.logger.warning("item: %r,%r,%r,%r,%r,%r" % (item.x_inv,item.y_inv,item.z_inv,item.color,str(item.tile_id),item.zoom_level))
                 item.correct = "correct"
                 if (not item.x_inv) and item.y_inv and item.z_inv and item.color == u'GnBu':
                     if item.tile_id == u'[0, 0]' and item.zoom_level == 0:
