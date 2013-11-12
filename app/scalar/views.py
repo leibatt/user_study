@@ -138,12 +138,14 @@ def fetch_first_tile():
             try:
                 ds = db_session.query(DataSet).filter_by(name=data_set).one()
                 query = ds.query
-                session['data_set'] = ds
+                session['data_set'] = ds.id
                 if len(taskname) > 0 and taskname not in session: # record what data set was used for this task
                     session[taskname]=ds.id
+                current_app.logger.info("found data set %s" % (data_set))
+
             except:
-                current_app.logger.warning("could not locate data set %r" % \
-                                           (str(data_set)))
+                current_app.logger.warning("could not locate data set %s" % \
+                                           (data_set))
     session['query'] = query
     user_metadata.original_query = query
     data_threshold = request.args.get('data_threshold',0,type=int)
@@ -604,9 +606,12 @@ def before_request(exception=None):
         g.consent = session['consent']
     g.ds = None
     if 'data_set' in session:
-         g.ds = session['data_set']
-         db_session.add(g.ds)
-         db_session.commit()
+         try:
+             g.ds = db_session.query(DataSet).filter_by(id=session['data_set']).one()
+             #db_session.add(g.ds)
+             #db_session.commit()
+         except:
+             pass
     g.user = None
     if 'user_id' not in session:
         session['user_id'] = str(uuid.uuid4())
