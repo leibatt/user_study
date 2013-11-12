@@ -143,7 +143,7 @@ def fetch_first_tile():
                     session[taskname]=ds.id
             except:
                 current_app.logger.warning("could not locate data set %r" % \
-                                           data_set)
+                                           (data_set))
     session['query'] = query
     user_metadata.original_query = query
     data_threshold = request.args.get('data_threshold',0,type=int)
