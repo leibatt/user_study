@@ -6,7 +6,7 @@ app = Flask(__name__,static_folder='static')
 app.config.from_object('config')
 
 # needs to be done at the end of the file
-__all__ = ['forms','scalar','bootstrap','home','util']
+__all__ = ['forms','scalar','home','util']
 
 #intialize database
 initialize_database(app)
