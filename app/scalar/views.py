@@ -1,5 +1,5 @@
 from flask import current_app,Flask,Blueprint, session, request, render_template, g, redirect, send_file,url_for
-import simplejson as json
+import json
 import traceback
 import logging
 from app.util.database.database import db_session
