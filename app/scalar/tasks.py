@@ -1,6 +1,3 @@
-from flask import current_app,session
-import websocket
-import logging
 from app.util.queue.queue_obj import JobsQueue
 import json
 
