@@ -126,7 +126,6 @@ def get_data2_canvas():
 @mod.route('/fetch-first-tile',methods=["POST", "GET"])
 @consent_required
 def fetch_first_tile():
-    user_metadata = scalar_tasks.TileMetadata()
     current_app.logger.info("got fetch first tile request")
     query = request.args.get('query',"",type=str)
     taskname = request.args.get('task',"",type=str)
@@ -139,6 +138,7 @@ def fetch_first_tile():
                 ds = db_session.query(DataSet).filter_by(name=data_set).one()
                 query = ds.query
                 session['data_set'] = ds.id
+                g.user_metadata.dataset_id = ds.id
                 if len(taskname) > 0 and taskname not in session: # record what data set was used for this task
                     session[taskname]=ds.id
                 current_app.logger.info("found data set %s" % (data_set))
@@ -146,20 +146,17 @@ def fetch_first_tile():
             except:
                 current_app.logger.warning("could not locate data set %s" % \
                                            (data_set))
-    session['query'] = query
-    user_metadata.original_query = query
+    g.user_metadata.original_query = query
     data_threshold = request.args.get('data_threshold',0,type=int)
-    session['threshold'] = data_threshold
-    user_metadata.user_id = session['user_id']
+    g.user_metadata.user_id = session['user_id']
     options = {'user_id':session['user_id']}
     session['usenumpy'] = request.args.get('usenumpy',False,type=bool)
     if data_threshold > 0:
-        user_metadata.threshold = data_threshold
+        g.user_metadata.threshold = data_threshold
         options['data_threshold'] = data_threshold
     if session['usenumpy']:
         options['usenumpy'] = False
-    options['user_metadata'] = user_metadata.get_dict()
-    session['user_metadata'] = user_metadata.get_dict() # save for later
+    options['user_metadata'] = g.user_metadata.get_dict()
     #result = scalar_tasks.fft.delay(query,options)   
     #taskid = result.task_id
     fft = scalar_tasks.Fft(db_session)
@@ -171,8 +168,6 @@ def fetch_first_tile():
 @mod.route('/fetch-first-tile/result/<task_id>',methods=["POST", "GET"])
 @consent_required
 def fetch_first_tile_result(task_id):
-    user_metadata = scalar_tasks.TileMetadata()
-    user_metadata.load_dict(session['user_metadata'])
     # setup job wrapper
     fft = scalar_tasks.Fft(db_session)
     # query for our job
@@ -186,37 +181,29 @@ def fetch_first_tile_result(task_id):
                                     % (task_id))
         return json.dumps('fail')
     queryresultarr = fft.result()
-    '''
-    result = scalar_tasks.fft.AsyncResult(task_id)
-    if result.failed():
-        current_app.logger.info("fetch_first_tile request failed for job %s" \
-                                    % (task_id))
-        return json.dumps('fail')
-    elif not result.ready():
-        current_app.logger.info("fetch_first_tile result for job %s not ready yet" \
-                                    % (task_id))
-        return json.dumps('wait')
-    queryresultarr = result.result
-    '''
+    
     if 'error' not in queryresultarr: # error didn't happen
-        user_metadata.total_zoom_levels = queryresultarr['max_zoom']
-        user_metadata.threshold = queryresultarr['threshold']
-        user_metadata.saved_qpresults = queryresultarr.pop('original_saved_qpresults',None)
+        g.user_metadata.total_zoom_levels = queryresultarr['max_zoom']
+        g.user_metadata.threshold = queryresultarr['threshold']
+        g.user_metadata.saved_qpresults = queryresultarr.pop('original_saved_qpresults',None)
         current_app.logger.info("result length: "+str(len(queryresultarr['data'])))
+        current_app.logger.info("new threshold: "+str(g.user_metadata.threshold))
         tile_id = [0,0]
         if 'saved_qpresults' in queryresultarr:
             tile_id = [0] * int(queryresultarr['saved_qpresults']['numdims'])
+        g.user_metadata.current_tile_id = tile_id
+        g.user_metadata.current_zoom_level = 0
         user_trace = UserTrace(tile_id=str(tile_id),
                                 zoom_level=0,
-                                threshold=session['threshold'],
-                                query=session['query'],
+                                threshold=g.user_metadata.threshold,
+                                query=g.user_metadata.original_query,
                                 user_id=g.user.id,
                                 dataset_id=None)
         # save current tile info for tracking tile selection
         uts = UserTileSelection(tile_id=str(tile_id),
                                 zoom_level=0,
-                                threshold=session['threshold'],
-                                query=session['query'],
+                                threshold=g.user_metadata.threshold,
+                                query=g.user_metadata.original_query,
                                 user_id=g.user.id,
                                 dataset_id=None,
                                 image=None)
@@ -229,7 +216,6 @@ def fetch_first_tile_result(task_id):
         db_session.commit()
         #log the tile request
 
-        session['user_tile_selection'] = uts
         try:
             db_session.query(UserTileSelection).filter_by(tile_id=uts.tile_id,
                                                       user_id=uts.user_id,
@@ -241,17 +227,13 @@ def fetch_first_tile_result(task_id):
         except: # uh oh, something bad happened here
             current_app.logger.warning("error occured when querying \
                                    for user's selections")
-    session.pop('user_metadata',None)
-    session['user_metadata'] = user_metadata.get_dict() # save updates
     #print "user_metadata.saved_qpresults:",user_metadata.saved_qpresults
     return json.dumps(queryresultarr)
 
 @mod.route('/fetch-tile',methods=["POST", "GET"])
 @consent_required
 def fetch_tile():
-    user_metadata = scalar_tasks.TileMetadata()
-    user_metadata.load_dict(session['user_metadata'])
-    #print "user_metadata.saved_qpresults:",user_metadata.saved_qpresults
+    #print "g.user_metadata.saved_qpresults:",g.user_metadata.saved_qpresults
     current_app.logger.info("got fetch tile request")
     tile_id = request.args.getlist('temp_id[]')
     for i in range(len(tile_id)):
@@ -262,9 +244,10 @@ def fetch_tile():
     options = {'user_id':session['user_id']}
     if session['usenumpy']:
         options['usenumpy'] = False
-    options['user_metadata'] = user_metadata.get_dict()
-    session['tile_id'] = tile_id
-    session['zoom_level'] = level
+
+    g.user_metadata.current_tile_id = tile_id
+    g.user_metadata.current_zoom_level = level
+    options['user_metadata'] = g.user_metadata.get_dict()
     
     ft = scalar_tasks.Ft(db_session)
     ft.run(tile_id,level,options) # my queue now
@@ -277,9 +260,6 @@ def fetch_tile():
 @mod.route('/fetch-tile/result/<task_id>',methods=["POST", "GET"])
 @consent_required
 def fetch_tile_result(task_id):
-    user_metadata = scalar_tasks.TileMetadata()
-    user_metadata.load_dict(session['user_metadata'])
-
     # setup job wrapper
     ft = scalar_tasks.Ft(db_session)
     # query for our job
@@ -295,20 +275,19 @@ def fetch_tile_result(task_id):
     queryresultarr = ft.result()
 
     if 'saved_qpresults' in queryresultarr:
-        tile_id = session['tile_id']
-        level = session['zoom_level']
-        session['saved_qpresults'] = queryresultarr['saved_qpresults']
+        tile_id = g.user_metadata.current_tile_id
+        level = g.user_metadata.current_zoom_level
         user_trace = UserTrace(tile_id=str(tile_id),zoom_level=level,
-                                                    threshold=session['threshold'],
-                                                    query=session['query'],
+                                                    threshold=g.user_metadata.threshold,
+                                                    query=g.user_metadata.original_query,
                                                     user_id=g.user.id,
                                                     dataset_id=None)
 
         # save current tile info for tracking tile selection
         uts = UserTileSelection(tile_id=str(tile_id),
                                 zoom_level=level,
-                                threshold=session['threshold'],
-                                query=session['query'],
+                                threshold=g.user_metadata.threshold,
+                                query=g.user_metadata.original_query,
                                 user_id=g.user.id,
                                 dataset_id=None,
                                 image=None)
@@ -321,7 +300,7 @@ def fetch_tile_result(task_id):
 
         db_session.add(user_trace)
         db_session.commit()
-        session['user_tile_selection'] = uts
+
         try:
             db_session.query(UserTileSelection).filter_by(tile_id=uts.tile_id,
                                                       user_id=uts.user_id,
@@ -388,28 +367,30 @@ def get_menu_args(method,args):
 @mod.route('/tile-updated/',methods=["POST","GET"])
 @consent_required
 def menu_updated():
-    if 'user_tile_selection' in session:
-        uts = session['user_tile_selection']
-        result = get_menu_args(request.method,request.args)
-        # build a new menu update entry every time
-        utu = UserTileUpdate(tile_id=uts.tile_id,zoom_level=uts.zoom_level,query=session['query'],user_id=g.user.id,dataset_id=None)
-        #print "result:",result
-        try:
-            utu.x_label = result['x_label']
-            utu.y_label = result['y_label']
-            utu.z_label = result['z_label']
-            utu.x_inv = result['x_inv']
-            utu.y_inv = result['y_inv']
-            utu.z_inv = result['z_inv']
-            utu.color = result['color']
-            utu.width = result['width']
-            utu.height = result['height']
-            db_session.add(utu) 
-            db_session.commit()
-        except Exception as e:
-            current_app.logger.warning("unable to insert into database: %r" % (str(e)))
-            #print "utu:",utu
-        current_app.logger.info("got here")
+    tile_id = g.user_metadata.current_tile_id
+    zoom_level = g.user_metadata.current_zoom_level
+    query = g.user_metadata.original_query
+
+    result = get_menu_args(request.method,request.args)
+    # build a new menu update entry every time
+    utu = UserTileUpdate(tile_id=tile_id,zoom_level=zoom_level,query=query,user_id=g.user.id,dataset_id=None)
+    #print "result:",result
+    try:
+        utu.x_label = result['x_label']
+        utu.y_label = result['y_label']
+        utu.z_label = result['z_label']
+        utu.x_inv = result['x_inv']
+        utu.y_inv = result['y_inv']
+        utu.z_inv = result['z_inv']
+        utu.color = result['color']
+        utu.width = result['width']
+        utu.height = result['height']
+        db_session.add(utu) 
+        db_session.commit()
+    except:
+        current_app.logger.warning("unable to insert into database")
+        #print "utu:",utu
+    current_app.logger.info("got here")
     return json.dumps(str(0))
 
 
@@ -421,8 +402,7 @@ def filters_cleared():
         current_app.logger.warning("no dataset recorded for user: %r" % (session['user_id']))
         return json.dumps(str(0))
 
-    if 'query' in session:
-        query = session['query']
+    query = g.user_metadata.original_query
     try:
         ufu = UserFilterUpdate(filter_name="SCALAR_FILTER_CLEAR",
                                     lower=0.0,
@@ -433,8 +413,8 @@ def filters_cleared():
                                     dataset_id=g.ds.id)
         db_session.add(ufu)
         db_session.commit()
-    except Exception as e:
-        current_app.logger.warning("unable to insert filter update into database: %r" % (str(e)))
+    except:
+        current_app.logger.warning("unable to insert filter update into database")
     return json.dumps(str(0))
 
 
@@ -443,11 +423,10 @@ def filters_cleared():
 def filters_applied():
     query = None
     if g.ds is None:
-        current_app.logger.warning("no dataset recorded for user: %r" % (session['user_id']))
+        current_app.logger.warning("no dataset recorded for user: %r" % (g.user.id))
         return json.dumps(str(0))
 
-    if 'query' in session:
-        query = session['query']
+    query = g.user_metadata.original_query
 
     filter_names = request.values.getlist('filter_labels[]')
     filter_lowers = request.values.getlist('filter_lowers[]')
@@ -467,8 +446,8 @@ def filters_applied():
                                     dataset_id=g.ds.id)
             db_session.add(ufu)
             db_session.commit()
-        except Exception as e:
-            current_app.logger.warning("unable to insert filter update into database: %r" % (str(e)))
+        except:
+            current_app.logger.warning("unable to insert filter update into database")
     return json.dumps(str(0))
 
 
@@ -480,39 +459,47 @@ def tile_selected():
     try:
         img = result['img']
         if len(img) > 0: # tile_id and zoom accounted for in fetch_tile function
-            session['user_tile_selection'].image = img
-            session['user_tile_selection'].x_label = result['x_label']
-            session['user_tile_selection'].y_label = result['y_label']
-            session['user_tile_selection'].z_label = result['z_label']
-            session['user_tile_selection'].x_inv = result['x_inv']
-            session['user_tile_selection'].y_inv = result['y_inv']
-            session['user_tile_selection'].z_inv = result['z_inv']
-            session['user_tile_selection'].color = result['color']
-            session['user_tile_selection'].width = result['width']
-            session['user_tile_selection'].height = result['height']
-        db_session.add(session['user_tile_selection']) 
-        db_session.commit()
+            uts = UserTileSelection(tile_id=str(g.user_metadata.current_tile_id),
+                                zoom_level=g.user_metadata.current_zoom_level,
+                                threshold=g.user_metadata.threshold,
+                                query=g.user_metadata.original_query,
+                                user_id=g.user.id,
+                                dataset_id=None,
+                                image=img)
+
+            if g.ds is not None:
+              uts.dataset_id = g.ds.id
+            uts.x_label=result['x_label']
+            uts.y_label=result['y_label']
+            uts.z_label=result['z_label']
+            uts.width=result['width']
+            uts.height=result['height']
+            uts.color=result['color']
+            
+            db_session.add(uts)
+            db_session.commit()
     except Exception as e:
-        current_app.logger.warning("unable to insert into database %r" % (str(e)))
-    current_app.logger.info("got here")
+        current_app.logger.warning("unable to insert into database")
     return json.dumps(str(0))
 
 @mod.route('/tile-unselected/',methods=["POST","GET"])
 @consent_required
 def tile_unselected():
     result = get_menu_args(request.method,request.args)
-    if 'user_tile_selection' in session:
-        uts = session['user_tile_selection']
-        try:
-            db_session.query(UserTileSelection).filter_by(tile_id=uts.tile_id,
-                                                      user_id=uts.user_id,
-                                                      zoom_level=uts.zoom_level,
-                                                      query=uts.query).delete()
-            db_session.commit()
-        except:
-            pass #didn't work but oh well
-            current_app.logger.warning("unable to remove %r from database" \
-                                       % (str(uts)))
+
+    tile_id = g.user_metadata.current_tile_id
+    zoom_level = g.user_metadata.current_zoom_level
+    query = g.user_metadata.original_query
+
+    try:
+        db_session.query(UserTileSelection).filter_by(tile_id=str(tile_id),
+                                                  user_id=g.user.id,
+                                                  zoom_level=zoom_level,
+                                                  query=query).delete()
+        db_session.commit()
+    except Exception as e:
+        pass #didn't work but oh well
+        current_app.logger.warning("unable to remove user tile selection from database")
     return json.dumps(str(0))
 
 @mod.route('/warmup/selections/',methods=["POST","GET"])
@@ -601,6 +588,10 @@ def get_tile_selections(taskname):
     
 @mod.before_request
 def before_request(exception=None):
+    g.user_metadata = scalar_tasks.TileMetadata()
+    if 'user_metadata' in session:
+      g.user_metadata.load_dict(session['user_metadata'])
+      current_app.logger.info("begin user metadata: "+json.dumps(session['user_metadata']))
     g.consent = None
     if 'consent' in session:
         g.consent = session['consent']
@@ -623,8 +614,11 @@ def before_request(exception=None):
         db_session.add(g.user)
         db_session.commit()
 
-@mod.teardown_request
-def teardown_request(exception=None):
+@mod.after_request
+def after_request(response):
+    session.pop('user_metadata',None)
+    session['user_metadata'] = g.user_metadata.get_dict() # save updates
+    current_app.logger.info("end user metadata: "+json.dumps(session['user_metadata']))
     if 'user_id' in session:
         try:
             user = db_session.query(User).filter_by(flask_session_id=session['user_id']).one()
@@ -636,5 +630,10 @@ def teardown_request(exception=None):
                                        % (session['user_id']))
 
     db_session.remove()
+    return response
 
-
+'''
+@mod.teardown_request
+def teardown_request(exception=None):
+    pass
+'''

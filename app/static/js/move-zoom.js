@@ -346,7 +346,7 @@ $(document).ready(function() {
     function fetch_tile(zoom,x_label,y_label,new_id) {
         var self = this;
         var tries = 1;
-        var maxtries = 5;
+        var maxtries = 20;
 
         self.getJSON = function(url,data,callback,error_string) {
             $.ajax({
@@ -416,7 +416,7 @@ $(document).ready(function() {
     function fetch_first_tile(data,resolution_lvl) {
         var self = this;
         var tries = 1;
-        var maxtries = 5;
+        var maxtries = 20;
 
         self.getJSON = function(url,data,callback,error_string) {
             $.ajax({

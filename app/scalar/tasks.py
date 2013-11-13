@@ -70,23 +70,25 @@ class TileMetadata(object):
   def __init__(self):
     self.user_id = None
     self.saved_qpresults = None
-    #self.current_tile_id = [0] * self.saved_qpresults['numdims']
-    #self.current_zoom_level = 0
+    self.current_tile_id = [0,0]
+    self.current_zoom_level = 0
     self.total_zoom_levels = 0
     self.threshold = -1
     self.original_query = None
-    #self.dataset_id = None
+    self.dataset_id = None
+    self.image = None
 
   def get_dict(self):
     return {
       'user_id': self.user_id,
       'saved_qpresults': self.saved_qpresults,
-      #'current_tile_id': self.current_tile_id,
-      #'current_zoom_level': self.current_zoom_level,
+      'current_tile_id': self.current_tile_id,
+      'current_zoom_level': self.current_zoom_level,
       'total_zoom_levels': self.total_zoom_levels,
       'threshold': self.threshold,
-      'original_query': self.original_query
-      #'dataset_id': self.dataset_id
+      'original_query': self.original_query,
+      'dataset_id': self.dataset_id,
+      'image': self.image
     }
 
   def load_dict(self,d):
@@ -95,4 +97,8 @@ class TileMetadata(object):
     self.total_zoom_levels = d['total_zoom_levels']
     self.threshold = d['threshold']
     self.original_query = d['original_query']
+    self.current_tile_id = d['current_tile_id']
+    self.current_zoom_level = d['current_zoom_level']
+    self.dataset_id = d['dataset_id']
+    self.image = d['image']
 
