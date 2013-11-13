@@ -68,7 +68,8 @@ class UserTileSelection(Base):
         self.image = image
                
     def __repr__(self):
-        return "UserTileSelection(%r, %r, %r, %r, %r, %r)" % (self.user_id,self.tile_id,self.query,self.dataset_id,self.timestamp)
+        return "UserTileSelection(%r, %r, %r, %r, %r, %r)" % \
+        (self.user_id,self.tile_id,self.zoom_level,self.query,self.dataset_id,self.timestamp)
 
 class UserTileUpdate(Base):
     __tablename__ = "user_tile_updates"
