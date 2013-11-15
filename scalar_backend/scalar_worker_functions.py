@@ -4,7 +4,6 @@ import scidb_server_interface as sdbi
 import scalar_tile_interface as sti
 from multiprocessing import Queue
 
-#def fetch_first_tile(userquery,options,q):
 def fetch_first_tile(fargs,job_id,q):
   query = str(fargs['query'])
   options = fargs['options']
@@ -22,7 +21,6 @@ def fetch_first_tile(fargs,job_id,q):
   if 'error' in saved_qpresults:
     print "error found, returning error:",saved_qpresults
     tile = saved_qpresults
-    return
   else:
     print "saved_qpresults:",saved_qpresults
   # user metadata does not contain saved_qpresults at this point, store it
@@ -36,6 +34,7 @@ def fetch_first_tile(fargs,job_id,q):
       usenumpy = False
     tile = sti.getTileByIDN(base_id,0,user_metadata,usenumpy)
   result = {
+    'fail': ('error' in tile),
     'job_id':job_id,
     'current_tile_id': base_id,
     'current_zoom': 0,
@@ -48,7 +47,6 @@ def fetch_first_tile(fargs,job_id,q):
 
 
 #this is called after original query is run
-#def fetch_tile(tile_id,level,options,q):
 def fetch_tile(fargs,job_id,q):
   tile_id = fargs['tile_id']
   level = fargs['level']
@@ -60,6 +58,7 @@ def fetch_tile(fargs,job_id,q):
     usenumpy = False
   tile = sti.getTileByIDN(tile_id,level,user_metadata,usenumpy)
   result = {
+    'fail': ('error' in tile),
     'job_id':job_id,
     'current_tile_id': tile_id,
     'current_zoom': level,

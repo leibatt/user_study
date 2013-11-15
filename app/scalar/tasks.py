@@ -75,7 +75,7 @@ class TileMetadata(object):
     self.total_zoom_levels = 0
     self.threshold = -1
     self.original_query = None
-    self.dataset_id = None
+    #self.dataset_id = None
     self.image = None
 
   def get_dict(self):
@@ -87,7 +87,7 @@ class TileMetadata(object):
       'total_zoom_levels': self.total_zoom_levels,
       'threshold': self.threshold,
       'original_query': self.original_query,
-      'dataset_id': self.dataset_id,
+      #'dataset_id': self.dataset_id,
       'image': self.image
     }
 
@@ -99,6 +99,6 @@ class TileMetadata(object):
     self.original_query = d['original_query']
     self.current_tile_id = d['current_tile_id']
     self.current_zoom_level = d['current_zoom_level']
-    self.dataset_id = d['dataset_id']
+    #self.dataset_id = d['dataset_id']
     self.image = d['image']
 

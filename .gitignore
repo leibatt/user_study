@@ -7,3 +7,4 @@ app/data/sqlite/temp.db
 app/data/sqlite/temp.db.old
 app/data/postgres/test.sql
 backend/user_history_files
+_scalar_cache_dir

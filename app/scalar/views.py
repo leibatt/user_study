@@ -15,89 +15,6 @@ from app.util.queue.queue_obj import JobsQueue
 
 mod = Blueprint('scalar',__name__,url_prefix='/scalar')
 
-@mod.route('/test/queue/add_job', methods=["POST", "GET"])
-@consent_required
-def queue_add_job():
-    q = JobsQueue(db_session)
-    #print "numjobs:",len(q)
-    taskid = q.addJobRecord(0,{})
-    return json.dumps(taskid)
-
-@mod.route('/test/queue/del_job/<job_id>', methods=["POST", "GET"])
-@consent_required
-def queue_del_job(job_id):
-    q = JobsQueue(db_session)
-    job_record = q.removeJobRecord(job_id)
-    return json.dumps(job_record.id)
-
-@mod.route('/test/queue/check_status/<job_id>', methods=["POST", "GET"])
-@consent_required
-def queue_check_job_status(job_id):
-    q = JobsQueue(db_session)
-    status = q.checkJobFinished(job_id)
-    success = q.checkJobSuccess(job_id)
-    fail = q.checkJobFail(job_id)
-    if status:
-      status = "job is finished"
-    else:
-      status = "job not finished"
-    if success:
-      status += ",job succeeded"
-    if fail:
-      status += ",job failed"
-    return json.dumps(status)
-
-@mod.route('/test/queue/finish/<job_id>', methods=["POST", "GET"])
-@consent_required
-def queue_succeed_job(job_id):
-    q = JobsQueue(db_session)
-    q.setJobRecordSuccess(job_id,{})
-    return "job %s set to succeed" % (job_id)
-
-@mod.route('/test/queue/fail/<job_id>', methods=["POST", "GET"])
-@consent_required
-def queue_fail_job(job_id):
-    q = JobsQueue(db_session)
-    q.setJobRecordFail(job_id,{})
-    return "job %s set to failed" % (job_id)
-
-@mod.route('/test/queue/start/<job_id>', methods=["POST", "GET"])
-@consent_required
-def queue_start_job(job_id):
-    q = JobsQueue(db_session)
-    q.setJobRecordStarted(job_id)
-    return "job %s set to started" % (job_id)
-
-
-@mod.route('/test/queue/pop_qjob', methods=["POST", "GET"])
-@consent_required
-def queue_pop_queued_job():
-    q = JobsQueue(db_session)
-    #print "numjobs:",len(q)
-    qjob_record = q.popNextQueuedJob()
-    #print "new numjobs:",len(q)
-    if qjob_record is None:
-      return "no jobs in queue"
-    return json.dumps(qjob_record.id)
-
-@mod.route('/test/', methods=["POST", "GET"])
-@consent_required
-def test():
-    result = scalar_tasks.test.delay(10)   
-    taskid = result.task_id
-    return json.dumps(taskid)
-
-@mod.route('/test/result/<task_id>', methods=["POST", "GET"])
-@consent_required
-def test_result(task_id):
-    result = scalar_tasks.test.AsyncResult(task_id)
-    if result.failed():
-        return 'result failed'
-    elif not result.ready():
-        return 'result not ready yet'
-    returnval = result.result
-    return json.dumps(returnval)
-
 @mod.route('/tutorial/', methods=["POST", "GET"])
 @consent_required
 def tutorial():
@@ -126,9 +43,18 @@ def get_data2_canvas():
 @mod.route('/fetch-first-tile',methods=["POST", "GET"])
 @consent_required
 def fetch_first_tile():
+    # clear the metadata
+    g.user_metadata = scalar_tasks.TileMetadata()
     current_app.logger.info("got fetch first tile request")
     query = request.args.get('query',"",type=str)
     taskname = request.args.get('task',"",type=str)
+    data_threshold = request.args.get('data_threshold',0,type=int)
+    session['usenumpy'] = request.args.get('usenumpy',False,type=bool)
+
+    current_app.logger.info("query: %s" % (query))
+    g.user_metadata.user_id = session['user_id']
+
+    # setup dataset object
     ds = None
     if len(query) == 0: #look for data set
         data_set = request.args.get('data_set',"",type=str)
@@ -138,31 +64,30 @@ def fetch_first_tile():
                 ds = db_session.query(DataSet).filter_by(name=data_set).one()
                 query = ds.query
                 session['data_set'] = ds.id
-                g.user_metadata.dataset_id = ds.id
-                if len(taskname) > 0 and taskname not in session: # record what data set was used for this task
+                # record what data set was used for this task
+                if len(taskname) > 0 and taskname not in session:
                     session[taskname]=ds.id
                 current_app.logger.info("found data set %s" % (data_set))
 
             except:
                 current_app.logger.warning("could not locate data set %s" % \
                                            (data_set))
+
+    # set query after we have identified the appropriate dataset
     g.user_metadata.original_query = query
-    data_threshold = request.args.get('data_threshold',0,type=int)
-    g.user_metadata.user_id = session['user_id']
-    options = {'user_id':session['user_id']}
-    session['usenumpy'] = request.args.get('usenumpy',False,type=bool)
+    # setup query options
+    options = {}
     if data_threshold > 0:
         g.user_metadata.threshold = data_threshold
         options['data_threshold'] = data_threshold
-    if session['usenumpy']:
-        options['usenumpy'] = False
+    options['usenumpy'] = session['usenumpy']
     options['user_metadata'] = g.user_metadata.get_dict()
-    #result = scalar_tasks.fft.delay(query,options)   
-    #taskid = result.task_id
+    current_app.logger.info("metadata: %s" % (json.dumps(options['user_metadata'])))
+
     fft = scalar_tasks.Fft(db_session)
     fft.run(query,options) # my queue now
     taskid = fft.job_id()
-    #print "taskid:",taskid
+    current_app.logger.info("taskid: %s" % (taskid))
     return json.dumps(taskid)
 
 @mod.route('/fetch-first-tile/result/<task_id>',methods=["POST", "GET"])
@@ -591,7 +516,7 @@ def before_request(exception=None):
     g.user_metadata = scalar_tasks.TileMetadata()
     if 'user_metadata' in session:
       g.user_metadata.load_dict(session['user_metadata'])
-      current_app.logger.info("begin user metadata: "+json.dumps(session['user_metadata']))
+      #current_app.logger.info("begin user metadata: "+json.dumps(session['user_metadata']))
     g.consent = None
     if 'consent' in session:
         g.consent = session['consent']
@@ -618,7 +543,7 @@ def before_request(exception=None):
 def after_request(response):
     session.pop('user_metadata',None)
     session['user_metadata'] = g.user_metadata.get_dict() # save updates
-    current_app.logger.info("end user metadata: "+json.dumps(session['user_metadata']))
+    #current_app.logger.info("end user metadata: "+json.dumps(session['user_metadata']))
     if 'user_id' in session:
         try:
             user = db_session.query(User).filter_by(flask_session_id=session['user_id']).one()
