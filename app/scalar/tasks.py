@@ -25,7 +25,8 @@ class JobWrapper(object):
     self.FINISHED = q.checkJobFinished(jid)
     if self.FINISHED:
       self.FAILED = q.checkJobFail(jid) # see if the job failed
-      self.job_record = q.getJobRecord(jid)
+      #self.job_record = q.getJobRecord(jid)
+      self.job_record = q.removeJobRecord(jid)
 
   def job_id(self):
     return self.jid

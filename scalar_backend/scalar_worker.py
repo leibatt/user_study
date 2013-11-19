@@ -38,9 +38,9 @@ def cache_insert_file(result):
   if not result['fail']:
     # hash string-based properties
     hashed_query = hash_it(result['query'])
-    print str(result['query']),",",hashed_query
+    if DEBUG: print str(result['query']),",",hashed_query
     hashed_tile_id = hash_it(result['current_tile_id'])
-    print str(result['current_tile_id']),",",hashed_tile_id
+    if DEBUG: print str(result['current_tile_id']),",",hashed_tile_id
 
     threshold = int(result['threshold'])
     zoom = int(result['current_zoom'])
@@ -197,8 +197,26 @@ if __name__ == "__main__":
   # setup cache directory
 
   # main loop
+  tracker = 0
+  maxtrack = 5
+  sleeptime = .5 # 500 ms
   while(True):
-    #step 1: check for finished results in the result queue
+    #step 1: check for queued jobs
+    if DEBUG:
+      if (tracker == 0):
+        print "queued jobs:",len(dbq) # print total jobs in queue
+      tracker += 1
+      if tracker == (maxtrack - 1):
+        tracker = 0
+    for i in range(2): # start up to 2 new jobs
+      next_job = dbq.popNextQueuedJob() # get the next queued job
+      if next_job is not None:
+        if DEBUG: print "next queued job:",next_job
+        start_job(next_job,dbq,result_queue)
+      #else:
+      #  if DEBUG: print "no new jobs"
+
+    #step 2: check for finished results in the result queue
     for i in range(10): # remove up to 10 items from the queue
       try:
         result = result_queue.get(timeout=1) # waits for a result
@@ -206,16 +224,8 @@ if __name__ == "__main__":
         cache_insert_file(result)
         return_result(dbq,result)
       except QueueEmptyException: # didn't find anything
-        if DEBUG: print "result queue is empty"
+        #if DEBUG: print "result queue is empty"
         break
 
-    #step 2: check for queued jobs
-    if DEBUG: print "queued jobs:",len(dbq) # print total jobs in queue
-    next_job = dbq.popNextQueuedJob() # get the next queued job
-    if next_job is not None:
-      if DEBUG: print "next queued job:",next_job
-      start_job(next_job,dbq,result_queue)
-    else:
-      if DEBUG: print "no new jobs"
-    sleep(2)
+        sleep(sleeptime)
   

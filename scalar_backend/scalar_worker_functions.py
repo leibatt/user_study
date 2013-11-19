@@ -4,6 +4,8 @@ import scidb_server_interface as sdbi
 import scalar_tile_interface as sti
 from multiprocessing import Queue
 
+DEBUG = True
+
 def fetch_first_tile(fargs,job_id,q):
   query = str(fargs['query'])
   options = fargs['options']
@@ -17,17 +19,17 @@ def fetch_first_tile(fargs,job_id,q):
   sdbi.scidbCloseConn(db)
   tile = None
 
-  print "saved qp results, looking for error"
+  if DEBUG: print "saved qp results, looking for error"
   if 'error' in saved_qpresults:
-    print "error found, returning error:",saved_qpresults
+    if DEBUG: print "error found, returning error:",saved_qpresults
     tile = saved_qpresults
   else:
-    print "saved_qpresults:",saved_qpresults
+    if DEBUG: print "saved_qpresults:",saved_qpresults
   # user metadata does not contain saved_qpresults at this point, store it
     user_metadata['saved_qpresults'] = saved_qpresults
     #get tile
     base_id = [0] * saved_qpresults['numdims']
-    print "base id:",base_id
+    if DEBUG: print "base id:",base_id
     if 'usenumpy' in options:
       usenumpy = options['usenumpy']
     else:
@@ -80,6 +82,6 @@ if __name__ == "__main__":
     "user_metadata":user_metadata
   }
   tile = fetch_first_tile("select * from cali100",options)
-  print "k:",tile['threshold'],",l:",tile['max_zoom']
+  if DEBUG: print "k:",tile['threshold'],",l:",tile['max_zoom']
   #print "data:",tile['data']
 
