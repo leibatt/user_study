@@ -67,12 +67,12 @@ def setup_cache_directory(d):
   except OSError as e:
     # is some error other than already exists
     if e.errno != errno.EEXIST:
-      print e
+      if DEBUG: print e
       return False
     # if it already exists, make sure it's a directory
     # this is not thread safe! only run in main thread
     elif not os.path.isdir(d):
-      print e
+      if DEBUG: print e
       return False
     else: # directory already exists
       return True
@@ -170,7 +170,6 @@ def run_jobs(jobs_queue,cache_queue):
         p = Process(target=compute_tile,args=(fargs,cache_queue))
         jobs.append(p)
         p.start() # don't wait for p to finish, pipe could be too full
-        print "got here"
     except QueueEmptyException: # didn't find anything
       if DEBUG: print "jobs queue is empty"
       break
@@ -200,7 +199,7 @@ if __name__ == "__main__":
   dir_exists = setup_cache_directory(cache_root_dir)
 
   if not dir_exists:
-    print "directory %s does not exist " % (cache_root_dir)
+    if DEBUG: print "directory %s does not exist " % (cache_root_dir)
     exit(1)
 
   get_all_metadata(cache_queue,metadata_queue)
@@ -210,12 +209,12 @@ if __name__ == "__main__":
   done_jobs = 0
 
   while done_jobs <= 4:
-    print "running more jobs"
+    if DEBUG: print "running more jobs"
     jobs_run = run_jobs(jobs_queue,cache_queue)
     done_jobs += cache_results(cache_queue)
-    print "jobs done?:",check_done(jobs_run)
-    print "total cached results:",done_jobs
+    if DEBUG: print "jobs done?:",check_done(jobs_run)
+    if DEBUG: print "total cached results:",done_jobs
     sleep(sleeptime)
-  print "got to the end"
+  if DEBUG: print "got to the end"
 
 

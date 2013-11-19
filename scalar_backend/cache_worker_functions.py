@@ -106,6 +106,7 @@ def get_tile_counts(fargs,metadata_queue):
       if DEBUG: print "tile is None"
       return
   user_metadata.tile_count = int(tile_count)
+  user_metadata.total_tiles = total_tiles_per_level
   if DEBUG: print "tile_count:",user_metadata.tile_count
   metadata_queue.put(user_metadata.get_dict())
 
@@ -121,14 +122,8 @@ def list_all_tiles(fargs,jobs_queue):
   for level in levels:
     # don't let this cause errors
     try: # get the first tile at each remaining level
-      # expects metadata in json format
-      tile = sti.getTileByIDN(base_id,level,user_metadata.get_dict(),usenumpy)
-    except Exception as e:
-      if DEBUG: print "error occured:",e
-
-    if tile is not None:
       #list of total tiles along each dimension
-      total_tiles = tile['total_tiles']
+      total_tiles = user_metadata.total_tiles[level]
       #for every remaining tile on this level
       for i in range(int(total_tiles[0])): # assume 2 dimensions for now
         for j in range(int(total_tiles[1])):
@@ -140,6 +135,10 @@ def list_all_tiles(fargs,jobs_queue):
             'level':level,
             'user_metadata':user_metadata.get_dict()
           })
+    except Exception as e:
+      if DEBUG: print "error occured:",e
+
+      
   # failsafe so job looks done
   jobs_queue.put(None)
 
