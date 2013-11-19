@@ -121,13 +121,17 @@ $(document).ready(function() {
     function disable_zooms() {
         $('#zoom-disable-div').empty();
         $('#zoom-disable-div').removeClass('show');
+        $('#zoom-disable-div').append('<span>tile: ['+current_id[0]+','+current_id[1]+'],</span>');
+        console.log(['current_id',current_id]);
+        $('#zoom-disable-div').append('<span>zoom level: '+current_zoom+'</span>');
         if(current_zoom === 0) { // disable zoom out
-            $('#zoom-disable-div').addClass('show');
-            $('#zoom-disable-div').append('<span>can\'t zoom out (at highest zoom level)</span>');
+            //$('#zoom-disable-div').addClass('show');
+            $('#zoom-disable-div').append('<span> -- can\'t zoom out (at highest zoom level)</span>');
         } else if (current_zoom === (max_zoom - 1)) { // disable zoom in
-            $('#zoom-disable-div').addClass('show');
-            $('#zoom-disable-div').append('<span>can\'t zoom in (at lowest zoom level)</span>');
+            //$('#zoom-disable-div').addClass('show');
+            $('#zoom-disable-div').append('<span> -- can\'t zoom in (at lowest zoom level)</span>');
         }
+        $('#zoom-disable-div').addClass('show');
     }
 
     function move_up() {
@@ -346,7 +350,7 @@ $(document).ready(function() {
     function fetch_tile(zoom,x_label,y_label,new_id) {
         var self = this;
         var tries = 1;
-        var maxtries = 20;
+        var maxtries = 120;
 
         self.getJSON = function(url,data,callback,error_string) {
             $.ajax({
@@ -373,9 +377,9 @@ $(document).ready(function() {
                     get_redraw_data_callback({'error':{'type':'','args':['timeout']}});
                 } else {
                     // call this function again in 10 seconds
-                    console.log("got a wait response, trying again in 2 seconds");
+                    console.log("got a wait response, trying again in 1 second");
                     tries++;
-                    setTimeout(self.f,2000); // try to get data again in 2 seconds
+                    setTimeout(self.f,1000); // try to get data again in 1 second
                 }
             } else {
                 console.log('task completed, initiating callback');
@@ -416,7 +420,7 @@ $(document).ready(function() {
     function fetch_first_tile(data,resolution_lvl) {
         var self = this;
         var tries = 1;
-        var maxtries = 20;
+        var maxtries = 120;
 
         self.getJSON = function(url,data,callback,error_string) {
             $.ajax({
@@ -443,9 +447,9 @@ $(document).ready(function() {
                     user_query_handler_callback({'error':{'type':'','args':['timeout']}});
                 } else {
                     // call this function again in 10 seconds
-                    console.log("got a wait response, trying again in 2 seconds");
+                    console.log("got a wait response, trying again in 1 second");
                     tries++;
-                    setTimeout(self.f,2000); // try to get data again in 2 seconds
+                    setTimeout(self.f,1000); // try to get data again in 1 second
                 }
             } else {
                 console.log('task completed, initiating callback');
@@ -502,11 +506,11 @@ $(document).ready(function() {
             var x_label = renderagg.labelsfrombase.x_label;
             var y_label = renderagg.labelsfrombase.y_label;
             disable_directions(indexmap[x_label],indexmap[y_label]); // need to do this after total_tiles is updated
-            disable_zooms();
 
             // set index back to 0
             current_id = new Array(numdims);
             for (var i = 0; i < numdims; i++) {current_id[i] = 0;}
+            disable_zooms();
 
         } else {
             console.log(["error!!!!! OMGOMGOMG",jsondata['error'],jsondata['error']['args'][0].indexOf("\n")]);
@@ -560,7 +564,8 @@ $(document).ready(function() {
             renderagg.slidersdiv.empty(); // remove all sliders
         }
         current_zoom = 0;
-        resolution_lvl = $('#resolution-lvl-menu').val();
+        // hardcoded to 250000
+        resolution_lvl = 250000;//$('#resolution-lvl-menu').val();
         console.log("resolution: "+resolution_lvl);
         console.log(["script root",$SCRIPT_ROOT]);
         $('#error_message').remove();
