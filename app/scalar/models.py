@@ -15,11 +15,12 @@ class UserTrace(Base):
     query = Column(Text,nullable=False) # must know what query was run
     user_id = Column(Integer,ForeignKey("users.id"),nullable=False)
     dataset_id = Column(Integer,ForeignKey("data_sets.id")) # dataset used? may be null, but hopefully isn't
+    taskname = Column(String)
 
     user = relationship("User",backref=backref("traces"))
     dataset = relationship("DataSet",backref=backref("traces"))
 
-    def __init__(self,tile_id,zoom_level,threshold,query,user_id,dataset_id):
+    def __init__(self,tile_id,zoom_level,threshold,query,user_id,dataset_id,taskname):
         self.user_id = user_id
         self.tile_id = tile_id
         self.threshold = threshold
@@ -27,9 +28,10 @@ class UserTrace(Base):
         self.timestamp = datetime.datetime.now()
         self.query = query
         self.dataset_id = dataset_id
+        self.taskname = taskname
 
     def __repr__():
-        return "UserTrace(%r, %r, %r, %r, %r, %r, %r)" % (self.user_id,self.tile_id,self.threshold,self.query,self.dataset_id,self.timestamp)
+        return "UserTrace(%r, %r, %r, %r, %r, %r, %r, %r)" % (self.user_id,self.tile_id,self.threshold,self.query,self.dataset_id,self.timestamp,self.taskname)
 
 class UserTileSelection(Base):
     __tablename__ = "user_tile_selections"
@@ -51,13 +53,14 @@ class UserTileSelection(Base):
     height = Column(Integer)
     user_id = Column(Integer,ForeignKey("users.id"),nullable=False)
     dataset_id = Column(Integer,ForeignKey("data_sets.id")) # dataset used? may be null, but hopefully isn't
+    taskname = Column(String,nullable=False)
 
     user = relationship("User",backref=backref("tile_selections"))
     dataset = relationship("DataSet",backref=backref("tile_selections"))
 
-    __table_args__ = (UniqueConstraint('tile_id','zoom_level','query','user_id', name='uix_3'),)
+    __table_args__ = (UniqueConstraint('tile_id','zoom_level','query','user_id','taskname', name='uix_3'),)
 
-    def __init__(self,tile_id,zoom_level,threshold,query,user_id,dataset_id,image):
+    def __init__(self,tile_id,zoom_level,threshold,query,user_id,dataset_id,image,taskname):
         self.user_id = user_id
         self.tile_id = tile_id
         self.zoom_level = zoom_level
@@ -66,10 +69,11 @@ class UserTileSelection(Base):
         self.query = query
         self.dataset_id = dataset_id
         self.image = image
+        self.taskname = taskname
                
     def __repr__(self):
-        return "UserTileSelection(%r, %r, %r, %r, %r, %r)" % \
-        (self.user_id,self.tile_id,self.zoom_level,self.query,self.dataset_id,self.timestamp)
+        return "UserTileSelection(%r, %r, %r, %r, %r, %r, %r)" % \
+        (self.user_id,self.tile_id,self.zoom_level,self.query,self.dataset_id,self.timestamp,self.taskname)
 
 class UserTileUpdate(Base):
     __tablename__ = "user_tile_updates"
@@ -80,22 +84,24 @@ class UserTileUpdate(Base):
     query = Column(Text,nullable=False) # must know what query was run
     user_id = Column(Integer,ForeignKey("users.id"),nullable=False)
     dataset_id = Column(Integer,ForeignKey("data_sets.id")) # dataset used? may be null, but hopefully isn't
+    taskname = Column(String)
 
     user = relationship("User",backref=backref("tile_updates"))
     dataset = relationship("DataSet",backref=backref("tile_updates"))
 
     #__table_args__ = (UniqueConstraint('tile_id','zoom_level','query','user_id', name='uix_4'),)
 
-    def __init__(self,tile_id,zoom_level,query,user_id,dataset_id):
+    def __init__(self,tile_id,zoom_level,query,user_id,dataset_id,taskname):
         self.user_id = user_id
         self.tile_id = tile_id
         self.zoom_level = zoom_level
         self.timestamp = datetime.datetime.now()
         self.query = query
         self.dataset_id = dataset_id
+        self.taskname = taskname
                
     def __repr__(self):
-        return "UserTileUpdate(%r, %r, %r, %r, %r)" % (self.user_id,self.tile_id,self.query,self.dataset_id,self.timestamp)
+        return "UserTileUpdate(%r, %r, %r, %r, %r, %r)" % (self.user_id,self.tile_id,self.query,self.dataset_id,self.timestamp,self.taskname)
 
 class UserFilterUpdate(Base):
     __tablename__ = "user_filter_updates"
@@ -108,11 +114,12 @@ class UserFilterUpdate(Base):
     query = Column(Text,nullable=False) # must know what query was run
     user_id = Column(Integer,ForeignKey("users.id"),nullable=False)
     dataset_id = Column(Integer,ForeignKey("data_sets.id")) # dataset used? may be null, but hopefully isn't
+    taskname = Column(String)
 
     user = relationship("User",backref=backref("filter_updates"))
     dataset = relationship("DataSet",backref=backref("filter_updates"))
 
-    def __init__(self,filter_name,lower,upper,applied,query,user_id,dataset_id):
+    def __init__(self,filter_name,lower,upper,applied,query,user_id,dataset_id, taskname):
         self.user_id = user_id
         self.lower = lower
         self.upper = upper
@@ -121,8 +128,9 @@ class UserFilterUpdate(Base):
         self.timestamp = datetime.datetime.now()
         self.query = query
         self.dataset_id = dataset_id
+        self.taskname = taskname
                
     def __repr__(self):
-        return "UserFilterUpdate(%r, %r, %r, %r, %r, %r)" % (self.user_id,self.filter_name,self.applied,self.query,self.dataset_id,self.timestamp)
+        return "UserFilterUpdate(%r, %r, %r, %r, %r, %r, %r)" % (self.user_id,self.filter_name,self.applied,self.query,self.dataset_id,self.timestamp, self.taskname)
 
 

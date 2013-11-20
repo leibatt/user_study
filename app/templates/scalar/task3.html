@@ -1,29 +1,29 @@
 {% extends "scalar/scalar_base.html" %}
-{% block title %}Task 2{% endblock %}
+{% block title %}Task 3{% endblock %}
 {% block specialvars %}
     {{ super() }}
     <script type=text/javascript>
         $DATA_SET = "thesis2";//"ndsi_agg3_istc11";//"us1000";
-        $NEXT_TASK_PAGE = "{{url_for('scalar.task3')}}";
-        $TASK="task2";
+        $NEXT_TASK_PAGE = "{{url_for('forms.get_posttest')}}";
+        $TASK="task3";
         $RESOLUTION_LVL = 250000;
     </script>
 {% endblock %}
 {% block head %}
     {{ super() }}
 {% endblock %}
-{% block header %}Task 2{% endblock %}
-{% block taskname %} Task 2{% endblock %}
-{% block task2_nav_active %}active{% endblock %}
+{% block header %}Task 3{% endblock %}
+{% block taskname %} Task 3{% endblock %}
+{% block task3_nav_active %}active{% endblock %}
 {% block instructions %}
     <h2>Overview</h2>
     <p>
-In Task 2, you will identify regions in Western Europe with relatively high amounts of snow cover.
-You will need to navigate to the tiles representing Western Europe in the data set, 
+In Task 3, you will identify regions in South America with relatively high amounts of snow cover.
+You will need to navigate to the tiles representing South America in the data set, 
 and find tiles in this area that meet the goal requirements described below.
     </p>
     <p><strong>About the Data Set</strong>
-: The Task 2 data set is the same data set used for Task 1. This data set is is a 2D array
+: The Task 3 data set is the same data set used for Task 1. This data set is is a 2D array
 containing Normalized Difference Snow Index (NDSI) calculations from the MODIS satellite imagery
 data set. The two dimensions are latitude (x) and longitude (y). A high NDSI value (1.0) means that
 particular latitude/longitude area contains a high amount of snow. A low value (-1.0) means that
@@ -32,9 +32,9 @@ oceans, lakes, rivers) appear as if they contain high amounts of snow. Add a lan
     </p>
     <p>
         <strong>Goal(s)</strong>
-: Find tiles in Western Europe at zoom level X that contain only NDSI values of .5 or greater.
-Hint: All tiles will be found in the Andes mountain range, along the western edge of the continent.
+: Find tiles in South America at zoom level X that contain NDSI values greater than .25.
+Hint: Apply a filter over 'avg_ndsi' values to ignore low NDSI values.
     </p>
 {% endblock %}
-{% block donebutton %}Task 2{% endblock %}
-{% block next %}{{ url_for('scalar.task2_selections')}}{% endblock %}
+{% block donebutton %}Task 3{% endblock %}
+{% block next %}{{ url_for('scalar.task3_selections')}}{% endblock %}

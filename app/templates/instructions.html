@@ -62,6 +62,12 @@
 						<li class="{% if g.consent is none %}disabled{% endif %} {% block task2select_nav_active %}{% endblock %}">
 							<a href="{{url_for('scalar.task2_selections')}}">Task 2 Selections</a>
 						</li>
+						<li class="{% if g.consent is none %}disabled{% endif %} {% block task3_nav_active %}{% endblock %}">
+							<a href="{{url_for('scalar.task3')}}">Task 3</a>
+						</li>
+						<li class="{% if g.consent is none %}disabled{% endif %} {% block task3select_nav_active %}{% endblock %}">
+							<a href="{{url_for('scalar.task3_selections')}}">Task 3 Selections</a>
+						</li>
 						<li class="{% if g.consent is none %}disabled{% endif %} {% block posttest_nav_active %}{% endblock %}">
 							<a href="{{url_for('forms.get_posttest')}}">Post-Test</a>
 						</li>

@@ -35,6 +35,11 @@ def task1():
 def task2():
     return render_template('scalar/task2.html')
 
+@mod.route('/task3/', methods=["POST", "GET"])
+@consent_required
+def task3():
+    return render_template('scalar/task3.html')
+
 @mod.route('/canvas/', methods=["POST", "GET"])
 @consent_required
 def get_data2_canvas():
@@ -65,8 +70,10 @@ def fetch_first_tile():
                 query = ds.query
                 session['data_set'] = ds.id
                 # record what data set was used for this task
-                if len(taskname) > 0 and taskname not in session:
-                    session[taskname]=ds.id
+                if len(taskname) > 0:
+                    session['taskname'] = taskname
+                    if taskname not in session:
+                      session[taskname]=ds.id
                 current_app.logger.info("found data set %s" % (data_set))
 
             except:
@@ -123,7 +130,8 @@ def fetch_first_tile_result(task_id):
                                 threshold=g.user_metadata.threshold,
                                 query=g.user_metadata.original_query,
                                 user_id=g.user.id,
-                                dataset_id=None)
+                                dataset_id=None,
+                                taskname=session['taskname'])
         # save current tile info for tracking tile selection
         uts = UserTileSelection(tile_id=str(tile_id),
                                 zoom_level=0,
@@ -131,7 +139,8 @@ def fetch_first_tile_result(task_id):
                                 query=g.user_metadata.original_query,
                                 user_id=g.user.id,
                                 dataset_id=None,
-                                image=None)
+                                image=None,
+                                taskname=session['taskname'])
         if g.ds is not None: #there is an associated data set
             user_trace.dataset_id = g.ds.id
             uts.dataset_id = g.ds.id
@@ -145,6 +154,7 @@ def fetch_first_tile_result(task_id):
             db_session.query(UserTileSelection).filter_by(tile_id=uts.tile_id,
                                                       user_id=uts.user_id,
                                                       zoom_level=uts.zoom_level,
+                                                      taskname=uts.taskname,
                                                       query=uts.query).one()
             queryresultarr['selected'] = True
         except NoResultFound:
@@ -206,7 +216,8 @@ def fetch_tile_result(task_id):
                                                     threshold=g.user_metadata.threshold,
                                                     query=g.user_metadata.original_query,
                                                     user_id=g.user.id,
-                                                    dataset_id=None)
+                                                    dataset_id=None,
+                                                    taskname=session['taskname'])
 
         # save current tile info for tracking tile selection
         uts = UserTileSelection(tile_id=str(tile_id),
@@ -215,7 +226,8 @@ def fetch_tile_result(task_id):
                                 query=g.user_metadata.original_query,
                                 user_id=g.user.id,
                                 dataset_id=None,
-                                image=None)
+                                image=None,
+                                taskname=session['taskname'])
 
         if g.ds is not None:
             user_trace.dataset_id = g.ds.id
@@ -230,6 +242,7 @@ def fetch_tile_result(task_id):
             db_session.query(UserTileSelection).filter_by(tile_id=uts.tile_id,
                                                       user_id=uts.user_id,
                                                       zoom_level=uts.zoom_level,
+                                                      taskname=uts.taskname,
                                                       query=uts.query).one()
             queryresultarr['selected'] = True
         except NoResultFound:
@@ -298,7 +311,7 @@ def menu_updated():
 
     result = get_menu_args(request.method,request.args)
     # build a new menu update entry every time
-    utu = UserTileUpdate(tile_id=tile_id,zoom_level=zoom_level,query=query,user_id=g.user.id,dataset_id=None)
+    utu = UserTileUpdate(tile_id=tile_id,zoom_level=zoom_level,query=query,user_id=g.user.id,dataset_id=None,taskname=session['taskname'])
     #print "result:",result
     try:
         utu.x_label = result['x_label']
@@ -335,7 +348,8 @@ def filters_cleared():
                                     applied=False,
                                     query=query,
                                     user_id=g.user.id,
-                                    dataset_id=g.ds.id)
+                                    dataset_id=g.ds.id,
+                                    taskname=session['taskname'])
         db_session.add(ufu)
         db_session.commit()
     except:
@@ -368,7 +382,8 @@ def filters_applied():
                                     applied=True,
                                     query=query,
                                     user_id=g.user.id,
-                                    dataset_id=g.ds.id)
+                                    dataset_id=g.ds.id,
+                                    taskname=session['taskname'])
             db_session.add(ufu)
             db_session.commit()
         except:
@@ -390,13 +405,17 @@ def tile_selected():
                                 query=g.user_metadata.original_query,
                                 user_id=g.user.id,
                                 dataset_id=None,
-                                image=img)
+                                image=img,
+                                taskname=session['taskname'])
 
             if g.ds is not None:
               uts.dataset_id = g.ds.id
             uts.x_label=result['x_label']
             uts.y_label=result['y_label']
             uts.z_label=result['z_label']
+            uts.x_inv = result['x_inv']
+            uts.y_inv = result['y_inv']
+            uts.z_inv = result['z_inv']
             uts.width=result['width']
             uts.height=result['height']
             uts.color=result['color']
@@ -420,6 +439,7 @@ def tile_unselected():
         db_session.query(UserTileSelection).filter_by(tile_id=str(tile_id),
                                                   user_id=g.user.id,
                                                   zoom_level=zoom_level,
+                                                  taskname=session['taskname'],
                                                   query=query).delete()
         db_session.commit()
     except Exception as e:
@@ -442,6 +462,11 @@ def task1_selections():
 def task2_selections():
     return get_tile_selections("task2")
 
+@mod.route('/task3/selections/',methods=["POST","GET"])
+@consent_required
+def task3_selections():
+    return get_tile_selections("task3")
+
 @mod.route('/warmup/selections/delete/',methods=["POST","GET"])
 @consent_required
 def delete_warmup_selections():
@@ -460,6 +485,12 @@ def delete_task2_selections():
     delete_selections()
     return redirect(url_for('scalar.task2_selections'))
 
+@mod.route('/task3/selections/delete/',methods=["POST","GET"])
+@consent_required
+def delete_task3_selections():
+    delete_selections()
+    return redirect(url_for('scalar.task3_selections'))
+
 def delete_selections():
     form = dict(request.form)
     for fieldname, value in form.items():
@@ -474,7 +505,7 @@ def get_tile_selections(taskname):
     examples = []
     results = []
     if taskname in session: # if there is a dataset_id already associated with this task
-        results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,dataset_id=session[taskname]).all()
+        results = db_session.query(UserTileSelection).filter_by(user_id=g.user.id,dataset_id=session[taskname],taskname=taskname).all()
         if taskname == 'warmup':
             for item in results:
                 current_app.logger.warning("item: %r,%r,%r,%r,%r,%r" % (item.x_inv,item.y_inv,item.z_inv,item.color,str(item.tile_id),item.zoom_level))

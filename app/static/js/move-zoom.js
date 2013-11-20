@@ -565,7 +565,7 @@ $(document).ready(function() {
         }
         current_zoom = 0;
         // hardcoded to 250000
-        resolution_lvl = 250000;//$('#resolution-lvl-menu').val();
+        resolution_lvl = $RESOLUTION_LVL;//$('#resolution-lvl-menu').val();
         console.log("resolution: "+resolution_lvl);
         console.log(["script root",$SCRIPT_ROOT]);
         $('#error_message').remove();
