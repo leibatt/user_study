@@ -1,9 +1,12 @@
 from flask import Flask
 from app.util.database.database_config import initialize_database
+from datetime import timedelta
 
 app = Flask(__name__,static_folder='static')
 #add app configurations
 app.config.from_object('config')
+app.permanent = True
+app.permanent_session_lifetime = timedelta(minutes=20)
 
 # needs to be done at the end of the file
 __all__ = ['forms','scalar','home','util']
