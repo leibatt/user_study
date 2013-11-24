@@ -34,6 +34,7 @@
 			</div>
 			<div id="collapseOverview" class="accordion-body collapse in">
 				<div class="accordion-inner">
+				{{ super() }}
 				{% block description %}
 					<div id="task-description">
 						{% block instructions%}
@@ -70,7 +71,6 @@
 						<span id="reset-query-button">
 							<a class="btn">Reset Answers for{% block taskname %}{% endblock %}</a>
 						</span>
-						{{ super() }}
 					</div>
 				</div>
 			</div>
