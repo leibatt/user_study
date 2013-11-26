@@ -117,12 +117,12 @@ def fetch_first_tile_result(task_id):
     if 'error' not in queryresultarr: # error didn't happen
         g.user_metadata.total_zoom_levels = queryresultarr['max_zoom']
         g.user_metadata.threshold = queryresultarr['threshold']
-        g.user_metadata.saved_qpresults = queryresultarr.pop('original_saved_qpresults',None)
+        g.user_metadata.saved_qpresults = queryresultarr.pop('orig_sqpr',None)
         current_app.logger.info("result length: "+str(len(queryresultarr['data'])))
         current_app.logger.info("new threshold: "+str(g.user_metadata.threshold))
         tile_id = [0,0]
-        if 'saved_qpresults' in queryresultarr:
-            tile_id = [0] * int(queryresultarr['saved_qpresults']['numdims'])
+        if 'numdims' in queryresultarr:
+            tile_id = [0] * int(queryresultarr['numdims'])
         g.user_metadata.current_tile_id = tile_id
         g.user_metadata.current_zoom_level = 0
         user_trace = UserTrace(tile_id=str(tile_id),
@@ -209,7 +209,7 @@ def fetch_tile_result(task_id):
         return json.dumps('fail')
     queryresultarr = ft.result()
 
-    if 'saved_qpresults' in queryresultarr:
+    if 'error' not in queryresultarr:
         tile_id = g.user_metadata.current_tile_id
         level = g.user_metadata.current_zoom_level
         user_trace = UserTrace(tile_id=str(tile_id),zoom_level=level,
@@ -240,16 +240,16 @@ def fetch_tile_result(task_id):
 
         try:
             db_session.query(UserTileSelection).filter_by(tile_id=uts.tile_id,
-                                                      user_id=uts.user_id,
-                                                      zoom_level=uts.zoom_level,
-                                                      taskname=uts.taskname,
-                                                      query=uts.query).one()
+                                                  user_id=uts.user_id,
+                                                  zoom_level=uts.zoom_level,
+                                                  taskname=uts.taskname,
+                                                  query=uts.query).one()
             queryresultarr['selected'] = True
         except NoResultFound:
             queryresultarr['selected'] = False
         except: # uh oh, something bad happened here
             current_app.logger.warning("error occured when querying \
-                                       for user's tile selection")
+                                   for user's tile selection")
 
     current_app.logger.info("result length: "+str(len(queryresultarr['data'])))
     #current_app.logger.info("tile id:"+str(tile_id))

@@ -65,9 +65,10 @@ def getTileHelper(tile_info,l,user_metadata,usenumpy=False):
     stats = sdbinp.stats_to_json(queryresultarr['stats'])
     queryresultarr['stats'] = stats
   else:
-    queryresultarr = sdbi.getAllAttrArrFromQueryForJSON(queryresultobj[0],sdbioptions)
+    #queryresultarr = sdbi.getAllAttrArrFromQueryForJSON(queryresultobj[0],sdbioptions)
+    queryresultarr = sdbi.buildCompressedJsonArr(queryresultobj[0])
   # return original saved_qpresults so front-end can track it for us
-  queryresultarr['original_saved_qpresults'] = saved_qpresults
+  queryresultarr['orig_sqpr'] = saved_qpresults
   saved_qpresults = queryresultobj[1] # don't need local saved_qpresults anymore, so reuse
   # get the new dim info
   queryresultarr['dimnames'] = saved_qpresults['dims']
@@ -75,7 +76,6 @@ def getTileHelper(tile_info,l,user_metadata,usenumpy=False):
   queryresultarr['dimwidths'] = saved_qpresults['dimwidths']
   queryresultarr['numdims'] = saved_qpresults['numdims']
   queryresultarr['indexes'] = saved_qpresults['indexes']
-  queryresultarr['saved_qpresults'] = saved_qpresults
   queryresultarr['max_zoom'] = levels
   queryresultarr['threshold'] = k
   queryresultarr['zoom_diff'] = default_diff

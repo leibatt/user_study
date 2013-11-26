@@ -977,6 +977,109 @@ def getAllAttrArrFromQuery(query_result):
         its[0].increment_to_next()
     return arr
 
+#helper function to compressed json function
+def isScidbNumber(tval):
+    return (tval[:3] == "int") or (tval[:4] == "uint") or (tval in ["float","double"])
+
+#returns items in a compressed format for JSON
+def buildCompressedJsonArr(result):
+    desc = result.array.getArrayDesc()
+    
+    dims = desc.getDimensions() # list of DimensionDesc objects
+    dimnames = []
+    dimdicts = {}
+    
+    attrs = desc.getAttributes() # list of AttributeDesc objects
+    attrnames = []
+    attrdicts = {}
+    
+    its = []
+    
+    for i,dim in enumerate(dims):
+        dname = "dims."+dim.getBaseName() # to match saved_qpresults
+        dimnames.append(dname)
+        dobj = {'pos':i,'max':None,'min':None,'dtype':None,'data':None}
+        print "dim id:",i
+        print "dim name:",dname
+        dobj['max'] = dim.getHighBoundary()
+        dobj['min'] = dim.getLowBoundary()
+        dobj['dtype'] = dim.getType()
+        dobj['data'] = []
+        print 'dobj:',dobj
+        dimdicts[dname] = dobj
+        
+    for i,attr in enumerate(attrs):
+        aname = attr.getName()
+        if aname != "EmptyTag":
+            aname = "attrs." + aname
+            attrnames.append(aname)
+            print "attr name:",aname
+            aobj = {'pos':i,'max':None,'min':None,'dtype':None,'data':None}
+            its.append(result.array.getConstIterator(i))
+            aobj['dtype'] = attr.getType()
+            aobj['data'] = []
+            print 'aobj:',aobj
+            attrdicts[aname] = aobj
+    
+    IGNORE_EMPTY_CELLS_FLAG = scidb.swig.ConstChunkIterator.IGNORE_EMPTY_CELLS
+    IGNORE_OVERLAPS_FLAG = scidb.swig.ConstChunkIterator.IGNORE_OVERLAPS
+    while not its[0].end():
+            #get chunk iterators
+            chunkiters = []
+            for itindex in range(len(its)):
+                currentchunk =its[itindex].getChunk()
+                chunkiter = currentchunk.getConstIterator((IGNORE_EMPTY_CELLS_FLAG |
+                  IGNORE_OVERLAPS_FLAG))
+                chunkiters.append(chunkiter)
+    
+            print "got here"
+            while not chunkiters[0].end():
+                currpos = chunkiters[0].getPosition()
+                for did in range(len(currpos)):
+                    dpos = currpos[did]
+                    dname = dimnames[did]
+                    dimdicts[dname]['data'].append(dpos)
+                    #print "dpos:",dpos
+                minval = None
+                for aid in range(len(chunkiters)):
+                    dataitem = chunkiters[aid].getItem()
+                    aname = attrnames[aid]
+                    # look up the value using the given data type string
+                    currtype = attrdicts[aname]['dtype']
+                    dataitem_val = scidb.getTypedValue(dataitem, currtype)
+                    attrdicts[aname]['data'].append(dataitem_val)
+                    if isScidbNumber(currtype):
+                        orig_min = attrdicts[aname]['min']
+                        orig_max = attrdicts[aname]['max']
+                        if (orig_min is None) or (dataitem_val < orig_min):
+                            attrdicts[aname]['min'] = dataitem_val
+                        if (orig_max is None) or (dataitem_val > orig_max):
+                            attrdicts[aname]['max'] = dataitem_val
+                    else:
+                        print "unrecognized type:",currtype
+                    chunkiters[aid].increment_to_next()
+                
+            for itindex in range(len(its)):        
+                its[itindex].increment_to_next()
+    
+    for did in range(len(dimdicts)):
+        print dimdicts[dimnames[did]]['data'][:10]
+    
+    for aid in range(len(attrdicts)):
+        print attrdicts[attrnames[aid]]['data'][:10]
+
+    final_obj = {
+        'dims':{
+            'obj':dimdicts,
+            'names':dimnames
+        },
+        'attrs':{
+            'obj':attrdicts,
+            'names':attrnames
+        }
+    }
+    return {'data':final_obj}
+
 #does returns items in a nicer/more accurate format for JSON
 #organization is an array of objects, where each object has a dimensions object and attributes object.
 #There is one object per element in the matrix

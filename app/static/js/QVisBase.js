@@ -84,6 +84,68 @@ QVis.Graph.prototype.remove_dupes = function(arr) {
 }
 
 //TODO: fix this. it's ugly
+QVis.Graph.prototype.newCreateScale = function(_data,_types,label,axislength,axispadding,invert,color) {
+    var scale;
+    if(this.isNumber(_types[label])) {
+        minx = d3.min(_data[label]);
+        maxx = d3.max(_data[label]);
+        console.log("ranges: "+minx+","+maxx);
+        if(color){
+            scale = d3.scale.quantize();
+        } else {
+            scale = d3.scale.linear();
+        }
+        if(invert) {
+            scale.domain([this.get_data_obj(maxx,_types[label]), this.get_data_obj(minx,_types[label])])
+                .range([axispadding,axislength-axispadding]);
+        } else {
+            scale.domain([this.get_data_obj(minx,_types[label]), this.get_data_obj(maxx,_types[label])])
+                .range([axispadding,axislength-axispadding]);
+        }
+    } else if (this.isDate(_types[label])) {
+        minx = d3.min(_data[label]);
+        maxx = d3.max(_data[label]);
+
+        console.log("ranges: "+minx+","+maxx);
+        console.log("true date ranges: "+this.get_data_obj(minx,_types[label])+","+this.get_data_obj(maxx,_types[label]));
+        if(color && invert) {
+            scale = d3.scale.quantize().domain([maxx,minx])
+                    .range([axispadding,axislength-axispadding]);
+        } else if (color) {
+            scale = d3.scale.quantize().domain([minx,maxx])
+                    .range([axispadding,axislength-axispadding]);
+        } else if(invert) {
+                scale = d3.time.scale().domain([this.get_data_obj(maxx,_types[label]), this.get_data_obj(minx,_types[label])])
+                    .range([axispadding,axislength-axispadding]);
+        } else {
+            scale = d3.time.scale().domain([this.get_data_obj(minx,_types[label]), this.get_data_obj(maxx,_types[label])])
+                .range([axispadding,axislength-axispadding]);
+        }
+    } else if (this.isString(_types[label])) {
+        self.strings = _data[label]
+        self.strings = this.remove_dupes(self.strings);
+        var steps = (axislength-2*axispadding)/(self.strings.length-1);
+        var range = [];
+        if(invert) {
+            for(var i = self.strings.length-1; i >= 0 ;i--){
+                range.push(axispadding+steps*i);
+            }
+        } else {
+            for(var i = 0; i < self.strings.length;i++){
+                range.push(axispadding+steps*i);
+            }
+        }
+        scale = d3.scale.ordinal().domain(self.strings)
+        if(!color) {
+            scale.range(range);
+        }
+    } else {
+        console.log("unrecognized type: "+_types[label] + " for "+label);
+    }
+    return scale;
+}
+
+//TODO: fix this. it's ugly
 QVis.Graph.prototype.createScale = function(_data,_types,label,axislength,axispadding,invert,color) {
     var scale;
     if(this.isNumber(_types[label])) {
@@ -212,7 +274,6 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
             attrnames.push(_labels.names[i]['name']);
         }
         if(!this.dimsonly || !_labels.names[i]['isattr']) {
-            labelnames.push(_labels.names[i]);
             if(_labels.names[i]['name'] === _labels.x){
                 found_xlabel = true;
             }
@@ -237,24 +298,9 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
         }
     }
 
-
-    //console.log("this.rootid: " + this.rootid+", self.rootid: "+self.rootid);
-    //console.log("this == self?" + this === self);
-
     var x_label = _labels.x,
         y_label = _labels.y,
-        z_label = _labels.z;/*,
-        cscale = d3.scale.category10().domain(_labels.names.map(function(d) {return d['name'];}));  // color scale
-
-    //TODO: push the legend and menu features into the graph object
-    // add the legend and color it appropriately
-    var legend = d3.selectAll(this.jlegend.get()).selectAll('text')
-            .data(_labels.names)
-        .enter().append('span')
-            //.style('float', 'left')
-            .style('color', function(d) {return cscale(d['name']);})
-            .text(function(d) {return d['name'];});
-    */
+        z_label = _labels.z;
 
     if(this.selectz) {
         if(_labels.z === '') {
@@ -270,7 +316,6 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
     }
     console.log('z_label: '+z_label);
     
-    //
     // render x-axis select options
     if(this.selectx) {
         //this.xlabeldiv.prepend($("<label for=\"xaxis-select\">invert</label>"));
@@ -291,46 +336,9 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
                 .attr("value", function(d) { return d;})
                 .text(function(d) { return d;});
         console.log(['xaxisselect',xaxisselect]);
-        //var xaxislabel = d3.selectAll(xaxisselect.get()).selectAll("option")
-        //        .data(/*_labels.names*/labelnames)
-        //    .enter().append("option")
-        //        .attr("value", function(d) { return d/*['name']*/;})
-        //        .text(function(d) { return d/*['name']*/;});
         xaxisselect.val(x_label);
-        //console.log(["label names",/*_labels.names*/labelnames]);
-
-        //
-        // I create and execute this anonymous function so
-        // selectedval will be private to and accessible by the .change() callback function
-        // Manually set the new labels and call render_scatterplot again
-        // 
-        // notice that I use "self" instead of "this".
-        //
-/*
-        (function() {
-            var selectedval = x_label;
-            $("#"+self.rootid+" .xlabel select").change(function() {
-                var val = $("#"+self.rootid+" .xlabel select").val();
-                var yval = '';
-                if(self.selecty) {
-                    yval = $("#"+self.rootid+" .ylabel select").val(); // should be the same as before
-                }
-                var zval = '';
-                if(self.selectz) {
-                    zval = $("#"+self.rootid+" .zlabel select").val(); // should be the same as before
-                }
-                console.log(["selected option", selectedval, val])                
-                if (val == selectedval) return;
-                selectedval = val;
-                var newlabels = {"x" : val,"y": yval, "z":zval, "names" : _labels.names,'dimnames':_labels.dimnames,'dimwidths':_labels.dimwidths,'dimbases':_labels.dimbases,
-                    "max":_labels.max,"min":_labels.min};
-
-                self.render(_data, newlabels,_types, opts);
-            });
-        })();*/
     }
 
-    //
     // render y-axis select options
     if(this.selecty) {
         //var yaxisselect = this.ylabeldiv.prepend($("<select></select>")).find("select");
@@ -350,40 +358,10 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
             .enter().append("option")
                 .attr("value", function(d) { return d;})
                 .text(function(d) { return d;});
-        //var yaxisattrselect = yaxisselect.append($('<optgroup label="attrs"></optgroup>')).find("optgroup");
-        //var yaxislabel = d3.selectAll(yaxisattrselect.get()).selectAll("option")
-        //        .data(/*_labels.names*/labelnames)
-        //    .enter().append("option")
-        //        .attr("value", function(d) { return d/*['name']*/;})
-        //        .text(function(d) { return d/*['name']*/;});
         yaxisselect.val(y_label);
-/*
-        (function() {
-            var selectedval = y_label;
-            $("#"+self.rootid+" .ylabel select").change(function() {
-                var val = $("#"+self.rootid+" .ylabel select").val();
-                var xval;
-                if(self.selectx) {
-                    xval = $("#"+self.rootid+" .xlabel select").val(); // should be the same as before
-                }
-                var zval = '';
-                if(self.selectz) {
-                    zval = $("#"+self.rootid+" .zlabel select").val(); // should be the same as before
-                }
-                console.log(["selected option", selectedval, val])                
-                if (val == selectedval) return;
-                selectedval = val;
-                var newlabels = {"y" : val,"x": xval, "z":zval, 'names' : _labels.names,'dimnames':_labels.dimnames,'dimwidths':_labels.dimwidths,'dimbases':_labels.dimbases,
-                    "max":_labels.max,"min":_labels.min};
-
-                self.render(_data, newlabels,_types, opts);
-            });
-        })();*/
     }
 
-    //
     // render z-axis select options
-
     if(this.selectz) {
         //var zaxisselect = this.zlabeldiv.prepend($("<select></select>")).find("select");
         this.zlabeldiv.find("#zlabel-select").after($("<select name=\"zaxis-select\" id=\"zaxis-select\" class=\"span2\"></select>"));
@@ -400,42 +378,7 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
             .enter().append("option")
                 .attr("value", function(d) { return d;})
                 .text(function(d) { return d;});
-        //var zaxislabel = d3.selectAll(zaxisselect.get()).selectAll("option")
-        //        .data(_labels.names.filter(function(d){return self.isNumber(_types[d]);}))
-        //    .enter().append("option")
-        //        .attr("value", function(d) { return d['name'];})
-        //        .text(function(d) { return d['name'];});
         zaxisselect.val(z_label);
-
-        //
-        // I create and execute this anonymous function so
-        // selectedval will be private to and accessible by the .change() callback function
-        // Manually set the new labels and call render_scatterplot again
-        // 
-        // notice that I use "self" instead of "this".
-        //
-/*
-        (function() {
-            var selectedval = z_label;
-            $("#"+self.rootid+" .zlabel select").change(function() {
-                var val = $("#"+self.rootid+" .zlabel select").val();
-                var yval = '';
-                var xval = '';
-                if(self.selecty) {
-                    yval = $("#"+self.rootid+" .ylabel select").val(); // should be the same as before
-                }
-                if(self.selectx) {
-                    xval = $("#"+self.rootid+" .xlabel select").val(); // should be the same as before
-                }
-                console.log(["selected option", selectedval, val])                
-                if (val == selectedval) return;
-                selectedval = val;
-                var newlabels = {"z" : val,"y": yval, "x":xval, "names" : _labels.names,'dimnames':_labels.dimnames,'dimwidths':_labels.dimwidths,'dimbases':_labels.dimbases,
-                    "max":_labels.max,"min":_labels.min};
-
-                self.render(_data, newlabels,_types, opts);
-            });
-        })();*/
     }
 
         // setup select menu for filters
@@ -485,13 +428,8 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
     //set to the current width and height
     $('#update-width').val(self.w);
     $('#update-height').val(self.h);
-    //
-    // I create and execute this anonymous function so
-    // selectedval will be private to and accessible by the .change() callback function
+
     // Manually set the new labels and call render_scatterplot again
-    // 
-    // notice that I use "self" instead of "this".
-    //
     (function() {
         var selectedzval = z_label; // get the previous values
         var selectedxval = x_label;
@@ -1054,6 +992,35 @@ QVis.Graph.prototype.defaultColor = function(d) {
     return 'red';
 }
 
+QVis.Graph.prototype.newDrawRects =
+function(container,_data,_types,xscale,yscale,x_label,
+        y_label,z_label,width,height,color) {
+    var start = Math.round((new Date().getTime())/1000);
+    var temp = this;
+    var xdata = _data[x_label];
+    var ydata = _data[y_label];
+    container.selectAll('rect')
+        .data(xdata)
+    .enter().append('rect')
+        .attr('y', function(d,i) {
+                    return yscale(temp.get_data_obj(ydata[i],_types[y_label]))})
+        .attr('x', function(d,i) {
+                    return xscale(temp.get_data_obj(d,_types[x_label]))})
+        .attr('width', function(d,i) {
+                    return width(temp.get_data_obj(d,_types[x_label]))})
+        .attr('height', function(d,i) {
+                    return height(temp.get_data_obj(d,_types[x_label]))})
+        .attr('fill', color)
+        .attr('label', function(d,i) {
+                    return "("+temp.get_data_obj(d[y_label],_types[y_label])+","+temp.get_data_obj(d[x_label],_types[x_label])+") = "+color(d);});
+
+/*
+    container.selectAll('rect')
+        .on("click",function(d,i){console.log(d3.mouse(this))});
+*/
+    var end = Math.round((new Date().getTime())/1000);
+    console.log(["draw rect duration",end-start]);
+}
 QVis.Graph.prototype.drawRects = function(container,_data,_types,xscale,yscale,x_label,y_label,width,height,color) {
     var start = Math.round((new Date().getTime())/1000);
     var temp = this;
@@ -1148,6 +1115,31 @@ QVis.Graph.prototype.drawZoomGrid = function(ctx,x_interval,y_interval,xinv,yinv
     }
 }
 
+QVis.Graph.prototype.newDrawRectsCanvas = function(ctx,_data,_types,xscale,yscale,x_label,y_label,z_label,width,height,color) {
+    //var ctx = canvas.getContext('2d');
+    var temp = this;
+    var start = Math.round((new Date().getTime())/1000);
+    //console.log(['use filters',temp.use_filters]);
+    if(temp.use_filters) {
+        color = temp.wrap_color_with_filters(color,_data);
+    }
+    var xdata = _data[x_label];
+    var ydata = _data[y_label];
+    var zdata = _data[z_label];
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0,0,this.w,this.h); // set the back to be white first
+    for(var drawindex = 0; drawindex < xdata.length; drawindex++) {
+        ctx.fillStyle = color(zdata[drawindex],drawindex);
+        ctx.fillRect(xscale(temp.get_data_obj(xdata[drawindex],_types[x_label])),
+            yscale(temp.get_data_obj(ydata[drawindex],_types[y_label])),
+            width(temp.get_data_obj(xdata[drawindex],_types[x_label])),
+            height(temp.get_data_obj(xdata[drawindex],_types[x_label]))
+        );
+    }
+    var end = Math.round((new Date().getTime())/1000);
+    console.log(["draw rect duration",end-start]);
+}
+
 QVis.Graph.prototype.drawRectsCanvas = function(ctx,_data,_types,xscale,yscale,x_label,y_label,width,height,color) {
     //var ctx = canvas.getContext('2d');
     var temp = this;
@@ -1170,14 +1162,13 @@ QVis.Graph.prototype.drawRectsCanvas = function(ctx,_data,_types,xscale,yscale,x
     console.log(["draw rect duration",end-start]);
 }
 
-QVis.Graph.prototype.wrap_color_with_filters = function(color) {
+QVis.Graph.prototype.wrap_color_with_filters = function(color, _data) {
     var self = this;
-    return function(d) {
-        if(self.passes_filters(d)) {
+    return function(d,i) {
+        if(self.passes_filters(i,_data)) {
             return color(d);
         } else {
-            //console.log(['greying',self.filterscale(d[self.labelsfrombase.z_label])]);
-            return self.filterscale(d[self.labelsfrombase.z_label]);
+            return self.filterscale(d);
         }
     };
 }
@@ -1186,13 +1177,14 @@ QVis.Graph.prototype.wrap_color_with_filters = function(color) {
 returns true if given data point satisfies all filter requirements
 only check filters if use_filters flag is set
 */
-QVis.Graph.prototype.passes_filters = function(d) {
+QVis.Graph.prototype.passes_filters = function(i,_data) {
     var self = this;
     for(var filterid = 0; filterid < self.filter_labels.length; filterid++) {
         var filter_label = self.filter_labels[filterid];
         var filter_range = self.filter_ranges[filterid];
-        //console.log(['label',filter_label,'range',filter_range]);
-        var p = d[filter_label];
+        var p = _data[filter_label][i];
+        //var p = d[filter_label];
+        //console.log(['label',filter_label,'range',filter_range,'p',p]);
         if((p < filter_range[0]) || (p > filter_range[1])) {
             return false;
         }

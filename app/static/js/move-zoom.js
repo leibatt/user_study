@@ -19,7 +19,9 @@ var menutype;
 var once =0;
 
 $(document).ready(function() {
-    $('ul.nav-list > li.disabled > a').click(function () { return false; }); // don't let IE users click on disabled nav links
+    // don't let IE users click on disabled nav links
+    $('ul.nav-list > li.disabled > a').click(function () { return false; });
+
     $('[rel=tooltip]').tooltip(); // enable tooltips
     $('#sliders-div div.myslider input[type=text]').slider();
     $('#sql-query-submit').on('click',user_query_handler);
@@ -27,7 +29,6 @@ $(document).ready(function() {
     $('#button-down').on('click',move_down);
     $('#button-left').on('click',move_left);
     $('#button-right').on('click',move_right);
-    //$('#done-button a').on('click',goto_next);
     $('#reset-query-button a').on('click',user_query_handler);
     $('#answer-select-checkbox').on('click',function() {
         console.log("checking answer select checkbox");
@@ -60,7 +61,7 @@ $(document).ready(function() {
         }
     });
 
-        function handle_selection(selected) {
+    function handle_selection(selected) {
         if(selected) { // check if user selected data tile as answer
             $('#answer-select-checkbox').attr('checked',true);
             $('#answer-select-checked-yes').addClass('highlight');
@@ -326,7 +327,8 @@ $(document).ready(function() {
             indexmap = jsondata['indexes'];
             var x_label = renderagg.labelsfrombase.x_label;
             var y_label = renderagg.labelsfrombase.y_label;
-            disable_directions(indexmap[x_label],indexmap[y_label]); // need to do this after total_tiles is updated
+            // need to do this after total_tiles is updated
+            disable_directions(indexmap[x_label],indexmap[y_label]);
 
             disable_zooms();
         } else {
@@ -505,7 +507,8 @@ $(document).ready(function() {
             //disable directional buttons (should all be disabled)
             var x_label = renderagg.labelsfrombase.x_label;
             var y_label = renderagg.labelsfrombase.y_label;
-            disable_directions(indexmap[x_label],indexmap[y_label]); // need to do this after total_tiles is updated
+            // need to do this after total_tiles is updated
+            disable_directions(indexmap[x_label],indexmap[y_label]);
 
             // set index back to 0
             current_id = new Array(numdims);
@@ -528,34 +531,6 @@ $(document).ready(function() {
 
     }
 
-
-
-    function user_query_handler_ajax(url,data,callback) {
-        //$.getJSON
-        $.ajax({
-            dataType: "json",
-            url:url,
-            data:data,
-            tryCount: 0,
-            retryLimit: 3,
-            success:callback,
-            error: function(xhr, textStatus, errorThrown ) {
-                if (textStatus == 'timeout') {
-                    this.tryCount++;
-                    if (this.tryCount < this.retryLimit) {
-                        //try again
-                        $.ajax(this);
-                        return;
-                    } else {
-                        user_query_handler_callback({'error':{'type':'timeout','args':['']}});
-                    }
-                } else {
-                    user_query_handler_callback({'error':{'type':textStatus,'args':['']}});
-                }
-            }
-        });
-    }
-
     function user_query_handler() {
         max_zoom = QVis.DEFAULT_MAX_ZOOM;
         once = 0;
@@ -565,7 +540,8 @@ $(document).ready(function() {
         }
         current_zoom = 0;
         // hardcoded to 250000
-        resolution_lvl = $RESOLUTION_LVL;//$('#resolution-lvl-menu').val();
+        //$('#resolution-lvl-menu').val();
+        resolution_lvl = $RESOLUTION_LVL;
         console.log("resolution: "+resolution_lvl);
         console.log(["script root",$SCRIPT_ROOT]);
         $('#error_message').remove();
@@ -578,93 +554,12 @@ $(document).ready(function() {
         //$('#loading_image').addClass('show');
         $("body").css("cursor", "progress");
         $('#vis-loading-modal').modal('show');
-        //user_query_handler_ajax(resolution_lvl);
-        /*
-        user_query_handler_ajax($SCRIPT_ROOT+'/scalar/fetch-first-tile',
-                                {data_set: $DATA_SET,task:$TASK,data_threshold:resolution_lvl},
-                                user_query_handler_callback);
-        */
+        
         fetch_first_tile(
             {data_set: $DATA_SET,task:$TASK,data_threshold:resolution_lvl},
             resolution_lvl
         );
         return false;
-    }
-
-    function redraw_graph(jsondata){
-        // TODO: hardcode xdim and ydim
-        // preserve existing labels
-        var x_label = renderagg.labelsfrombase.x_label;
-        var y_label = renderagg.labelsfrombase.y_label;
-        var z_label = renderagg.labelsfrombase.z_label;
-        var opts = {overlap:-0, r:1.5};
-        var data = jsondata['data'];
-        console.log(['data',data]);
-        var labels={'names' : jsondata['names'],
-                   'x' : x_label,
-           'y' : y_label,
-           'z' : z_label,
-           'dimbases':jsondata['dimbases'],
-           'dimwidths':jsondata['dimwidths'],
-           'dimnames':jsondata['dimnames'],
-           'max':jsondata['max'],
-           'min':jsondata['min'],
-           'inv':renderagg.inv};
-        var types = jsondata['types'];
-        
-        console.log(['dimbases',jsondata['dimbases']]);
-        console.log(['dimwidths',jsondata['dimwidths']]);
-
-        numdims =jsondata['numdims'];
-        max_zoom = jsondata['max_zoom'];
-        /*
-        total_xtiles = jsondata['total_xtiles'];
-        total_ytiles = jsondata['total_ytiles'];
-        future_xtiles_exact = jsondata['future_xtiles_exact'];
-        future_ytiles_exact = jsondata['future_ytiles_exact'];
-        future_xtiles = jsondata['future_xtiles'];
-        future_ytiles = jsondata['future_ytiles'];
-        */
-        future_tiles_exact = jsondata['future_tiles_exact'];
-        future_tiles = jsondata['future_tiles'];
-        total_tiles = jsondata['total_tiles'];
-        console.log("max zoom: "+max_zoom);
-
-        if(once == 1) {
-            once += 1;
-            (function() {
-                var mini_render = renderagg.mini_render_canvas;
-                renderagg.mini_render = function(_data, _labels,_types, opts) {
-                    mini_render.apply(this,[_data, _labels,_types, opts]);
-                    add_zoom_grid();
-                    console.log("got here in mouseclick thing");
-                    //$('svg rect').off();
-                    //$('svg rect').unbind();
-                    $('#mouseclick_rect').off();
-                    $('#mouseclick_rect').unbind();
-                    //renderagg.rectcontainer.selectAll('rect')
-                    renderagg.rectcontainer.selectAll('#mouseclick_rect')
-                        .on("click",function(d,i){return check_zoom_in(d3.mouse(this));});
-
-                    //$('svg rect')
-                    $('#mouseclick_rect')
-                        .bind("contextmenu",function(e) { return zoom_out();});
-                }
-
-
-            })();
-        }
-        renderagg.mini_render(data, labels, types, opts);
-        console.log(["after mini render call:",current_id,current_zoom]);
-
-/*
-        renderagg.mini_render(data, labels,types);
-        renderagg.rectcontainer.selectAll('rect')
-            .on("click",function(d,i){return check_zoom_in(d3.mouse(this));});
-
-        $('svg rect')
-            .bind("contextmenu",function(e) { return zoom_out();});
-*/
     }
 
     function build_index(xid,yid,x_label,y_label) {
@@ -676,6 +571,70 @@ $(document).ready(function() {
         return id;
     }
 
+    function get_attrnames(data) {
+      return data['attrs']['names']
+    }
+
+    function get_dimnames(data) {
+      return data['dims']['names']
+    }
+
+    function build_names_obj(data,dimnames,attrnames) {
+      var names = [];
+      for(var i = 0; i < attrnames.length; i++) {
+        names.push({"name":attrnames[i],"isattr":true});
+      }
+      for(var i = 0; i < dimnames.length; i++) {
+        names.push({"name":dimnames[i],"isattr":false});
+      }
+      return names;
+    }
+
+    function build_types_obj(data,dimnames,attrnames) {
+      var types = {};
+      for(var i = 0; i < dimnames.length; i++) {
+        types[dimnames[i]] = data['dims']['obj'][dimnames[i]]['dtype']
+      }
+      for(var i = 0; i < attrnames.length; i++) {
+        types[attrnames[i]] = data['attrs']['obj'][attrnames[i]]['dtype']
+      }
+      return types;
+    }
+
+    function build_max_obj(data,dimnames,attrnames) {
+      var max = {};
+      for(var i = 0; i < dimnames.length; i++) {
+        max[dimnames[i]] = data['dims']['obj'][dimnames[i]]['max']
+      }
+      for(var i = 0; i < attrnames.length; i++) {
+        max[attrnames[i]] = data['attrs']['obj'][attrnames[i]]['max']
+      }
+      return max;
+    }
+
+    function build_min_obj(data,dimnames,attrnames) {
+      var min = {};
+      for(var i = 0; i < dimnames.length; i++) {
+        min[dimnames[i]] = data['dims']['obj'][dimnames[i]]['min']
+      }
+      for(var i = 0; i < attrnames.length; i++) {
+        min[attrnames[i]] = data['attrs']['obj'][attrnames[i]]['min']
+      }
+      return min;
+    }
+
+    // collapse data arrays into a single dict
+    function build_compressed_data_obj(data,dimnames,attrnames) {
+      var newdata = {};
+      for(var i = 0; i < dimnames.length; i++) {
+        newdata[dimnames[i]] = data['dims']['obj'][dimnames[i]]['data']
+      }
+      for(var i = 0; i < attrnames.length; i++) {
+        newdata[attrnames[i]] = data['attrs']['obj'][attrnames[i]]['data']
+      }
+      return newdata;
+    }
+
     function draw_graph(jsondata) {
         //TODO: hardcode xdim and ydim
         var opts = {overlap:-0, r:1.5};
@@ -683,32 +642,39 @@ $(document).ready(function() {
         renderagg = new QVis.HeatMap('aggplot', opts);
         renderagg.add_filter();
 
+        // build the necessary objects for access
         var data = jsondata['data'];
+        var dimnames = get_dimnames(data);
+        var attrnames = get_attrnames(data);
+        var types = build_types_obj(data,dimnames,attrnames);
+        var names = build_names_obj(data,dimnames,attrnames);
+        var min = build_min_obj(data,dimnames,attrnames);
+        var max = build_max_obj(data,dimnames,attrnames);
+        var newdata = build_compressed_data_obj(data,dimnames,attrnames);
 
         // set x and y labels
-        var x_label = jsondata['dimnames'][0];
+        var x_label = dimnames[0];
         var y_label = x_label;
         if(use_dims) {
-            x_label = jsondata['dimnames'][0];
-            if(jsondata['dimnames'].length > 1) {
-                y_label = jsondata['dimnames'][1];
+            x_label = dimnames[0];
+            if(dimnames.length > 1) {
+                y_label = dimnames[1];
             } else {
                 y_label = x_label;
             }
-        } else if(jsondata['names'].length > 0) {
-            y_label = jsondata['dimnames'][1];
+        } else if(names.length > 0) {
+            y_label = dimnames[1];
         }
 
-        var labels={'names' : jsondata['names'],
+        var labels={'names' : names,
                    'x' : x_label,
            'y' : y_label,
            'z' : '',
            'dimbases':jsondata['dimbases'],
            'dimwidths':jsondata['dimwidths'],
            'dimnames':jsondata['dimnames'],
-           'max':jsondata['max'],
-           'min':jsondata['min']};
-        var types = jsondata['types'];
+           'max':max,
+           'min':min};
         
         console.log(jsondata['dimbases']);
         console.log(jsondata['dimwidths']);
@@ -736,14 +702,11 @@ $(document).ready(function() {
                     render.apply(this,[_data, _labels,_types, _opts]);
                     add_zoom_grid();
                     console.log("got here in mouseclick thing");
-                    //$('svg rect').off();
-                    //$('svg rect').unbind();
                     $('#mouseclick_rect').off();
                     $('#mouseclick_rect').unbind();
                     renderagg.rectcontainer.selectAll('#mouseclick_rect')
                         .on("click",function(d,i){return check_zoom_in(d3.mouse(this));});
 
-                    //$('svg rect')
                     $('#mouseclick_rect')
                         .bind("contextmenu",function(e) { return zoom_out();});
                 }
@@ -752,9 +715,73 @@ $(document).ready(function() {
             })();
         }
 
-        renderagg.render(data, labels,types, opts);
+        renderagg.render(newdata, labels,types, opts);
         console.log(["after render call:",current_id,current_zoom]);
     }
+
+    function redraw_graph(jsondata){
+        // TODO: hardcode xdim and ydim
+        // preserve existing labels
+        var x_label = renderagg.labelsfrombase.x_label;
+        var y_label = renderagg.labelsfrombase.y_label;
+        var z_label = renderagg.labelsfrombase.z_label;
+        var opts = {overlap:-0, r:1.5};
+
+        var data = jsondata['data'];
+        var dimnames = get_dimnames(data);
+        var attrnames = get_attrnames(data);
+        var types = build_types_obj(data,dimnames,attrnames);
+        var names = build_names_obj(data,dimnames,attrnames);
+        var min = build_min_obj(data,dimnames,attrnames);
+        var max = build_max_obj(data,dimnames,attrnames);
+        var newdata = build_compressed_data_obj(data,dimnames,attrnames);
+
+        var labels={'names' : names,
+                   'x' : x_label,
+           'y' : y_label,
+           'z' : z_label,
+           'dimbases':jsondata['dimbases'],
+           'dimwidths':jsondata['dimwidths'],
+           'dimnames':jsondata['dimnames'],
+           'max':max,
+           'min':min,
+           'inv':renderagg.inv};
+        
+        console.log(['dimbases',jsondata['dimbases']]);
+        console.log(['dimwidths',jsondata['dimwidths']]);
+
+        numdims =jsondata['numdims'];
+        max_zoom = jsondata['max_zoom'];
+        
+        future_tiles_exact = jsondata['future_tiles_exact'];
+        future_tiles = jsondata['future_tiles'];
+        total_tiles = jsondata['total_tiles'];
+        console.log("max zoom: "+max_zoom);
+
+        if(once == 1) {
+            once += 1;
+            (function() {
+                var mini_render = renderagg.mini_render_canvas;
+                renderagg.mini_render = function(_data, _labels,_types, opts) {
+                    mini_render.apply(this,[_data, _labels,_types, opts]);
+                    add_zoom_grid();
+                    console.log("got here in mouseclick thing");
+                    $('#mouseclick_rect').off();
+                    $('#mouseclick_rect').unbind();
+                    renderagg.rectcontainer.selectAll('#mouseclick_rect')
+                        .on("click",function(d,i){return check_zoom_in(d3.mouse(this));});
+
+                    $('#mouseclick_rect')
+                        .bind("contextmenu",function(e) { return zoom_out();});
+                }
+
+
+            })();
+        }
+        renderagg.mini_render(newdata, labels, types, opts);
+        console.log(["after mini render call:",current_id,current_zoom]);
+    }
+
 
     function check_zoom_in(coords) {
         console.log(["coords:",coords,"future_tiles_exact",future_tiles_exact]);
