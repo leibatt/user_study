@@ -179,14 +179,14 @@ data-slider-value="[0,-14]" data-slider-orientation="horizontal" data-slider-sel
 						</div>
 						<div name="ylabel" class="ylabel form-inline">
 							<label id="ylabel-select">y Axis:</label>
-							<label class="checkbox"><input type="radio" id="ylabel-radio1" name="ylabel-radio" value="invert"/>invert</label>
-							<label class="checkbox"><input type="radio" id="ylabel-radio2" name="ylabel-radio" checked="checked" value=""/>none</label>
+							<label class="checkbox"><input type="radio" id="ylabel-radio1" name="ylabel-radio" checked="checked" value="invert"/>invert</label>
+							<label class="checkbox"><input type="radio" id="ylabel-radio2" name="ylabel-radio" value=""/>none</label>
 							<a rel="tooltip" data-placement="right" data-toggle="tooltip" title="select a menu item to change which dimension/attribute of the data set should be the y-axis of the visualization. Invert will map the largest value to the bottom edge of the visualization"><i class="icon-question-sign"></i></a>
 						</div>
 						<div name="zlabel" class="zlabel form-inline">
 							<label id="zlabel-select">z Axis (color):</label>
-							<label class="checkbox"><input type="radio" id="zlabel-radio1" name="zlabel-radio" value="invert"/>invert</label>
-							<label class="checkbox"><input type="radio" id="zlabel-radio2" name="zlabel-radio" checked="checked" value=""/>none</label>
+							<label class="checkbox"><input type="radio" id="zlabel-radio1" name="zlabel-radio" checked="checked" value="invert"/>invert</label>
+							<label class="checkbox"><input type="radio" id="zlabel-radio2" name="zlabel-radio" value=""/>none</label>
 							<a rel="tooltip" data-placement="right" data-toggle="tooltip" title="select a menu item to change which dimension/attribute of the data set should dictate the coloring of the visualization. Invert will invert the color mapping"><i class="icon-question-sign"></i></a>
 						</div>
 						<div class="colorscheme">
@@ -249,6 +249,26 @@ data-slider-value="[0,-14]" data-slider-orientation="horizontal" data-slider-sel
 			</div>
 			<div class="modal-body">
 				<p>This window will close automatically when finished.</p>
+			</div>
+		</div>
+	</div>
+  <div id="tile-selected-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="tile-unselected-label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h3 id="tile-selected-modal-label">Selection Saved</h3>
+			</div>
+			<div class="modal-body">
+				<p>This tile selection has been saved!</p>
+			</div>
+		</div>
+	</div>
+  <div id="tile-unselected-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="tile-unselected-modal-label" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h3 id="tile-unselected-modal-label">Selection removed</h3>
+			</div>
+			<div class="modal-body">
+				<p>This tile selection has been removed!</p>
 			</div>
 		</div>
 	</div>

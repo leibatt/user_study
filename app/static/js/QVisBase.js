@@ -255,7 +255,7 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
 
     this.max = _labels['max'];
     this.min = _labels['min'];
-    this.inv = 'inv' in _labels ? _labels['inv'] : [false,false,false];
+    this.inv = 'inv' in _labels ? _labels['inv'] : [false,true,true];
     console.log("max:");
     console.log(this.max);
     console.log("min:");
@@ -434,7 +434,7 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
         var selectedzval = z_label; // get the previous values
         var selectedxval = x_label;
         var selectedyval = y_label;
-        var inv = 'inv' in _labels ? _labels['inv'] : [false,false,false];
+        var inv = 'inv' in _labels ? _labels['inv'] : [false,true,true];
         console.log(['inv' in _labels,'x' in _labels]);
 
         self.vis_metadata = {x_label:x_label, y_label:y_label, z_label:z_label, // strings
@@ -452,7 +452,7 @@ QVis.Graph.prototype.render = function(_data, _labels,_types, opts) {
             var height = self.h;
             var color = self.colorscheme;
 
-            var inv_new = [false,false,false];
+            var inv_new = [false,true,true];
             console.log(["old radio vals: ",inv]);
             console.log(["old color scheme:",color]);
             if(self.selectz) {
@@ -591,7 +591,7 @@ QVis.Graph.prototype.mini_render = function(_data, _labels,_types, opts) {
         var width = self.w;
         var height = self.h;
         var color = self.colorscheme;
-        var inv = 'inv' in _labels ? _labels['inv'] : [false,false,false];
+        var inv = 'inv' in _labels ? _labels['inv'] : [false,true,true];
         console.log(['inv' in _labels,'x' in _labels]);
 
         self.vis_metadata = {x_label:selectedxval, y_label:selectedyval, z_label:selectedzval, // strings
@@ -606,7 +606,7 @@ QVis.Graph.prototype.mini_render = function(_data, _labels,_types, opts) {
             var yval = '';//$("#"+self.rootid+" .zlabel select").val();
             var xval = '';//$("#"+self.rootid+" .zlabel select").val();
 
-            var inv_new = [false,false,false];
+            var inv_new = [false,true,true];
             console.log(["old radio vals: ",inv]);
             if(self.selectz) {
                 zval = $("#"+self.rootid+"-form .zlabel select").val(); // should be the same as before

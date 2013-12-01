@@ -12,7 +12,8 @@ from time import sleep
 
 DEBUG = True
 
-cache_root_dir = '_scalar_cache_dir'
+#cache_root_dir = '_scalar_cache_dir'
+cache_root_dir = '_scalar_cache_dir2'
 uri = 'postgresql+psycopg2://testuser:password@localhost:5432/test'
 db.initialize_database(uri)
 from queue.queue_obj import JobsQueue
@@ -167,7 +168,7 @@ def return_result(dbq,result):
     if result['fail']:
       dbq.setJobRecordFail(job_id,result)
     else:
-      if DEBUG: print "data:",tile['data'][:10]
+      #if DEBUG: print "data:",tile['data'][:10]
       dbq.setJobRecordSuccess(job_id,tile)
 
 # must happen in main thread to avoid race conditions

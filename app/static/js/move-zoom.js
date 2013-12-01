@@ -34,7 +34,8 @@ $(document).ready(function() {
         console.log("checking answer select checkbox");
         $('#answer-select-checked-yes').toggleClass('highlight');
         $('#answer-select-checked-no').toggleClass('highlight');
-        if ($('#answer-select-checkbox').is(':checked')) {
+        //if ($('#answer-select-checkbox').is(':checked')) {
+        if ($('#answer-select-checked-yes').hasClass('highlight')) {
             var canvasImg = $('#canvas')[0].toDataURL('image/jpeg'); // get image data
             $.post($SCRIPT_ROOT+'/scalar/tile-selected/',{img:canvasImg,
                 x_label:renderagg.vis_metadata['x_label'],
@@ -46,6 +47,8 @@ $(document).ready(function() {
                 color:renderagg.vis_metadata['color'],
                 width:renderagg.vis_metadata['width'],
                 height:renderagg.vis_metadata['height']});
+
+            $('#tile-selected-modal').modal('show');
         } else {
             $.get($SCRIPT_ROOT+'/scalar/tile-unselected/',{
                 x_label:renderagg.vis_metadata['x_label'],
@@ -58,16 +61,17 @@ $(document).ready(function() {
                 width:renderagg.vis_metadata['width'],
                 height:renderagg.vis_metadata['height']
             });
+            $('#tile-unselected-modal').modal('show');
         }
     });
 
     function handle_selection(selected) {
         if(selected) { // check if user selected data tile as answer
-            $('#answer-select-checkbox').attr('checked',true);
+            $('#answer-select-checkbox').prop('checked',true);
             $('#answer-select-checked-yes').addClass('highlight');
             $('#answer-select-checked-no').removeClass('highlight');
         } else {
-            $('#answer-select-checkbox').attr('checked',false);
+            $('#answer-select-checkbox').prop('checked',false);
             $('#answer-select-checked-yes').removeClass('highlight');
             $('#answer-select-checked-no').addClass('highlight');
         }
