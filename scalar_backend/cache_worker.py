@@ -11,7 +11,7 @@ from time import sleep
 
 DEBUG = True
 
-cache_root_dir = '_scalar_cache_dir'
+cache_root_dir = '_scalar_cache_dir2'
 uri = 'postgresql+psycopg2://testuser:password@localhost:5432/test'
 db.initialize_database(uri)
 
@@ -20,7 +20,8 @@ data_thresholds = [D3_DATA_THRESHOLD] # list of thresholds (ints)
 
 QUEUE_MARKER = "END"
 
-sleeptime = 2
+sleeptime = 20
+maxpool = 2
 
 # hashes a string
 def hash_it(s):
@@ -33,16 +34,16 @@ def cache_insert_file(result):
   if not result['fail']:
     # hash string-based properties
     hashed_query = hash_it(result['query'])
-    if DEBUG: print str(result['query']),",",hashed_query
+    #if DEBUG: print str(result['query']),",",hashed_query
     hashed_tile_id = hash_it(result['current_tile_id'])
-    if DEBUG: print str(result['current_tile_id']),",",hashed_tile_id
+    #if DEBUG: print str(result['current_tile_id']),",",hashed_tile_id
 
     threshold = int(result['threshold'])
     zoom = int(result['current_zoom'])
 
     # tile to cache
     tile = result['tile']
-    if DEBUG: print "k:",tile['threshold'],",l:",tile['max_zoom']
+    #if DEBUG: print "k:",tile['threshold'],",l:",tile['max_zoom']
 
     # build directory location
     d = os.path.join(cache_root_dir, hashed_query, str(threshold), str(zoom))
@@ -108,7 +109,7 @@ def get_metadata_objects(metadata_queue):
         done = True
     except QueueEmptyException: # didn't find anything
       #if DEBUG: print "metadata queue is currently empty"
-      sleep(sleeptime)
+      sleep(2)
   return metadata_objects
 
 def get_total_jobs(metadata_queue):
@@ -162,7 +163,7 @@ def check_done(jobs):
 
 def run_jobs(jobs_queue,cache_queue):
   jobs = []
-  for i in range(2):
+  for i in range(maxpool):
     try:
       job = jobs_queue.get(timeout=.5) # waits for a result
       if job is not None:
@@ -179,11 +180,11 @@ def cache_results(cache_queue):
   done_jobs = 0
   for i in range(10):
     try:
-      result = cache_queue.get(timeout=sleeptime) # waits for a result
+      result = cache_queue.get(timeout=.5) # waits for a result
       cache_insert_file(result)
       done_jobs += 1
     except QueueEmptyException: # didn't find anything
-      #if DEBUG: print "metadata queue is empty"
+      #if DEBUG: print "cache queue is empty"
       break
   return done_jobs
 
@@ -207,14 +208,20 @@ if __name__ == "__main__":
   total_jobs = get_total_jobs(metadata_queue)
   setup_jobs = setup_all_jobs(metadata_queue,jobs_queue)
   done_jobs = 0
+  jobs_run = []
+  current_jobs_done = True
 
-  while done_jobs <= 4:
-    if DEBUG: print "running more jobs"
-    jobs_run = run_jobs(jobs_queue,cache_queue)
-    done_jobs += cache_results(cache_queue)
-    if DEBUG: print "jobs done?:",check_done(jobs_run)
-    if DEBUG: print "total cached results:",done_jobs
-    sleep(sleeptime)
+  while done_jobs < total_jobs:
+    new_results_count = cache_results(cache_queue) # store any new tiles
+    if new_results_count > 0: # any newly cached tiles?
+      done_jobs += new_results_count
+      if DEBUG: print "total cached results:",done_jobs
+    if current_jobs_done: # if currently running jobs have finished
+      jobs_run = run_jobs(jobs_queue,cache_queue) # start new jobs
+      if DEBUG: print "running %d new jobs" % (len(jobs_run))
+    sleep(sleeptime) # wait for jobs for a while
+    current_jobs_done = check_done(jobs_run) # see if the current jobs are done
+    if DEBUG: print "current jobs done?:",current_jobs_done
   if DEBUG: print "got to the end"
 
 

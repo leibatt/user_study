@@ -81,7 +81,7 @@ def get_tile_counts(fargs,metadata_queue):
   user_metadata.load_dict(fargs['user_metadata'])
   saved_qpresults = user_metadata.saved_qpresults
   total_levels = int(user_metadata.total_zoom_levels)
-  total_tiles_per_level = []
+  total_tiles_per_level = [None] * total_levels
   tile_count = 0
   levels = range(total_levels)
   base_id = [0] * saved_qpresults['numdims']
@@ -101,7 +101,7 @@ def get_tile_counts(fargs,metadata_queue):
       for tt in total_tiles:
         c *= tt
       tile_count += c
-      total_tiles_per_level.append(total_tiles)
+      total_tiles_per_level[level] = total_tiles
     else:
       if DEBUG: print "tile is None"
       return

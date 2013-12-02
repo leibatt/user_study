@@ -999,13 +999,13 @@ def buildCompressedJsonArr(result):
         dname = "dims."+dim.getBaseName() # to match saved_qpresults
         dimnames.append(dname)
         dobj = {'pos':i,'max':None,'min':None,'dtype':None,'data':None}
-        print "dim id:",i
-        print "dim name:",dname
+        #print "dim id:",i
+        #print "dim name:",dname
         dobj['max'] = dim.getHighBoundary()
         dobj['min'] = dim.getLowBoundary()
         dobj['dtype'] = dim.getType()
         dobj['data'] = []
-        print 'dobj:',dobj
+        #print 'dobj:',dobj
         dimdicts[dname] = dobj
         
     for i,attr in enumerate(attrs):
@@ -1013,12 +1013,12 @@ def buildCompressedJsonArr(result):
         if aname != "EmptyTag":
             aname = "attrs." + aname
             attrnames.append(aname)
-            print "attr name:",aname
+            #print "attr name:",aname
             aobj = {'pos':i,'max':None,'min':None,'dtype':None,'data':None}
             its.append(result.array.getConstIterator(i))
             aobj['dtype'] = attr.getType()
             aobj['data'] = []
-            print 'aobj:',aobj
+            #print 'aobj:',aobj
             attrdicts[aname] = aobj
     
     IGNORE_EMPTY_CELLS_FLAG = scidb.swig.ConstChunkIterator.IGNORE_EMPTY_CELLS
@@ -1032,7 +1032,7 @@ def buildCompressedJsonArr(result):
                   IGNORE_OVERLAPS_FLAG))
                 chunkiters.append(chunkiter)
     
-            print "got here"
+            #print "got here"
             while not chunkiters[0].end():
                 currpos = chunkiters[0].getPosition()
                 for did in range(len(currpos)):
@@ -1062,11 +1062,11 @@ def buildCompressedJsonArr(result):
             for itindex in range(len(its)):        
                 its[itindex].increment_to_next()
     
-    for did in range(len(dimdicts)):
-        print dimdicts[dimnames[did]]['data'][:10]
+    #for did in range(len(dimdicts)):
+    #    print dimdicts[dimnames[did]]['data'][:10]
     
-    for aid in range(len(attrdicts)):
-        print attrdicts[attrnames[aid]]['data'][:10]
+    #for aid in range(len(attrdicts)):
+    #    print attrdicts[attrnames[aid]]['data'][:10]
 
     final_obj = {
         'dims':{
