@@ -18,6 +18,52 @@
 
 
 <body>
+	<div class="sidebar span1">
+		<div id="nav-menu" class="tabbable tabs-left">
+			<ul class="nav nav-tabs nav-stacked">
+				<li class="{% block welcome_nav_active %}{% endblock %}">
+					<a href="{{url_for('home.welcome')}}">Home</a>
+				</li>
+				<li class="{% block consent_nav_active %}{% endblock %}">
+					<a href="{{url_for('forms.get_consent')}}">Consent Form</a>
+				</li>
+				<li class="{% if g.consent is none %}disabled{% endif %} {% block pretest_nav_active %}{% endblock %}">
+					<a href="{{url_for('forms.get_pretest')}}">Pre-Test</a>
+				</li>
+				<li class="{% if g.consent is none %}disabled{% endif %} {% block tutorial_nav_active %}{% endblock %}">
+					<a href="{{url_for('scalar.tutorial')}}">Tutorial</a>
+				</li>
+				<li class="{% if g.consent is none %}disabled{% endif %} {% block warmup_nav_active %}{% endblock %}">
+					<a href="{{url_for('scalar.warmup')}}">Warmup</a>
+				</li>
+				<li class="{% if g.consent is none %}disabled{% endif %} {% block warmupselect_nav_active %}{% endblock %}">
+					<a href="{{url_for('scalar.warmup_selections')}}">Warmup Selections</a>
+				</li>
+				<li class="{% if g.consent is none %}disabled{% endif %} {% block task1_nav_active %}{% endblock %}">
+					<a href="{{url_for('scalar.task1')}}">Task 1</a>
+				</li>
+				<li class="{% if g.consent is none %}disabled{% endif %} {% block task1select_nav_active %}{% endblock %}">
+					<a href="{{url_for('scalar.task1_selections')}}">Task 1 Selections</a>
+				</li>
+				<li class="{% if g.consent is none %}disabled{% endif %} {% block task2_nav_active %}{% endblock %}">
+					<a href="{{url_for('scalar.task2')}}">Task 2</a>
+				</li>
+				<li class="{% if g.consent is none %}disabled{% endif %} {% block task2select_nav_active %}{% endblock %}">
+					<a href="{{url_for('scalar.task2_selections')}}">Task 2 Selections</a>
+				</li>
+				<li class="{% if g.consent is none %}disabled{% endif %} {% block task3_nav_active %}{% endblock %}">
+					<a href="{{url_for('scalar.task3')}}">Task 3</a>
+				</li>
+				<li class="{% if g.consent is none %}disabled{% endif %} {% block task3select_nav_active %}{% endblock %}">
+					<a href="{{url_for('scalar.task3_selections')}}">Task 3 Selections</a>
+				</li>
+				<li class="{% if g.consent is none %}disabled{% endif %} {% block posttest_nav_active %}{% endblock %}">
+					<a href="{{url_for('forms.get_posttest')}}">Post-Test</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+  <div class="main">
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="span12">
@@ -27,54 +73,7 @@
 					{% endblock %}
 				</div>
 			</div>
-		</div>
-		<div class="row-fluid">
-			<div class="span1">
-				<div id="nav-menu" class="tabbable tabs-left">
-					<ul class="nav nav-tabs nav-stacked">
-						<li class="{% block welcome_nav_active %}{% endblock %}">
-							<a href="{{url_for('home.welcome')}}">Home</a>
-						</li>
-						<li class="{% block consent_nav_active %}{% endblock %}">
-							<a href="{{url_for('forms.get_consent')}}">Consent Form</a>
-						</li>
-						<li class="{% if g.consent is none %}disabled{% endif %} {% block pretest_nav_active %}{% endblock %}">
-							<a href="{{url_for('forms.get_pretest')}}">Pre-Test</a>
-						</li>
-						<li class="{% if g.consent is none %}disabled{% endif %} {% block tutorial_nav_active %}{% endblock %}">
-							<a href="{{url_for('scalar.tutorial')}}">Tutorial</a>
-						</li>
-						<li class="{% if g.consent is none %}disabled{% endif %} {% block warmup_nav_active %}{% endblock %}">
-							<a href="{{url_for('scalar.warmup')}}">Warmup</a>
-						</li>
-						<li class="{% if g.consent is none %}disabled{% endif %} {% block warmupselect_nav_active %}{% endblock %}">
-							<a href="{{url_for('scalar.warmup_selections')}}">Warmup Selections</a>
-						</li>
-						<li class="{% if g.consent is none %}disabled{% endif %} {% block task1_nav_active %}{% endblock %}">
-							<a href="{{url_for('scalar.task1')}}">Task 1</a>
-						</li>
-						<li class="{% if g.consent is none %}disabled{% endif %} {% block task1select_nav_active %}{% endblock %}">
-							<a href="{{url_for('scalar.task1_selections')}}">Task 1 Selections</a>
-						</li>
-						<li class="{% if g.consent is none %}disabled{% endif %} {% block task2_nav_active %}{% endblock %}">
-							<a href="{{url_for('scalar.task2')}}">Task 2</a>
-						</li>
-						<li class="{% if g.consent is none %}disabled{% endif %} {% block task2select_nav_active %}{% endblock %}">
-							<a href="{{url_for('scalar.task2_selections')}}">Task 2 Selections</a>
-						</li>
-						<li class="{% if g.consent is none %}disabled{% endif %} {% block task3_nav_active %}{% endblock %}">
-							<a href="{{url_for('scalar.task3')}}">Task 3</a>
-						</li>
-						<li class="{% if g.consent is none %}disabled{% endif %} {% block task3select_nav_active %}{% endblock %}">
-							<a href="{{url_for('scalar.task3_selections')}}">Task 3 Selections</a>
-						</li>
-						<li class="{% if g.consent is none %}disabled{% endif %} {% block posttest_nav_active %}{% endblock %}">
-							<a href="{{url_for('forms.get_posttest')}}">Post-Test</a>
-						</li>
-					</ul>
-				</div>
-			</div>
-			<div class="span10">
+			<div class="span12">
 				<div id="content">
 				{% block content %}
 				{% block form %}
@@ -88,5 +87,6 @@
 				</div>
 			</div>
 		</div>
+	</div>
 	</div>
 </body>
