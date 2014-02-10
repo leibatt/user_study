@@ -24,6 +24,8 @@ def home():
 @consent_required
 def done():
     #update user entry to say done
+    uid = g.user.id
+    print "uid:",uid
     try:
         user = db_session.query(User).filter_by(flask_session_id=session['user_id']).one()
         user.done = True
@@ -36,7 +38,7 @@ def done():
         session.pop('user_id') #don't let user modify selections at this point
     if 'consent' in session:
         session.pop('consent')
-    return render_template('done.html')
+    return render_template('done.html',uid=uid)
 
 @mod.before_request
 def before_request(exception=None):
