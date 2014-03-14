@@ -4,7 +4,7 @@ import hashlib
 from Queue import Empty as QueueEmptyException
 from multiprocessing import Process, Queue
 from scidb_server_interface import D3_DATA_THRESHOLD
-from cache_worker_functions import compute_tile, compute_first_tile, list_all_tiles, get_tile_counts
+from cache_worker_functions import compute_tile, compute_first_tile, list_all_tiles, get_tile_counts, TileMetadata
 import database as db
 import json
 from time import sleep
@@ -176,6 +176,53 @@ def run_jobs(jobs_queue,cache_queue):
       break
   return jobs
 
+def print_all_datasets(metadata_queue):
+  jobs = []
+  metadata_objects = get_metadata_objects(metadata_queue)
+  for metadata_dict in metadata_objects:
+    fargs = {
+      'user_metadata':metadata_dict
+    }
+    p = Process(target=get_tile_counts,args=(fargs,metadata_queue))
+    jobs.append(p)
+    p.start()
+  for j in jobs:
+    j.join()
+  metadata_queue.put(QUEUE_MARKER)
+  metadata_objects = get_metadata_objects(metadata_queue)
+  for metadata_dict in metadata_objects:
+    fargs = {
+      'user_metadata':metadata_dict
+    }
+    print_all_tiles(fargs)
+
+def print_all_tiles(fargs):
+  user_metadata = TileMetadata()
+  user_metadata.load_dict(fargs['user_metadata'])
+  saved_qpresults = user_metadata.saved_qpresults
+  total_levels = int(user_metadata.total_zoom_levels)
+  levels = range(total_levels)
+  #levels = [0,1]
+  if DEBUG: print "levels:",levels
+  if DEBUG: print "total tiles:",user_metadata.total_tiles
+  base_id = [0] * saved_qpresults['numdims']
+  query = user_metadata.original_query
+  threshold = user_metadata.threshold
+  for level in levels:
+    # don't let this cause errors
+    try: # get the first tile at each remaining level
+      #list of total tiles along each dimension
+      total_tiles = user_metadata.total_tiles[level]
+      #for every remaining tile on this level
+      for i in range(int(total_tiles[0])): # assume 2 dimensions for now
+        for j in range(int(total_tiles[1])):
+          #new_id = [i,j]
+          #if DEBUG: print "coord:",new_id
+          new_id = '['+str(i)+', '+str(j)+']'
+          print '%s\t%s\t%s\t%s\t%d\t%d' % (query,str(hash_it(query)),new_id,str(hash_it(new_id)),level,threshold)
+    except Exception as e:
+      if DEBUG: print "error occured:",e
+
 def cache_results(cache_queue):
   done_jobs = 0
   for i in range(10):
@@ -188,7 +235,18 @@ def cache_results(cache_queue):
       break
   return done_jobs
 
-if __name__ == "__main__":
+def printmain():
+  metadata_queue = Queue()
+  cache_queue = Queue()
+  dir_exists = setup_cache_directory(cache_root_dir)
+  if not dir_exists:
+    if DEBUG: print "directory %s does not exist " % (cache_root_dir)
+    exit(1)
+
+  get_all_metadata(cache_queue,metadata_queue)
+  print_all_datasets(metadata_queue)
+
+def main():
   # setup
   # queue used to schedule jobs for caching specific tiles
   jobs_queue = Queue()
@@ -224,4 +282,7 @@ if __name__ == "__main__":
     if DEBUG: print "current jobs done?:",current_jobs_done
   if DEBUG: print "got to the end"
 
+if __name__ == "__main__":
+  #main()
+  printmain()
 
