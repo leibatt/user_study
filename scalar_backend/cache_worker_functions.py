@@ -1,5 +1,6 @@
 import scalar_tile_interface as sti
 import scidb_server_interface as sdbi
+import tile_print as tp
 
 usenumpy = False
 DEBUG = True
@@ -16,6 +17,23 @@ def verify_query(query):
     if DEBUG: print "error occured:",e
     pass
   return saved_qpresults
+
+def print_tile_params(fargs,cache_queue):
+  user_metadata = TileMetadata()
+  user_metadata.load_dict(fargs['user_metadata'])
+  query = user_metadata.original_query
+  tile_id = fargs['tile_id']
+  level = fargs['level']
+  tile = ""
+  # don't let this cause errors
+  if DEBUG: print "preparing to print tile"
+  try:
+    tile = tp.getTileByIDN(tile_id,level,user_metadata.get_dict())
+    if DEBUG: print "tile computed"
+  except Exception as e:
+    if DEBUG: print "error occured:",e
+  if DEBUG: "placing result in cache queue"
+  cache_queue.put(tile)
 
 # compute the given tile and return the result
 def compute_tile(fargs,cache_queue):
@@ -83,7 +101,7 @@ def get_tile_counts(fargs,metadata_queue):
   total_levels = int(user_metadata.total_zoom_levels)
   total_tiles_per_level = [None] * total_levels
   tile_count = 0
-  levels = range(total_levels)
+  levels = [0,1,2,3]#range(total_levels)
   base_id = [0] * saved_qpresults['numdims']
   for level in levels:
     c = 1
@@ -116,7 +134,7 @@ def list_all_tiles(fargs,jobs_queue):
   user_metadata.load_dict(fargs['user_metadata'])
   saved_qpresults = user_metadata.saved_qpresults
   total_levels = int(user_metadata.total_zoom_levels)
-  levels = range(total_levels)
+  levels = [0,1,2,3]#range(total_levels)
   if DEBUG: print "levels:",levels
   base_id = [0] * saved_qpresults['numdims']
   for level in levels:

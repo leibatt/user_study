@@ -4,7 +4,7 @@ import hashlib
 from Queue import Empty as QueueEmptyException
 from multiprocessing import Process, Queue
 from scidb_server_interface import D3_DATA_THRESHOLD
-from cache_worker_functions import compute_tile, compute_first_tile, list_all_tiles, get_tile_counts, TileMetadata
+from cache_worker_functions import compute_tile, print_tile_params, compute_first_tile, list_all_tiles, get_tile_counts, TileMetadata
 import database as db
 import json
 from time import sleep
@@ -176,6 +176,22 @@ def run_jobs(jobs_queue,cache_queue):
       break
   return jobs
 
+def run_print_jobs(jobs_queue,cache_queue):
+  jobs = []
+  for i in range(maxpool):
+    try:
+      job = jobs_queue.get(timeout=.5) # waits for a result
+      if job is not None:
+        fargs = job
+        p = Process(target=print_tile_params,args=(fargs,cache_queue))
+        jobs.append(p)
+        p.start() # don't wait for p to finish, pipe could be too full
+    except QueueEmptyException: # didn't find anything
+      if DEBUG: print "jobs queue is empty"
+      break
+  return jobs
+
+
 def print_all_datasets(metadata_queue):
   jobs = []
   metadata_objects = get_metadata_objects(metadata_queue)
@@ -235,6 +251,51 @@ def cache_results(cache_queue):
       break
   return done_jobs
 
+def print_results(cache_queue):
+  done_jobs = 0
+  for i in range(10):
+    try:
+      result = cache_queue.get(timeout=.5) # waits for a result
+      print result
+      done_jobs += 1
+    except QueueEmptyException: # didn't find anything
+      #if DEBUG: print "cache queue is empty"
+      break
+  return done_jobs
+
+
+def printjobsmain():
+  jobs_queue = Queue()
+  cache_queue = Queue()
+  metadata_queue = Queue()
+  # setup cache directory
+  dir_exists = setup_cache_directory(cache_root_dir)
+
+  if not dir_exists:
+    if DEBUG: print "directory %s does not exist " % (cache_root_dir)
+    exit(1)
+
+  get_all_metadata(cache_queue,metadata_queue)
+  #tell us when we're done
+  total_jobs = get_total_jobs(metadata_queue)
+  setup_jobs = setup_all_jobs(metadata_queue,jobs_queue)
+  done_jobs = 0
+  jobs_run = []
+  current_jobs_done = True
+
+  while done_jobs < total_jobs:
+    new_results_count = print_results(cache_queue) # store any new tiles
+    if new_results_count > 0: # any newly cached tiles?
+      done_jobs += new_results_count
+      if DEBUG: print "total cached results:",done_jobs
+    if current_jobs_done: # if currently running jobs have finished
+      jobs_run = run_print_jobs(jobs_queue,cache_queue) # start new jobs
+      if DEBUG: print "running %d new jobs" % (len(jobs_run))
+    sleep(.05) # wait for jobs for a while
+    current_jobs_done = check_done(jobs_run) # see if the current jobs are done
+    if DEBUG: print "current jobs done?:",current_jobs_done
+  if DEBUG: print "got to the end"
+
 def printmain():
   metadata_queue = Queue()
   cache_queue = Queue()
@@ -284,5 +345,6 @@ def main():
 
 if __name__ == "__main__":
   #main()
-  printmain()
+  #printmain()
+  printjobsmain()
 
