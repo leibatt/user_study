@@ -31,7 +31,7 @@ $(document).ready(function() {
     $('#button-right').on('click',move_right);
     $('#reset-query-button a').on('click',user_query_handler);
     $('#answer-select-checkbox').on('click',function() {
-        console.log("checking answer select checkbox");
+        //console.log("checking answer select checkbox");
         $('#answer-select-checked-yes').toggleClass('highlight');
         $('#answer-select-checked-no').toggleClass('highlight');
         //if ($('#answer-select-checkbox').is(':checked')) {
@@ -91,8 +91,8 @@ $(document).ready(function() {
                 $('#button-down').hasClass('disabled'),
                 $('#button-left').hasClass('disabled'),
                 $('#button-right').hasClass('disabled')];
-        console.log(["disabled",disabled]);
-        console.log(["xpos",xpos,"ypos",ypos]);
+        //console.log(["disabled",disabled]);
+        //console.log(["xpos",xpos,"ypos",ypos]);
         // disable up
         if((renderagg.inv[1] && (current_id[ypos] < (total_tiles[ypos]-1))) || 
             (!renderagg.inv[1] && (current_id[ypos] > 0))) {
@@ -127,7 +127,7 @@ $(document).ready(function() {
         $('#zoom-disable-div').empty();
         $('#zoom-disable-div').removeClass('show');
         $('#zoom-disable-div').append('<span>tile: ['+current_id[0]+','+current_id[1]+'],</span>');
-        console.log(['current_id',current_id]);
+        //console.log(['current_id',current_id]);
         $('#zoom-disable-div').append('<span>zoom level: '+current_zoom+'</span>');
         if(current_zoom === 0) { // disable zoom out
             //$('#zoom-disable-div').addClass('show');
@@ -160,7 +160,7 @@ $(document).ready(function() {
         }
         
         if(!check_same_id(new_id)) { // if we're actually going somewhere else
-            console.log(["move up: ",current_id,current_zoom,"-->",new_id,zoom]);
+            //console.log(["move up: ",current_id,current_zoom,"-->",new_id,zoom]);
             current_id = new_id;
             get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
         }
@@ -188,7 +188,7 @@ $(document).ready(function() {
         }
 
         if(!check_same_id(new_id)) { // if we're actually going somewhere else
-            console.log(["move down: ",current_id,current_zoom,"-->",new_id,zoom]);
+            //console.log(["move down: ",current_id,current_zoom,"-->",new_id,zoom]);
             current_id = new_id;
             get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
         }
@@ -216,7 +216,7 @@ $(document).ready(function() {
         }
 
         if(!check_same_id(new_id)) { // id changed
-            console.log(["move left: ",current_id,current_zoom,"-->",new_id,zoom]);
+            //console.log(["move left: ",current_id,current_zoom,"-->",new_id,zoom]);
             current_id = new_id;
             get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
         }
@@ -245,7 +245,7 @@ $(document).ready(function() {
         }
 
         if(!check_same_id(new_id)) { // if we're actually going somewhere else
-            console.log(["move right: ",current_id,current_zoom,"-->",new_id,zoom]);
+            //console.log(["move right: ",current_id,current_zoom,"-->",new_id,zoom]);
             current_id = new_id;
             get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
         }
@@ -269,7 +269,7 @@ $(document).ready(function() {
         new_id[ypos] = Math.floor(new_id[ypos]/zoom_diff);
 
         if(current_zoom !== zoom) { // if we're actually going somewhere else
-            console.log(["zoom out: ",current_id,current_zoom,"-->",new_id,zoom]);
+            //console.log(["zoom out: ",current_id,current_zoom,"-->",new_id,zoom]);
             current_id = new_id;
             current_zoom = zoom;
             get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
@@ -301,9 +301,9 @@ $(document).ready(function() {
         if(zoom >= max_zoom) {
             zoom = max_zoom - 1;
         }
-        console.log(["current_zoom",current_zoom,"zoom",zoom,"max_zoom",max_zoom]);
+        //console.log(["current_zoom",current_zoom,"zoom",zoom,"max_zoom",max_zoom]);
         if(current_zoom !== zoom) { // if we're actually going somewhere else
-            console.log(["zoom in: ",current_id,current_zoom,"-->",new_id,zoom]);
+            //console.log(["zoom in: ",current_id,current_zoom,"-->",new_id,zoom]);
             current_id = new_id;
             current_zoom = zoom;
             get_redraw_data(zoom,x_label,y_label,xpos,ypos,new_id);
@@ -324,8 +324,8 @@ $(document).ready(function() {
         $('#canvas-overlay').remove();
         $("body").css("cursor", "auto");
         if(!("error" in jsondata)) {
-            console.log('redraw data callback called');
-            console.log(['jsondata',jsondata,jsondata['selected']]);
+            //console.log('redraw data callback called');
+            //console.log(['jsondata',jsondata,jsondata['selected']]);
             redraw_graph(jsondata);
             handle_selection(jsondata['selected']);
             indexmap = jsondata['indexes'];
@@ -354,6 +354,7 @@ $(document).ready(function() {
     }
 
     function fetch_tile(zoom,x_label,y_label,new_id) {
+        var start = get_timestamp();
         var self = this;
         var tries = 1;
         var maxtries = 120;
@@ -372,25 +373,27 @@ $(document).ready(function() {
             });
         };
         var get_results = function(results) {
-            console.log('get_results called');
-            console.log(['results',results]);
+            //console.log('get_results called');
+            //console.log(['results',results]);
             if(results === 'fail' || results.length == 0) {
                 console.log('task failed');
                 get_redraw_data_callback({'error':{'type':'','args':['task fail']}});
             } else if (results === 'wait') {
-                console.log('task in progress');
+                //console.log('task in progress');
                 if(tries > maxtries) {
                     get_redraw_data_callback({'error':{'type':'','args':['timeout']}});
                 } else {
                     // call this function again in 10 seconds
-                    console.log("got a wait response, trying again in 1 second");
+                    //console.log("got a wait response, trying again in 1 second");
                     tries++;
                     setTimeout(self.f,1000); // try to get data again in 1 second
                 }
             } else {
-                console.log('task completed, initiating callback');
-                console.log(['results',results]);
+               //console.log('task completed, initiating callback');
+                //console.log(['results',results]);
                 get_redraw_data_callback(results);
+                var end = get_timestamp();
+	        console.log(["timestamp (in ms)",(end-start)]);
             }
         };
 
@@ -399,7 +402,7 @@ $(document).ready(function() {
             if(jobid > 0) {
                 // get results here bc this is when we have the jobid
                 self.f = function() {
-                    console.log('calling f');
+                    //console.log('calling f');
                     self.getJSON(
                         $SCRIPT_ROOT+'/scalar/fetch-tile/result/'+jobid,
                         {},
@@ -420,10 +423,11 @@ $(document).ready(function() {
             get_jobid,
             '' // error string should be empty string
         );
-       
+        
     }
 
     function fetch_first_tile(data,resolution_lvl) {
+	var start = get_timestamp();
         var self = this;
         var tries = 1;
         var maxtries = 120;
@@ -442,35 +446,38 @@ $(document).ready(function() {
             });
         };
         var get_results = function(results) {
-            console.log('get_results called');
-            console.log(['results',results]);
+            //console.log('get_results called');
+            //console.log(['results',results]);
             if(results === 'fail' || results.length == 0) {
                 console.log('task failed');
                 user_query_handler_callback({'error':{'type':'','args':['task fail']}});
             } else if (results === 'wait') {
-                console.log('task in progress');
+                //console.log('task in progress');
                 if(tries > maxtries) {
                     user_query_handler_callback({'error':{'type':'','args':['timeout']}});
                 } else {
                     // call this function again in 10 seconds
-                    console.log("got a wait response, trying again in 1 second");
+                    //console.log("got a wait response, trying again in 1 second");
                     tries++;
                     setTimeout(self.f,1000); // try to get data again in 1 second
                 }
             } else {
-                console.log('task completed, initiating callback');
-                console.log(['results',results]);
+                //console.log('task completed, initiating callback');
+                //console.log(['results',results]);
                 user_query_handler_callback(results);
+                var end = get_timestamp();
+	        console.log(["timestamp (in ms)",(end-start)]);
+
             }
         };
 
         var get_jobid = function(jsondata) {
             var jobid = jsondata;
-            console.log(["jobid",jobid,"length",jobid > 0]);
+            //console.log(["jobid",jobid,"length",jobid > 0]);
             if(jobid > 0) {
                 // get results here bc this is when we have the jobid
                 self.f = function() {
-                    console.log('calling f');
+                    //console.log('calling f');
                     self.getJSON(
                         $SCRIPT_ROOT+'/scalar/fetch-first-tile/result/'+jobid,
                         {},
@@ -493,7 +500,7 @@ $(document).ready(function() {
     }
 
     function user_query_handler_callback(jsondata) {
-        console.log(jsondata);
+        //console.log(jsondata);
         //$('#loading_image').removeClass('show');
         if(!("error" in jsondata)) {
             //mapping of labels to id numbers
@@ -546,8 +553,8 @@ $(document).ready(function() {
         // hardcoded to 250000
         //$('#resolution-lvl-menu').val();
         resolution_lvl = $RESOLUTION_LVL;
-        console.log("resolution: "+resolution_lvl);
-        console.log(["script root",$SCRIPT_ROOT]);
+        //console.log("resolution: "+resolution_lvl);
+        //console.log(["script root",$SCRIPT_ROOT]);
         $('#error_message').remove();
         $('#resulting-plot-header').removeClass('show');
         $('#aggplot').removeClass('show');
@@ -680,8 +687,8 @@ $(document).ready(function() {
            'max':max,
            'min':min};
         
-        console.log(jsondata['dimbases']);
-        console.log(jsondata['dimwidths']);
+        //console.log(jsondata['dimbases']);
+        //console.log(jsondata['dimwidths']);
 
         numdims =jsondata['numdims'];
         zoom_diff = jsondata['zoom_diff'];
@@ -696,7 +703,7 @@ $(document).ready(function() {
         future_tiles_exact = jsondata['future_tiles_exact'];
         future_tiles = jsondata['future_tiles'];
         total_tiles = jsondata['total_tiles'];
-        console.log("max zoom: "+max_zoom);
+        //console.log("max zoom: "+max_zoom);
 
         if(once == 0){
             once += 1;
@@ -705,7 +712,7 @@ $(document).ready(function() {
                 renderagg.render = function(_data, _labels,_types, _opts) {
                     render.apply(this,[_data, _labels,_types, _opts]);
                     add_zoom_grid();
-                    console.log("got here in mouseclick thing");
+                    //console.log("got here in mouseclick thing");
                     $('#mouseclick_rect').off();
                     $('#mouseclick_rect').unbind();
                     renderagg.rectcontainer.selectAll('#mouseclick_rect')
@@ -720,7 +727,7 @@ $(document).ready(function() {
         }
 
         renderagg.render(newdata, labels,types, opts);
-        console.log(["after render call:",current_id,current_zoom]);
+        //console.log(["after render call:",current_id,current_zoom]);
     }
 
     function redraw_graph(jsondata){
@@ -751,8 +758,8 @@ $(document).ready(function() {
            'min':min,
            'inv':renderagg.inv};
         
-        console.log(['dimbases',jsondata['dimbases']]);
-        console.log(['dimwidths',jsondata['dimwidths']]);
+        //console.log(['dimbases',jsondata['dimbases']]);
+        //console.log(['dimwidths',jsondata['dimwidths']]);
 
         numdims =jsondata['numdims'];
         max_zoom = jsondata['max_zoom'];
@@ -760,7 +767,7 @@ $(document).ready(function() {
         future_tiles_exact = jsondata['future_tiles_exact'];
         future_tiles = jsondata['future_tiles'];
         total_tiles = jsondata['total_tiles'];
-        console.log("max zoom: "+max_zoom);
+        //console.log("max zoom: "+max_zoom);
 
         if(once == 1) {
             once += 1;
@@ -769,7 +776,7 @@ $(document).ready(function() {
                 renderagg.mini_render = function(_data, _labels,_types, opts) {
                     mini_render.apply(this,[_data, _labels,_types, opts]);
                     add_zoom_grid();
-                    console.log("got here in mouseclick thing");
+                    //console.log("got here in mouseclick thing");
                     $('#mouseclick_rect').off();
                     $('#mouseclick_rect').unbind();
                     renderagg.rectcontainer.selectAll('#mouseclick_rect')
@@ -783,12 +790,12 @@ $(document).ready(function() {
             })();
         }
         renderagg.mini_render(newdata, labels, types, opts);
-        console.log(["after mini render call:",current_id,current_zoom]);
+        //console.log(["after mini render call:",current_id,current_zoom]);
     }
 
 
     function check_zoom_in(coords) {
-        console.log(["coords:",coords,"future_tiles_exact",future_tiles_exact]);
+        //console.log(["coords:",coords,"future_tiles_exact",future_tiles_exact]);
         // cut up the space according to the size of the tiles
         var width = Math.min(1.0*renderagg.w / future_tiles_exact[indexmap[renderagg.labelsfrombase.x_label]],renderagg.w);
         var height = Math.min(1.0*renderagg.h / future_tiles_exact[indexmap[renderagg.labelsfrombase.y_label]],renderagg.h);
@@ -805,11 +812,9 @@ $(document).ready(function() {
 
         var xindex = Math.floor(xdim / width);
         var yindex = Math.floor(ydim / height);
-        console.log(["width",width,"height",height,"xdim",xdim,"ydim",ydim,"xindex",xindex,"yindex",yindex,"future_xtiles_exact",future_tiles_exact[indexmap[renderagg.labelsfrombase.x_label]],"future_ytiles_exact",future_tiles_exact[indexmap[renderagg.labelsfrombase.y_label]]]);
+        //console.log(["width",width,"height",height,"xdim",xdim,"ydim",ydim,"xindex",xindex,"yindex",yindex,"future_xtiles_exact",future_tiles_exact[indexmap[renderagg.labelsfrombase.x_label]],"future_ytiles_exact",future_tiles_exact[indexmap[renderagg.labelsfrombase.y_label]]]);
         return zoom_in2(xindex,yindex);
     }
-
-    user_query_handler();
 
     function add_zoom_grid() {
         var width = Math.min(1.0*renderagg.w / future_tiles_exact[indexmap[renderagg.labelsfrombase.x_label]],renderagg.w);
@@ -817,4 +822,14 @@ $(document).ready(function() {
         //console.log(["future_tiles_exact",future_tiles_exact,width,height,indexmap]);
         renderagg.drawZoomGrid(renderagg.canvas[0].getContext('2d'), width,height,renderagg.inv[0],renderagg.inv[1]);
     }
+
+    function get_timestamp() {
+        return Date.now();
+    }
+
+    if (!Date.now) {
+        Date.now = function() { return new Date().getTime(); }
+    }
+
+    user_query_handler();
 });
